@@ -24,7 +24,7 @@ export default function Header() {
           <div
             className={`flex items-center justify-between transition-all duration-500 ease-out ${
               scrolled
-                ? 'h-14 gap-5 rounded-full border border-line bg-bg/85 px-5 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl'
+                ? 'h-14 gap-6 rounded-full border border-line bg-bg/85 px-6 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
                 : 'h-20 gap-6 rounded-full border border-transparent bg-transparent px-0'
             }`}
           >
@@ -39,7 +39,7 @@ export default function Header() {
 
             <nav
               className={`hidden items-center transition-all duration-500 ease-out lg:flex ${
-                scrolled ? 'gap-6 lg:mr-auto lg:ml-8' : 'gap-9'
+                scrolled ? 'gap-6' : 'gap-9'
               }`}
               aria-label="Разделы сайта"
             >
