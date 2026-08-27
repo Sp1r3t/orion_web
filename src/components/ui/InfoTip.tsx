@@ -48,7 +48,7 @@ export default function InfoTip({ label, text }: InfoTipProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.97 }}
             transition={{ duration: 0.18 }}
-            className="absolute bottom-full left-1/2 z-40 mb-3 w-72 -translate-x-1/2 rounded-card border border-accent/30 bg-surface-2 p-4 text-left text-xs leading-relaxed text-muted shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] sm:w-80"
+            className="absolute bottom-full left-1/2 z-50 mb-3 w-72 -translate-x-1/2 rounded-card border border-accent/30 bg-surface-2 p-4 text-left text-xs leading-relaxed text-muted shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] sm:w-80"
           >
             <span className="label-mono mb-2 block text-accent">{label}</span>
             {text}

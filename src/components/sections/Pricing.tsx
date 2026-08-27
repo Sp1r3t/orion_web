@@ -156,6 +156,9 @@ export default function Pricing() {
 
   // Шаги «темп» и «опции» раскрываются по кнопке: сразу они перегружают экран.
   const [expanded, setExpanded] = useState(false)
+  // Пока едет разворот высоты, содержимое подрезается. После разворота подрезку
+  // снимаем, иначе всплывающие подсказки обрезаются краем блока.
+  const [revealed, setRevealed] = useState(false)
 
   const typeId = type.id
   const urgencyId = urgency.id
@@ -252,7 +255,8 @@ export default function Pricing() {
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-col gap-14 overflow-hidden"
+                onAnimationComplete={() => setRevealed(true)}
+                className={`flex flex-col gap-14 ${revealed ? '' : 'overflow-hidden'}`}
               >
                 <div>
                   <p className="label-mono text-muted">Шаг 2 — темп работы</p>
@@ -329,7 +333,11 @@ export default function Pricing() {
             <div className="flex justify-center">
               <button
                 type="button"
-                onClick={() => setExpanded(true)}
+                onClick={() => {
+                  setExpanded(true)
+                  // Страховка на случай, если анимация не доиграет.
+                  window.setTimeout(() => setRevealed(true), 700)
+                }}
                 className="inline-flex h-13 animate-breathe items-center gap-3 rounded-full bg-accent px-8 text-base font-medium text-bg shadow-glow transition-colors duration-300 hover:bg-accent-hover"
               >
                 Показать ещё
