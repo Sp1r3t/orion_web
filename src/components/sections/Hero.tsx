@@ -13,17 +13,23 @@ export default function Hero() {
         className="pointer-events-none absolute top-1/4 -left-40 size-[36rem] rounded-full bg-accent/10 blur-[150px]"
       />
 
-      <div className="container-page relative flex flex-1 flex-col justify-center py-16">
+      <div className="container-page relative flex flex-1 flex-col justify-center py-16 lg:py-10">
         <div className="grid items-center gap-14 lg:grid-cols-12">
           {/* Слева — звёздное небо и кнопки. */}
-          <div className="order-2 lg:order-1 lg:col-span-5">
-            <StarField className="pointer-events-none h-56 w-full sm:h-72 lg:h-96" />
+          <div className="order-2 lg:order-1 lg:col-span-4">
+            <StarField className="pointer-events-none h-56 w-full sm:h-64 lg:h-72" />
 
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Button href="#contact" size="lg">
+            {/* Колонка стала уже — на десктопе кнопки стоят в столбик во всю её ширину. */}
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:flex-col">
+              <Button href="#contact" size="lg" className="w-full sm:w-auto lg:w-full">
                 Обсудить проект
               </Button>
-              <Button href="#portfolio" variant="outline" size="lg">
+              <Button
+                href="#portfolio"
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto lg:w-full"
+              >
                 Смотреть работы
               </Button>
             </div>
@@ -31,9 +37,10 @@ export default function Hero() {
           </div>
 
           {/* Справа — заголовок и описание. */}
-          {/* @container: кегль заголовка считается от ширины колонки, а не окна —
-              иначе длинное «выполнение» вылезает за край. */}
-          <div className="@container order-1 lg:order-2 lg:col-span-7 lg:text-right">
+          {/* @container: кегль считается от ширины колонки, а не окна — иначе длинное
+              «выполнение» вылезает за край. Слово стоит на отдельной строке: пока рядом
+              с ним было «на», строка стоила на четверть дороже и кегль приходилось резать. */}
+          <div className="@container order-1 lg:order-2 lg:col-span-8 lg:text-right">
             <div className="flex items-center gap-3 lg:justify-end">
               <span
                 className="size-1.5 animate-pulse-dot rounded-full bg-accent"
@@ -42,12 +49,12 @@ export default function Hero() {
               <p className="label-mono text-muted">{site.tagline}</p>
             </div>
 
-            <h1 className="text-display mt-8 text-[clamp(1.75rem,9.6cqw,4.75rem)]">
-              Держим курс
+            <h1 className="text-display mt-8 text-[clamp(1.75rem,11.9cqw,6.5rem)]">
+              Держим
               <br />
-              <span className="inline-flex items-baseline gap-[0.25em] lg:justify-end">
-                на <PixelWord words={rotatingWords} interval={3000} />
-              </span>
+              курс на
+              <br />
+              <PixelWord words={rotatingWords} interval={3000} />
             </h1>
 
             <p className="mt-8 text-lg text-muted lg:ml-auto lg:max-w-lg">{site.description}</p>

@@ -8,7 +8,8 @@ describe('App', () => {
   it('рендерит hero с заголовком студии', () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Держим курс')
+    // Заголовок разбит на строки, поэтому пробелов между ними в textContent нет.
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Держим\s*курс на/)
   })
 
   it('каждый пункт хедера ведёт на существующую секцию', () => {
