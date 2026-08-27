@@ -33,7 +33,6 @@ export default function Hero() {
                 Смотреть работы
               </Button>
             </div>
-            <p className="label-mono mt-5 text-muted">Ответим за час · Оценка бесплатно</p>
           </div>
 
           {/* Справа — заголовок и описание. */}
@@ -41,15 +40,7 @@ export default function Hero() {
               «выполнение» вылезает за край. Слово стоит на отдельной строке: пока рядом
               с ним было «на», строка стоила на четверть дороже и кегль приходилось резать. */}
           <div className="@container order-1 lg:order-2 lg:col-span-8 lg:text-right">
-            <div className="flex items-center gap-3 lg:justify-end">
-              <span
-                className="size-1.5 animate-pulse-dot rounded-full bg-accent"
-                aria-hidden="true"
-              />
-              <p className="label-mono text-muted">{site.tagline}</p>
-            </div>
-
-            <h1 className="text-display mt-8 text-[clamp(1.75rem,11.9cqw,6.5rem)]">
+            <h1 className="text-display text-[clamp(1.75rem,11.9cqw,6.5rem)]">
               Держим
               <br />
               курс на
