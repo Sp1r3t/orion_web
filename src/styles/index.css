@@ -28,7 +28,7 @@
   --animate-marquee: marquee 40s linear infinite;
   --animate-marquee-reverse: marquee-reverse 40s linear infinite;
   --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
-  --animate-pulse-glow: pulse-glow 2.4s ease-out infinite;
+  --animate-breathe: breathe 2.6s ease-in-out infinite;
 
   @keyframes marquee {
     from {
@@ -48,22 +48,14 @@
     }
   }
 
-  /* Кольцо, расходящееся от кнопки: зовёт нажать, но не мигает раздражающе. */
-  @keyframes pulse-glow {
-    0% {
-      box-shadow:
-        0 0 0 0 rgb(255 106 0 / 0.5),
-        0 12px 30px -12px rgb(255 106 0 / 0.6);
-    }
-    70% {
-      box-shadow:
-        0 0 0 16px rgb(255 106 0 / 0),
-        0 12px 30px -12px rgb(255 106 0 / 0.35);
-    }
+  /* Кнопка едва заметно дышит — зовёт нажать, но не мигает. */
+  @keyframes breathe {
+    0%,
     100% {
-      box-shadow:
-        0 0 0 0 rgb(255 106 0 / 0),
-        0 12px 30px -12px rgb(255 106 0 / 0.6);
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.04);
     }
   }
 

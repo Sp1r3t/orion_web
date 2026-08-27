@@ -1,5 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Boxes, Building2, Check, Layers, Minus, Plus, ShoppingBag, Zap } from 'lucide-react'
+import {
+  Boxes,
+  Building2,
+  Check,
+  ChevronDown,
+  Layers,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Zap,
+} from 'lucide-react'
 import { useState } from 'react'
 import type { ComponentType, MouseEvent } from 'react'
 
@@ -318,10 +328,10 @@ export default function Pricing() {
               <button
                 type="button"
                 onClick={() => setExpanded(true)}
-                className="inline-flex h-13 animate-pulse-glow items-center gap-3 rounded-full bg-accent px-8 text-base font-medium text-bg transition-colors duration-300 hover:bg-accent-hover"
+                className="inline-flex h-13 animate-breathe items-center gap-3 rounded-full bg-accent px-8 text-base font-medium text-bg shadow-glow transition-colors duration-300 hover:bg-accent-hover"
               >
                 Показать ещё
-                <Plus className="size-4" />
+                <ChevronDown className="size-5" />
               </button>
             </div>
           )}
