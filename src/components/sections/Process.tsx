@@ -79,7 +79,18 @@ export default function Process() {
   useEffect(() => {
     measure()
     window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+
+    // Круги стоят в пикселях поверх svg: если холст сменил ширину без события
+    // resize (шрифты, раскрытие блоков), разметку нужно пересчитать, иначе
+    // круги съедут относительно кривой и точка перестанет попадать в центр.
+    const svg = svgRef.current
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : null
+    if (svg) observer?.observe(svg)
+
+    return () => {
+      window.removeEventListener('resize', measure)
+      observer?.disconnect()
+    }
   }, [measure])
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
