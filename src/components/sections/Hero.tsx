@@ -11,30 +11,13 @@ export default function Hero() {
       {/* Космос занимает весь первый экран и живёт под контентом — границы не видно. */}
       <SpaceField />
 
-      <div className="container-page relative z-10 flex flex-1 flex-col justify-center py-16 lg:py-10">
+      <div className="container-page relative z-10 flex flex-1 flex-col justify-center py-16 lg:py-12">
         <div className="grid items-center gap-14 lg:grid-cols-12">
-          {/* Слева — только кнопки: остальное место отдано созвездию в фоне. */}
-          <div className="order-2 lg:order-1 lg:col-span-4">
-            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <Button href="#contact" size="lg" className="w-full sm:w-auto lg:w-full">
-                Обсудить проект
-              </Button>
-              <Button
-                href="#portfolio"
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto lg:w-full"
-              >
-                Смотреть работы
-              </Button>
-            </div>
-          </div>
-
-          {/* Справа — заголовок и описание. */}
+          {/* Справа — заголовок и описание. Слева пусто: там живёт созвездие. */}
           {/* @container: кегль считается от ширины колонки, а не окна — иначе длинное
               «выполнение» вылезает за край. Слово стоит на отдельной строке: пока рядом
               с ним было «на», строка стоила на четверть дороже и кегль приходилось резать. */}
-          <div className="@container order-1 lg:order-2 lg:col-span-8 lg:text-right">
+          <div className="@container lg:col-span-8 lg:col-start-5 lg:text-right">
             <h1 className="text-display text-[clamp(1.75rem,11.9cqw,6.5rem)]">
               Держим
               <br />
@@ -45,6 +28,16 @@ export default function Hero() {
 
             <p className="mt-8 text-lg text-muted lg:ml-auto lg:max-w-lg">{site.description}</p>
           </div>
+        </div>
+
+        {/* Кнопки прижаты к низу экрана — созвездие остаётся выше них. */}
+        <div className="mt-auto flex flex-col gap-3 pt-16 sm:flex-row">
+          <Button href="#contact" size="lg" className="w-full sm:w-auto">
+            Обсудить проект
+          </Button>
+          <Button href="#portfolio" variant="outline" size="lg" className="w-full sm:w-auto">
+            Смотреть работы
+          </Button>
         </div>
       </div>
 
