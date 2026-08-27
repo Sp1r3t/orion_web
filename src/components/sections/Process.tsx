@@ -28,6 +28,14 @@ const CURVE = 'M 60 200 C 220 200 260 60 420 60 S 640 200 780 200 S 1000 60 1140
 const NODE_T = [0.03, 0.35, 0.66, 0.98]
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
+const smoothstep = (t: number) => t * t * (3 - 2 * t)
+
+/**
+ * Радиус видимого свечения точки в единицах viewBox: внешний ореол плюс
+ * размытие фильтра. Пока точка ближе этого расстояния к кругу этапа,
+ * её свечение легло бы на круг — поэтому она полностью погашена.
+ */
+const DOT_GLOW = 34
 
 type NodePosition = { left: number; top: number }
 
@@ -103,27 +111,34 @@ export default function Process() {
 
       let x = point.x
       let y = point.y
-      let nearest = 0
 
-      nodePoints.current.forEach((node) => {
+      // Ближайший узел притягивает точку к своему центру.
+      let nearestDistance = Infinity
+      let nearest: { x: number; y: number } | null = null
+
+      for (const node of nodePoints.current) {
         const distance = Math.hypot(node.x - x, node.y - y)
-        if (
-          distance <
-          Math.hypot(nodePoints.current[nearest].x - x, nodePoints.current[nearest].y - y)
-        ) {
-          nearest = nodePoints.current.indexOf(node)
+        if (distance < nearestDistance) {
+          nearestDistance = distance
+          nearest = node
         }
-      })
+      }
 
-      const target = nodePoints.current[nearest]
-      if (target) {
-        const distance = Math.hypot(target.x - x, target.y - y)
-        const raw = clamp01(1 - distance / snapRadius.current)
-        // Сглаживание, чтобы точка входила в круг плавно, а не притягивалась рывком.
-        const pull = raw * raw * (3 - 2 * raw)
-        x += (target.x - x) * pull
-        y += (target.y - y) * pull
-        dotFade.set(1 - pull)
+      if (nearest) {
+        // Притяжение начинается заранее и завершается на границе круга:
+        // к моменту, когда точка касается круга, она уже в его центре.
+        const inner = snapRadius.current
+        const hide = inner + DOT_GLOW
+        const capture = hide * 1.9
+
+        const pull = smoothstep(clamp01((capture - nearestDistance) / (capture - inner)))
+        x += (nearest.x - x) * pull
+        y += (nearest.y - y) * pull
+
+        // Гасим по итоговому положению и с запасом на ореол: пока свечение
+        // способно задеть круг, точки не видно совсем.
+        const finalDistance = Math.hypot(nearest.x - x, nearest.y - y)
+        dotFade.set(smoothstep(clamp01((finalDistance - hide) / (capture - hide))))
       }
 
       dotX.set(x)
@@ -208,7 +223,7 @@ export default function Process() {
                     <stop offset="100%" stopColor="#ffb020" />
                   </linearGradient>
                   <filter id="process-glow" x="-100%" y="-100%" width="300%" height="300%">
-                    <feGaussianBlur stdDeviation="10" result="blur" />
+                    <feGaussianBlur stdDeviation="6" result="blur" />
                     <feMerge>
                       <feMergeNode in="blur" />
                       <feMergeNode in="SourceGraphic" />
@@ -238,8 +253,8 @@ export default function Process() {
                 />
 
                 <motion.g style={{ x: dotX, y: dotY, opacity: dotFade }}>
-                  <circle r="26" fill="rgba(255,106,0,0.12)" />
-                  <circle r="14" fill="rgba(255,106,0,0.22)" />
+                  <circle r="22" fill="rgba(255,106,0,0.12)" />
+                  <circle r="12" fill="rgba(255,106,0,0.22)" />
                   <circle r="6" fill="#ff6a00" filter="url(#process-glow)" />
                 </motion.g>
               </svg>
