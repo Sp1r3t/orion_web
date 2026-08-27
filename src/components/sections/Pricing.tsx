@@ -168,7 +168,9 @@ export default function Pricing() {
       eyebrow="Тарифы"
       title={<>Соберите смету за минуту</>}
       lead="Выберите тип проекта и то, что нужно добавить. Непонятный термин — нажмите на значок рядом, объясним человеческим языком."
-      className="overflow-hidden"
+      // overflow-clip, а не hidden: hidden создаёт контейнер прокрутки и ломает
+      // прилипание номера раздела и панели сметы.
+      className="overflow-clip"
     >
       <div
         aria-hidden="true"
