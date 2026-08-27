@@ -1,6 +1,6 @@
 import Button from '@/components/ui/Button'
 import PixelWord from '@/components/ui/PixelWord'
-import Constellation from '@/components/ui/Constellation'
+import SpaceField from '@/components/ui/SpaceField'
 import { site, stats } from '@/content/site'
 
 const rotatingWords = ['создание', 'выполнение', 'креатив']
@@ -8,19 +8,14 @@ const rotatingWords = ['создание', 'выполнение', 'креати
 export default function Hero() {
   return (
     <section id="top" className="relative flex min-h-dvh flex-col overflow-hidden pt-20">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1/4 -left-40 size-[36rem] rounded-full bg-accent/10 blur-[150px]"
-      />
+      {/* Космос занимает весь первый экран и живёт под контентом — границы не видно. */}
+      <SpaceField />
 
-      <div className="container-page relative flex flex-1 flex-col justify-center py-16 lg:py-10">
+      <div className="container-page relative z-10 flex flex-1 flex-col justify-center py-16 lg:py-10">
         <div className="grid items-center gap-14 lg:grid-cols-12">
-          {/* Слева — звёздное небо и кнопки. */}
+          {/* Слева — только кнопки: остальное место отдано созвездию в фоне. */}
           <div className="order-2 lg:order-1 lg:col-span-4">
-            <Constellation className="h-64 w-full sm:h-72 lg:h-[22rem]" />
-
-            {/* Колонка стала уже — на десктопе кнопки стоят в столбик во всю её ширину. */}
-            <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:flex-col">
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
               <Button href="#contact" size="lg" className="w-full sm:w-auto lg:w-full">
                 Обсудить проект
               </Button>
@@ -54,7 +49,7 @@ export default function Hero() {
       </div>
 
       {/* Цифры студии — полосой во всю ширину под первым экраном. */}
-      <div className="relative border-t border-line">
+      <div className="relative z-10 border-t border-line bg-bg/40 backdrop-blur-sm">
         <div className="container-page grid grid-cols-2 divide-line lg:grid-cols-4 lg:divide-x">
           {stats.map((stat, index) => (
             <div
