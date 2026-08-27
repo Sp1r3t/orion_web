@@ -44,7 +44,7 @@ export default function StarField({ className = '' }: { className?: string }) {
     const context = canvas.getContext('2d')
     if (!context) return
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
     let width = 0
     let height = 0
     let stars: Star[] = []

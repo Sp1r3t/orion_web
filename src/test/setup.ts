@@ -17,6 +17,21 @@ class IntersectionObserverStub implements IntersectionObserver {
 
 vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
 
+// jsdom не реализует matchMedia — им проверяются настройки уменьшенной анимации.
+vi.stubGlobal(
+  'matchMedia',
+  vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+)
+
 // jsdom не умеет canvas — звёздное поле в тестах просто не рисуется.
 vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null as never)
 

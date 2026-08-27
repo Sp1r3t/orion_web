@@ -1,10 +1,26 @@
-import { motion } from 'framer-motion'
-import { Check } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Boxes, Building2, Check, Layers, Minus, Plus, ShoppingBag, Zap } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import type { ComponentType, MouseEvent } from 'react'
 
 import Button from '@/components/ui/Button'
+import InfoTip from '@/components/ui/InfoTip'
 import Section from '@/components/ui/Section'
-import { pricingOptions, projectTypes } from '@/content/pricing'
+import {
+  optionGroups,
+  pricingOptions,
+  projectTypes,
+  urgencyModes,
+  type PricingOption,
+} from '@/content/pricing'
+import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
+
+const typeIcons: Record<string, ComponentType<{ className?: string }>> = {
+  landing: Layers,
+  corporate: Building2,
+  shop: ShoppingBag,
+  product: Boxes,
+}
 
 const money = new Intl.NumberFormat('ru-RU', {
   style: 'currency',
@@ -12,30 +28,144 @@ const money = new Intl.NumberFormat('ru-RU', {
   maximumFractionDigits: 0,
 })
 
+/** Подсветка под курсором на карточке типа проекта. */
+function spotlight(event: MouseEvent<HTMLElement>) {
+  const bounds = event.currentTarget.getBoundingClientRect()
+  event.currentTarget.style.setProperty('--x', `${event.clientX - bounds.left}px`)
+  event.currentTarget.style.setProperty('--y', `${event.clientY - bounds.top}px`)
+}
+
+function OptionRow({
+  option,
+  count,
+  onChange,
+}: {
+  option: PricingOption
+  count: number
+  onChange: (update: (current: number) => number) => void
+}) {
+  const active = count > 0
+  const quantity = option.quantity
+
+  return (
+    <div
+      className={`group flex items-center gap-4 border-b border-line py-4 transition-colors duration-300 ${
+        active ? 'bg-accent/4' : ''
+      }`}
+    >
+      {quantity ? (
+        <div className="flex flex-1 items-center gap-4">
+          <span className="flex flex-1 flex-col">
+            <span className="flex items-center gap-2 text-sm">
+              {option.title}
+              <InfoTip label={option.title} text={option.explain} />
+            </span>
+            <span className="mt-0.5 text-xs text-muted">{option.hint}</span>
+          </span>
+
+          <div className="flex items-center gap-1 rounded-full border border-line p-1">
+            <button
+              type="button"
+              onClick={() => onChange((current) => Math.max(0, current - 1))}
+              disabled={count === 0}
+              aria-label={`Убрать ${option.title.toLowerCase()}`}
+              className="flex size-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-accent disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted"
+            >
+              <Minus className="size-3.5" />
+            </button>
+            <span
+              className={`label-mono w-6 text-center ${active ? 'text-accent' : 'text-muted'}`}
+              aria-live="polite"
+            >
+              {count}
+            </span>
+            <button
+              type="button"
+              onClick={() => onChange((current) => Math.min(quantity.max, current + 1))}
+              disabled={count >= quantity.max}
+              aria-label={`Добавить ${option.title.toLowerCase()}`}
+              className="flex size-7 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-accent disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-muted"
+            >
+              <Plus className="size-3.5" />
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={() => onChange((current) => (current > 0 ? 0 : 1))}
+            aria-pressed={active}
+            className="flex flex-1 items-center gap-4 text-left"
+          >
+            <span
+              className={`flex size-5 shrink-0 items-center justify-center rounded border transition-all duration-300 ${
+                active
+                  ? 'border-accent bg-accent text-bg'
+                  : 'border-line-strong text-transparent group-hover:border-accent'
+              }`}
+            >
+              <Check className="size-3.5" />
+            </span>
+            <span className="flex flex-col">
+              <span className="text-sm">{option.title}</span>
+              <span className="mt-0.5 text-xs text-muted">{option.hint}</span>
+            </span>
+          </button>
+          <InfoTip label={option.title} text={option.explain} />
+        </>
+      )}
+
+      <span
+        className={`label-mono w-28 shrink-0 text-right ${active ? 'text-accent' : 'text-muted'}`}
+      >
+        {quantity
+          ? active
+            ? money.format(option.price * count)
+            : `${money.format(option.price)}/${quantity.unit}`
+          : `+${money.format(option.price)}`}
+      </span>
+    </div>
+  )
+}
+
 export default function Pricing() {
   const [typeId, setTypeId] = useState(projectTypes[0].id)
-  const [selected, setSelected] = useState<string[]>([])
+  const [urgencyId, setUrgencyId] = useState(urgencyModes[0].id)
+  const [counts, setCounts] = useState<Record<string, number>>({})
 
   const type = projectTypes.find((item) => item.id === typeId) ?? projectTypes[0]
+  const urgency = urgencyModes.find((item) => item.id === urgencyId) ?? urgencyModes[0]
+
+  const chosen = useMemo(
+    () => pricingOptions.filter((option) => (counts[option.id] ?? 0) > 0),
+    [counts],
+  )
 
   const estimate = useMemo(() => {
-    const options = pricingOptions.filter((option) => selected.includes(option.id))
-    const extraPrice = options.reduce((sum, option) => sum + option.price, 0)
-    const extraWeeks = options.reduce((sum, option) => sum + option.weeks, 0)
+    const extraPrice = chosen.reduce(
+      (sum, option) => sum + option.price * (counts[option.id] ?? 0),
+      0,
+    )
+    const extraWeeks = chosen.reduce(
+      (sum, option) => sum + option.weeks * (counts[option.id] ?? 0),
+      0,
+    )
+
+    const min = (type.base + extraPrice) * urgency.priceFactor
+    const max = (type.base * type.spread + extraPrice) * urgency.priceFactor
 
     return {
-      min: type.base + extraPrice,
-      max: Math.round((type.base * type.spread + extraPrice) / 1000) * 1000,
-      weeksMin: Math.round(type.weeks[0] + extraWeeks),
-      weeksMax: Math.round(type.weeks[1] + extraWeeks),
+      min: Math.round(min / 1000) * 1000,
+      max: Math.round(max / 1000) * 1000,
+      weeksMin: Math.max(1, Math.round((type.weeks[0] + extraWeeks) * urgency.timeFactor)),
+      weeksMax: Math.max(2, Math.round((type.weeks[1] + extraWeeks) * urgency.timeFactor)),
+      surcharge:
+        Math.round(((min / urgency.priceFactor) * (urgency.priceFactor - 1)) / 1000) * 1000,
     }
-  }, [type, selected])
+  }, [type, urgency, chosen, counts])
 
-  function toggle(id: string) {
-    setSelected((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    )
-  }
+  const animatedMin = useAnimatedNumber(estimate.min)
 
   return (
     <Section
@@ -43,116 +173,244 @@ export default function Pricing() {
       index="04"
       eyebrow="Тарифы"
       title={<>Соберите смету за минуту</>}
-      lead="Выберите тип проекта и то, что нужно добавить. Калькулятор покажет вилку и срок — точную цену зафиксируем в договоре после брифа."
+      lead="Выберите тип проекта и то, что нужно добавить. Непонятный термин — нажмите на значок рядом, объясним человеческим языком."
+      className="overflow-hidden"
     >
-      <div className="mt-16 grid gap-10 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <p className="label-mono text-muted">Шаг 1 — тип проекта</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {projectTypes.map((item) => {
-              const active = item.id === typeId
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setTypeId(item.id)}
-                  aria-pressed={active}
-                  className={`rounded-card border p-5 text-left transition-all duration-300 ${
-                    active
-                      ? 'border-accent bg-accent/8'
-                      : 'border-line bg-surface hover:border-line-strong'
-                  }`}
-                >
-                  <span className={`block font-medium ${active ? 'text-accent' : ''}`}>
-                    {item.title}
-                  </span>
-                  <span className="mt-2 block text-sm text-muted">{item.hint}</span>
-                  <span className="label-mono mt-4 block text-muted">
-                    от {money.format(item.base)}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-1/3 -right-40 size-[40rem] rounded-full bg-accent/8 blur-[160px]"
+      />
 
-          <p className="label-mono mt-12 text-muted">Шаг 2 — что добавить</p>
-          <div className="mt-5 border-t border-line">
-            {pricingOptions.map((option) => {
-              const active = selected.includes(option.id)
-              return (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => toggle(option.id)}
-                  aria-pressed={active}
-                  className="group flex w-full items-center gap-4 border-b border-line py-4 text-left"
-                >
-                  <span
-                    className={`flex size-5 shrink-0 items-center justify-center rounded border transition-colors duration-300 ${
+      <div className="relative mt-16 grid gap-12 lg:grid-cols-12">
+        <div className="flex flex-col gap-14 lg:col-span-7">
+          <div>
+            <p className="label-mono text-muted">Шаг 1 — тип проекта</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {projectTypes.map((item) => {
+                const active = item.id === typeId
+                const Icon = typeIcons[item.icon]
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onMouseMove={spotlight}
+                    onClick={() => setTypeId(item.id)}
+                    aria-pressed={active}
+                    className={`group relative overflow-hidden rounded-card border p-5 text-left transition-all duration-300 ${
                       active
-                        ? 'border-accent bg-accent text-bg'
-                        : 'border-line-strong text-transparent group-hover:border-accent'
+                        ? 'border-accent bg-accent/8'
+                        : 'border-line bg-surface hover:border-line-strong'
                     }`}
                   >
-                    <Check className="size-3.5" />
-                  </span>
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                      style={{
+                        background:
+                          'radial-gradient(220px circle at var(--x) var(--y), rgba(255,106,0,0.16), transparent 70%)',
+                      }}
+                    />
 
-                  <span className="flex-1">
-                    <span className="block text-sm">{option.title}</span>
-                    <span className="block text-xs text-muted">{option.hint}</span>
-                  </span>
+                    <span className="relative flex items-start justify-between gap-3">
+                      <span
+                        className={`flex size-10 items-center justify-center rounded-full border transition-colors duration-300 ${
+                          active
+                            ? 'border-accent bg-accent text-bg'
+                            : 'border-line text-muted group-hover:text-accent'
+                        }`}
+                      >
+                        <Icon className="size-4" />
+                      </span>
+                      <span className="label-mono text-muted">от {money.format(item.base)}</span>
+                    </span>
 
-                  <span className={`label-mono ${active ? 'text-accent' : 'text-muted'}`}>
-                    +{money.format(option.price)}
-                  </span>
-                </button>
-              )
-            })}
+                    <span
+                      className={`relative mt-5 block font-medium ${active ? 'text-accent' : ''}`}
+                    >
+                      {item.title}
+                    </span>
+                    <span className="relative mt-1 block text-sm text-muted">{item.hint}</span>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center gap-2">
+              <span className="label-mono text-muted">Уже входит:</span>
+              {type.includes.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-line px-3 py-1 text-xs text-muted"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="label-mono text-muted">Шаг 2 — темп работы</p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {urgencyModes.map((mode) => {
+                const active = mode.id === urgencyId
+                return (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => setUrgencyId(mode.id)}
+                    aria-pressed={active}
+                    className={`relative overflow-hidden rounded-card border p-5 text-left transition-all duration-300 ${
+                      active
+                        ? 'border-accent bg-accent/8'
+                        : 'border-line bg-surface hover:border-line-strong'
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="urgency-active"
+                        className="pointer-events-none absolute inset-0 rounded-card border border-accent"
+                        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative flex items-center gap-2">
+                      {mode.id === 'fast' && <Zap className="size-4 text-accent" />}
+                      <span className={`font-medium ${active ? 'text-accent' : ''}`}>
+                        {mode.title}
+                      </span>
+                    </span>
+                    <span className="relative mt-1 block text-sm text-muted">{mode.hint}</span>
+                    {mode.priceFactor > 1 && (
+                      <span className="label-mono relative mt-3 block text-muted">
+                        +{Math.round((mode.priceFactor - 1) * 100)}% к цене · срок короче
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div>
+            <p className="label-mono text-muted">Шаг 3 — что добавить</p>
+
+            <div className="mt-5 flex flex-col gap-10">
+              {optionGroups.map((group) => (
+                <div key={group}>
+                  <p className="label-mono text-accent/70">{group}</p>
+                  <div className="mt-3 border-t border-line">
+                    {pricingOptions
+                      .filter((option) => option.group === group)
+                      .map((option) => (
+                        <OptionRow
+                          key={option.id}
+                          option={option}
+                          count={counts[option.id] ?? 0}
+                          onChange={(update) =>
+                            setCounts((prev) => ({
+                              ...prev,
+                              [option.id]: update(prev[option.id] ?? 0),
+                            }))
+                          }
+                        />
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         <div className="lg:col-span-5">
-          <div className="rounded-card border border-line bg-surface p-8 lg:sticky lg:top-28">
-            <p className="label-mono text-muted">Ориентировочная стоимость</p>
+          <div className="rounded-card bg-gradient-to-b from-accent/50 via-line to-line p-px lg:sticky lg:top-28">
+            <div className="rounded-card bg-surface p-8">
+              <div className="flex items-center justify-between">
+                <p className="label-mono text-muted">Ваша смета</p>
+                {urgency.priceFactor > 1 && (
+                  <span className="label-mono flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-accent">
+                    <Zap className="size-3" />
+                    срочно
+                  </span>
+                )}
+              </div>
 
-            <motion.p
-              key={estimate.min + estimate.max}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="text-display mt-4 text-4xl lg:text-5xl"
-            >
-              {money.format(estimate.min)}
-            </motion.p>
-            <p className="mt-2 text-muted">до {money.format(estimate.max)}</p>
+              <p className="text-display mt-5 text-4xl lg:text-5xl">{money.format(animatedMin)}</p>
+              <p className="mt-2 text-muted">до {money.format(estimate.max)}</p>
 
-            <div className="mt-8 space-y-3 border-t border-line pt-6 text-sm">
-              <div className="flex justify-between gap-4">
-                <span className="text-muted">Тип проекта</span>
-                <span className="text-right">{type.title}</span>
+              <div className="my-7 border-t border-dashed border-line-strong" />
+
+              <ul className="flex max-h-64 flex-col gap-2.5 overflow-y-auto pr-1 text-sm">
+                <li className="flex justify-between gap-4">
+                  <span className="text-muted">{type.title}</span>
+                  <span className="label-mono shrink-0">{money.format(type.base)}</span>
+                </li>
+
+                <AnimatePresence initial={false}>
+                  {chosen.map((option) => {
+                    const count = counts[option.id] ?? 0
+                    return (
+                      <motion.li
+                        key={option.id}
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.22 }}
+                        className="flex justify-between gap-4 overflow-hidden"
+                      >
+                        <span className="text-muted">
+                          {option.title}
+                          {option.quantity && count > 1 && (
+                            <span className="text-accent"> × {count}</span>
+                          )}
+                        </span>
+                        <span className="label-mono shrink-0">
+                          {money.format(option.price * count)}
+                        </span>
+                      </motion.li>
+                    )
+                  })}
+                </AnimatePresence>
+
+                {urgency.priceFactor > 1 && (
+                  <li className="flex justify-between gap-4 text-accent">
+                    <span>Срочность +{Math.round((urgency.priceFactor - 1) * 100)}%</span>
+                    <span className="label-mono shrink-0">{money.format(estimate.surcharge)}</span>
+                  </li>
+                )}
+              </ul>
+
+              <div className="mt-7 space-y-3 border-t border-line pt-6 text-sm">
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted">Срок</span>
+                  <span>
+                    {estimate.weeksMin}–{estimate.weeksMax} недель
+                  </span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-muted">Опций выбрано</span>
+                  <span>{chosen.length === 0 ? 'нет' : chosen.length}</span>
+                </div>
               </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-muted">Срок</span>
-                <span className="text-right">
-                  {estimate.weeksMin}–{estimate.weeksMax} недель
-                </span>
-              </div>
-              <div className="flex justify-between gap-4">
-                <span className="text-muted">Опции</span>
-                <span className="text-right">
-                  {selected.length === 0 ? 'без дополнений' : `${selected.length} шт.`}
-                </span>
-              </div>
+
+              <Button href="#contact" size="lg" className="mt-8 w-full">
+                Обсудить смету
+              </Button>
+
+              {chosen.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCounts({})}
+                  className="label-mono mt-4 w-full text-muted transition-colors hover:text-accent"
+                >
+                  Сбросить опции
+                </button>
+              )}
+
+              <p className="mt-6 text-xs text-muted">
+                Расчёт ориентировочный и не является офертой. После брифа назовём точную цену и
+                зафиксируем её в договоре.
+              </p>
             </div>
-
-            <Button href="#contact" size="lg" className="mt-8 w-full">
-              Обсудить смету
-            </Button>
-
-            <p className="mt-4 text-xs text-muted">
-              Расчёт ориентировочный и не является офертой. После брифа назовём точную цену и
-              зафиксируем её в договоре.
-            </p>
           </div>
         </div>
       </div>
