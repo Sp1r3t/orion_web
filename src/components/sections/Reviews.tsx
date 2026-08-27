@@ -16,8 +16,9 @@ export default function Reviews() {
   )
 
   const fillRef = useRef<HTMLSpanElement>(null)
-  // Пауза живёт в ref: цикл читает её каждый кадр, перерисовка React не нужна.
-  const paused = useRef(false)
+  // Состояние паузы живёт в ref: цикл читает его каждый кадр, перерисовка не нужна.
+  const hovering = useRef(false)
+  const lastMove = useRef(0)
 
   const review = reviews[index]
 
@@ -35,7 +36,11 @@ export default function Reviews() {
     function tick(now: number) {
       const delta = Math.min(now - last, 100)
       last = now
-      if (!paused.current) elapsed += delta
+
+      // Пауза только пока курсором действительно пользуются. Просто лежащий
+      // на блоке курсор (страница проехала под ним) отсчёт не останавливает.
+      const holding = hovering.current && now - lastMove.current < 1600
+      if (!holding) elapsed += delta
 
       const progress = Math.min(elapsed / SLIDE_MS, 1)
       if (fillRef.current) fillRef.current.style.transform = `scaleX(${progress})`
@@ -63,10 +68,14 @@ export default function Reviews() {
       <div
         className="mt-16"
         onPointerEnter={() => {
-          paused.current = true
+          hovering.current = true
+          lastMove.current = performance.now()
+        }}
+        onPointerMove={() => {
+          lastMove.current = performance.now()
         }}
         onPointerLeave={() => {
-          paused.current = false
+          hovering.current = false
         }}
       >
         <div className="grid gap-10 lg:grid-cols-12">
