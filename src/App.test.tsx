@@ -5,10 +5,10 @@ import App from '@/App'
 import { navItems } from '@/content/site'
 
 describe('App', () => {
-  it('рендерит hero с названием студии', () => {
+  it('рендерит hero с заголовком студии', () => {
     render(<App />)
 
-    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Создаём')
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Держим курс')
   })
 
   it('каждый пункт хедера ведёт на существующую секцию', () => {

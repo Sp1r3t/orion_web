@@ -17,6 +17,9 @@ class IntersectionObserverStub implements IntersectionObserver {
 
 vi.stubGlobal('IntersectionObserver', IntersectionObserverStub)
 
+// jsdom не умеет canvas — звёздное поле в тестах просто не рисуется.
+vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null as never)
+
 afterEach(() => {
   cleanup()
 })
