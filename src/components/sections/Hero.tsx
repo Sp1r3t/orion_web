@@ -31,7 +31,9 @@ export default function Hero() {
           </div>
 
           {/* Справа — заголовок и описание. */}
-          <div className="order-1 lg:order-2 lg:col-span-7 lg:text-right">
+          {/* @container: кегль заголовка считается от ширины колонки, а не окна —
+              иначе длинное «выполнение» вылезает за край. */}
+          <div className="@container order-1 lg:order-2 lg:col-span-7 lg:text-right">
             <div className="flex items-center gap-3 lg:justify-end">
               <span
                 className="size-1.5 animate-pulse-dot rounded-full bg-accent"
@@ -40,7 +42,7 @@ export default function Hero() {
               <p className="label-mono text-muted">{site.tagline}</p>
             </div>
 
-            <h1 className="text-display mt-8 text-[clamp(2.5rem,7vw,6.5rem)]">
+            <h1 className="text-display mt-8 text-[clamp(1.75rem,9.6cqw,4.75rem)]">
               Держим курс
               <br />
               <span className="inline-flex items-baseline gap-[0.25em] lg:justify-end">

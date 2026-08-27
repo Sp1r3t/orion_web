@@ -163,7 +163,7 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
       particles = Array.from({ length: pool }, (_, i) => {
         const target = start[pointIndex(i, start.length, pool)] ?? [cssWidth / 2, baseline]
         const angle = Math.random() * Math.PI * 2
-        const distance = fontSize * (0.4 + Math.random() * 1.2)
+        const distance = fontSize * (0.3 + Math.random() * 0.8)
         const x = target[0] + Math.cos(angle) * distance
         const y = target[1] + Math.sin(angle) * distance * 0.7
 
