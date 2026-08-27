@@ -13,8 +13,9 @@ type SectionProps = {
 }
 
 /**
- * Каркас секции: слева липкий индекс с подписью, справа заголовок и содержимое.
- * Липкая колонка держит контекст раздела в поле зрения, пока читаешь длинный блок.
+ * Каркас секции: слева крупный номер с названием раздела, справа заголовок
+ * и содержимое. Номер стоит вровень с первой строкой заголовка — отступ
+ * сверху компенсирует разницу между высотой строки и высотой самих букв.
  */
 export default function Section({
   id,
@@ -27,11 +28,16 @@ export default function Section({
 }: SectionProps) {
   return (
     <section id={id} className={`relative border-t border-line py-24 lg:py-32 ${className}`.trim()}>
-      <div className="container-page grid gap-x-10 gap-y-12 lg:grid-cols-12">
-        <div className="lg:col-span-3">
-          <div className="flex items-baseline gap-4 lg:sticky lg:top-28 lg:flex-col lg:items-start lg:gap-3">
-            <span className="label-mono text-accent">{index}</span>
-            <span className="label-mono text-muted">{eyebrow}</span>
+      <div className="container-page grid gap-x-10 gap-y-10 lg:grid-cols-12">
+        {/* Отступ подобран так, чтобы верх цифры совпал с верхом букв заголовка. */}
+        <div className="lg:col-span-3 lg:pt-[19px]">
+          <div className="flex items-baseline gap-4 lg:flex-col lg:items-start lg:gap-3">
+            <span className="font-mono text-3xl leading-none font-medium text-accent lg:text-4xl">
+              {index}
+            </span>
+            <span className="font-mono text-sm tracking-[0.16em] text-muted uppercase lg:text-base">
+              {eyebrow}
+            </span>
           </div>
         </div>
 

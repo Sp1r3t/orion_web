@@ -111,8 +111,12 @@ export default function Process() {
             <div className="flex flex-wrap items-end justify-between gap-8">
               <div>
                 <div className="flex items-baseline gap-4">
-                  <span className="label-mono text-accent">03</span>
-                  <span className="label-mono text-muted">Процесс</span>
+                  <span className="font-mono text-3xl leading-none font-medium text-accent lg:text-4xl">
+                    03
+                  </span>
+                  <span className="font-mono text-sm tracking-[0.16em] text-muted uppercase lg:text-base">
+                    Процесс
+                  </span>
                 </div>
                 <h2 className="text-display mt-6 text-[clamp(2rem,4vw,3.25rem)]">
                   Четыре этапа

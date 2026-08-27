@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Boxes, Building2, Check, Layers, Minus, Plus, ShoppingBag, Zap } from 'lucide-react'
+import { useState } from 'react'
 import type { ComponentType, MouseEvent } from 'react'
 
 import Button from '@/components/ui/Button'
@@ -143,6 +144,9 @@ export default function Pricing() {
     attach,
   } = useEstimate()
 
+  // Шаги «темп» и «опции» раскрываются по кнопке: сразу они перегружают экран.
+  const [expanded, setExpanded] = useState(false)
+
   const typeId = type.id
   const urgencyId = urgency.id
   const animatedMin = useAnimatedNumber(totals.min)
@@ -229,71 +233,98 @@ export default function Pricing() {
             </div>
           </div>
 
-          <div>
-            <p className="label-mono text-muted">Шаг 2 — темп работы</p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {urgencyModes.map((mode) => {
-                const active = mode.id === urgencyId
-                return (
-                  <button
-                    key={mode.id}
-                    type="button"
-                    onClick={() => setUrgencyId(mode.id)}
-                    aria-pressed={active}
-                    className={`relative overflow-hidden rounded-card border p-5 text-left transition-all duration-300 ${
-                      active
-                        ? 'border-accent bg-accent/8'
-                        : 'border-line bg-surface hover:border-line-strong'
-                    }`}
-                  >
-                    {active && (
-                      <motion.span
-                        layoutId="urgency-active"
-                        className="pointer-events-none absolute inset-0 rounded-card border border-accent"
-                        transition={{ type: 'spring', stiffness: 320, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative flex items-center gap-2">
-                      {mode.id === 'fast' && <Zap className="size-4 text-accent" />}
-                      <span className={`font-medium ${active ? 'text-accent' : ''}`}>
-                        {mode.title}
-                      </span>
-                    </span>
-                    <span className="relative mt-1 block text-sm text-muted">{mode.hint}</span>
-                    {mode.priceFactor > 1 && (
-                      <span className="label-mono relative mt-3 block text-muted">
-                        +{Math.round((mode.priceFactor - 1) * 100)}% к цене · срок короче
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-
-          <div>
-            <p className="label-mono text-muted">Шаг 3 — что добавить</p>
-
-            <div className="mt-5 flex flex-col gap-10">
-              {optionGroups.map((group) => (
-                <div key={group}>
-                  <p className="label-mono text-accent/70">{group}</p>
-                  <div className="mt-3 border-t border-line">
-                    {pricingOptions
-                      .filter((option) => option.group === group)
-                      .map((option) => (
-                        <OptionRow
-                          key={option.id}
-                          option={option}
-                          count={counts[option.id] ?? 0}
-                          onChange={(update) => setCount(option.id, update)}
-                        />
-                      ))}
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="flex flex-col gap-14 overflow-hidden"
+              >
+                <div>
+                  <p className="label-mono text-muted">Шаг 2 — темп работы</p>
+                  <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                    {urgencyModes.map((mode) => {
+                      const active = mode.id === urgencyId
+                      return (
+                        <button
+                          key={mode.id}
+                          type="button"
+                          onClick={() => setUrgencyId(mode.id)}
+                          aria-pressed={active}
+                          className={`relative overflow-hidden rounded-card border p-5 text-left transition-all duration-300 ${
+                            active
+                              ? 'border-accent bg-accent/8'
+                              : 'border-line bg-surface hover:border-line-strong'
+                          }`}
+                        >
+                          {active && (
+                            <motion.span
+                              layoutId="urgency-active"
+                              className="pointer-events-none absolute inset-0 rounded-card border border-accent"
+                              transition={{ type: 'spring', stiffness: 320, damping: 30 }}
+                            />
+                          )}
+                          <span className="relative flex items-center gap-2">
+                            {mode.id === 'fast' && <Zap className="size-4 text-accent" />}
+                            <span className={`font-medium ${active ? 'text-accent' : ''}`}>
+                              {mode.title}
+                            </span>
+                          </span>
+                          <span className="relative mt-1 block text-sm text-muted">
+                            {mode.hint}
+                          </span>
+                          {mode.priceFactor > 1 && (
+                            <span className="label-mono relative mt-3 block text-muted">
+                              +{Math.round((mode.priceFactor - 1) * 100)}% к цене · срок короче
+                            </span>
+                          )}
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
-              ))}
+
+                <div>
+                  <p className="label-mono text-muted">Шаг 3 — что добавить</p>
+
+                  <div className="mt-5 flex flex-col gap-10">
+                    {optionGroups.map((group) => (
+                      <div key={group}>
+                        <p className="label-mono text-accent/70">{group}</p>
+                        <div className="mt-3 border-t border-line">
+                          {pricingOptions
+                            .filter((option) => option.group === group)
+                            .map((option) => (
+                              <OptionRow
+                                key={option.id}
+                                option={option}
+                                count={counts[option.id] ?? 0}
+                                onChange={(update) => setCount(option.id, update)}
+                              />
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {!expanded && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setExpanded(true)}
+                className="inline-flex h-13 animate-pulse-glow items-center gap-3 rounded-full bg-accent px-8 text-base font-medium text-bg transition-colors duration-300 hover:bg-accent-hover"
+              >
+                Показать ещё
+                <Plus className="size-4" />
+              </button>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="lg:col-span-5">
