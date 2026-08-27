@@ -15,7 +15,7 @@ export default function Footer() {
               href="#contact"
               className="mt-6 inline-flex items-center gap-2 text-accent transition-colors hover:text-accent-hover"
             >
-              Обсудить проект →
+              Создать сайт →
             </a>
           </div>
 

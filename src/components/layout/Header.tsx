@@ -22,7 +22,7 @@ export default function Header() {
         <div className="container-page flex h-full items-center justify-between gap-6">
           <a
             href="#top"
-            className="font-display text-xl font-bold tracking-[-0.02em] uppercase transition-colors duration-300 hover:text-accent"
+            className="font-display text-2xl font-bold tracking-[-0.02em] uppercase transition-colors duration-300 hover:text-accent lg:text-3xl"
           >
             {site.name}
           </a>
@@ -60,7 +60,7 @@ export default function Header() {
               Telegram
             </a>
             <Button href="#contact" variant="light" className="hidden lg:inline-flex">
-              Обсудить проект
+              Создать сайт
             </Button>
             <button
               type="button"

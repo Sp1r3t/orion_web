@@ -3,7 +3,7 @@ import PixelWord from '@/components/ui/PixelWord'
 import SpaceField from '@/components/ui/SpaceField'
 import { site, stats } from '@/content/site'
 
-const rotatingWords = ['создание', 'выполнение', 'креатив']
+const rotatingWords = ['создание', 'качество', 'креатив']
 
 export default function Hero() {
   return (
@@ -11,14 +11,14 @@ export default function Hero() {
       {/* Космос занимает весь первый экран и живёт под контентом — границы не видно. */}
       <SpaceField />
 
-      <div className="container-page relative z-10 flex flex-1 flex-col justify-center py-16 lg:py-12">
+      <div className="container-page relative z-10 flex flex-1 flex-col justify-center py-12 lg:py-8">
         <div className="grid items-center gap-14 lg:grid-cols-12">
           {/* Справа — заголовок и описание. Слева пусто: там живёт созвездие. */}
           {/* @container: кегль считается от ширины колонки, а не окна — иначе длинное
               «выполнение» вылезает за край. Слово стоит на отдельной строке: пока рядом
               с ним было «на», строка стоила на четверть дороже и кегль приходилось резать. */}
           <div className="@container lg:col-span-8 lg:col-start-5 lg:text-right">
-            <h1 className="text-display text-[clamp(1.75rem,11.9cqw,6.5rem)]">
+            <h1 className="text-display text-[clamp(1.75rem,min(11.9cqw,12vh),6.5rem)]">
               Держим
               <br />
               курс на
@@ -26,14 +26,16 @@ export default function Hero() {
               <PixelWord words={rotatingWords} interval={3000} />
             </h1>
 
-            <p className="mt-8 text-lg text-muted lg:ml-auto lg:max-w-lg">{site.description}</p>
+            <p className="mt-8 text-base text-muted lg:ml-auto lg:max-w-2xl lg:text-lg">
+              {site.description}
+            </p>
           </div>
         </div>
 
         {/* Кнопки прижаты к низу экрана — созвездие остаётся выше них. */}
-        <div className="mt-auto flex flex-col gap-3 pt-16 sm:flex-row">
+        <div className="mt-auto flex flex-col gap-3 pt-10 sm:flex-row">
           <Button href="#contact" size="lg" className="w-full sm:w-auto">
-            Обсудить проект
+            Создать сайт
           </Button>
           <Button href="#portfolio" variant="outline" size="lg" className="w-full sm:w-auto">
             Смотреть работы

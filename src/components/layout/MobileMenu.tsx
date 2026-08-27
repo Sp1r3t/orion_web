@@ -40,7 +40,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
           aria-label="Меню"
         >
           <div className="container-page flex h-20 items-center justify-between">
-            <span className="font-display text-xl font-bold tracking-[-0.02em] uppercase">
+            <span className="font-display text-2xl font-bold tracking-[-0.02em] uppercase">
               {site.name}
             </span>
             <button
@@ -73,7 +73,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
 
           <div className="container-page mt-10 flex flex-col gap-4">
             <Button href="#contact" size="lg" onClick={onClose}>
-              Обсудить проект
+              Создать сайт
             </Button>
             <Button href={site.telegram} variant="outline" size="lg">
               Telegram
