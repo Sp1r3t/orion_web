@@ -22,22 +22,27 @@ export default function Header() {
           }`}
         >
           <div
-            className={`flex items-center justify-between gap-6 transition-all duration-500 ease-out ${
+            className={`flex items-center justify-between transition-all duration-500 ease-out ${
               scrolled
-                ? 'h-14 rounded-full border border-line bg-bg/85 px-6 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl'
-                : 'h-20 rounded-full border border-transparent bg-transparent px-0'
+                ? 'h-14 gap-5 rounded-full border border-line bg-bg/85 px-5 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] backdrop-blur-xl'
+                : 'h-20 gap-6 rounded-full border border-transparent bg-transparent px-0'
             }`}
           >
             <a
               href="#top"
               className={`font-display font-bold tracking-[-0.02em] uppercase transition-all duration-500 hover:text-accent ${
-                scrolled ? 'text-2xl' : 'text-2xl lg:text-3xl'
+                scrolled ? 'text-xl' : 'text-2xl lg:text-3xl'
               }`}
             >
               {site.name}
             </a>
 
-            <nav className="hidden items-center gap-9 lg:flex" aria-label="Разделы сайта">
+            <nav
+              className={`hidden items-center transition-all duration-500 ease-out lg:flex ${
+                scrolled ? 'gap-6 lg:mr-auto lg:ml-8' : 'gap-9'
+              }`}
+              aria-label="Разделы сайта"
+            >
               {navItems.map((item) => {
                 const active = activeId === item.id
                 return (
@@ -60,7 +65,11 @@ export default function Header() {
               })}
             </nav>
 
-            <div className="flex items-center gap-4">
+            <div
+              className={`flex items-center transition-all duration-500 ease-out ${
+                scrolled ? 'gap-3' : 'gap-4'
+              }`}
+            >
               <a
                 href={site.telegram}
                 target="_blank"
@@ -69,7 +78,12 @@ export default function Header() {
               >
                 Telegram
               </a>
-              <Button href="#contact" variant="light" className="hidden lg:inline-flex">
+              <Button
+                href="#contact"
+                variant="light"
+                size={scrolled ? 'sm' : 'md'}
+                className="hidden lg:inline-flex"
+              >
                 Создать сайт
               </Button>
               <button

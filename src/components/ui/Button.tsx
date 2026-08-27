@@ -1,7 +1,7 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react'
 
 type Variant = 'primary' | 'outline' | 'light'
-type Size = 'md' | 'lg'
+type Size = 'sm' | 'md' | 'lg'
 
 const base =
   'group relative inline-flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-300 whitespace-nowrap'
@@ -13,6 +13,7 @@ const variants: Record<Variant, string> = {
 }
 
 const sizes: Record<Size, string> = {
+  sm: 'h-9 px-5 text-[0.8125rem]',
   md: 'h-10 px-6 text-sm',
   lg: 'h-13 px-8 text-base',
 }
