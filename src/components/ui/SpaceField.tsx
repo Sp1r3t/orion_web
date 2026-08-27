@@ -128,12 +128,13 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       if (width < 1024) {
         // На узком экране всё сложено в столбик: созвездие уводим наверх,
         // иначе оно ложится ровно на кнопки внизу.
-        const side = Math.min(width * 0.78, height * 0.34)
+        const side = Math.min(width * 0.82, height * 0.36)
         return { x: (width - side) / 2, y: height * 0.02, side }
       }
 
-      const side = Math.min(width * 0.34, height * 0.6)
-      return { x: width * 0.03, y: height * 0.06, side }
+      // Правый край фигуры держим левее 39% ширины — дальше начинается заголовок.
+      const side = Math.min(width * 0.38, height * 0.68)
+      return { x: width * 0.055, y: height * 0.11, side }
     }
 
     function paintBackdrop() {
