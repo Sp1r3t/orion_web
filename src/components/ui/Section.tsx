@@ -15,7 +15,8 @@ type SectionProps = {
 /**
  * Каркас секции: слева крупный номер с названием раздела, справа заголовок
  * и содержимое. Номер стоит вровень с первой строкой заголовка — отступ
- * сверху компенсирует разницу между высотой строки и высотой самих букв.
+ * сверху компенсирует разницу между высотой строки и высотой самих букв, —
+ * а при прокрутке подпись прилипает и остаётся на виду до конца раздела.
  */
 export default function Section({
   id,
@@ -31,7 +32,8 @@ export default function Section({
       <div className="container-page grid gap-x-10 gap-y-10 lg:grid-cols-12">
         {/* Отступ подобран так, чтобы верх цифры совпал с верхом букв заголовка. */}
         <div className="lg:col-span-3 lg:pt-[19px]">
-          <div className="flex items-baseline gap-4 lg:flex-col lg:items-start lg:gap-3">
+          {/* Липкая колонка: подпись раздела едет вместе с прокруткой и не уходит вверх. */}
+          <div className="flex items-baseline gap-4 lg:sticky lg:top-28 lg:flex-col lg:items-start lg:gap-3">
             <span className="font-mono text-3xl leading-none font-medium text-accent lg:text-4xl">
               {index}
             </span>
