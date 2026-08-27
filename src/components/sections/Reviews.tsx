@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import Section from '@/components/ui/Section'
 import { reviews } from '@/content/reviews'
@@ -9,15 +9,48 @@ const SLIDE_MS = 7000
 
 export default function Reviews() {
   const [index, setIndex] = useState(0)
-  const [paused, setPaused] = useState(false)
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
   )
 
+  const fillRef = useRef<HTMLSpanElement>(null)
+  // Пауза живёт в ref: цикл читает её каждый кадр, перерисовка React не нужна.
+  const paused = useRef(false)
+
   const review = reviews[index]
-  const next = () => setIndex((current) => (current + 1) % reviews.length)
+
+  /**
+   * Отсчёт до следующего отзыва ведём сами, а не событием окончания CSS-анимации:
+   * анимацию мог прервать любой перерендер, и полоса застывала на середине.
+   */
+  useEffect(() => {
+    if (reduced) return
+
+    let frame = 0
+    let last = performance.now()
+    let elapsed = 0
+
+    function tick(now: number) {
+      const delta = Math.min(now - last, 100)
+      last = now
+      if (!paused.current) elapsed += delta
+
+      const progress = Math.min(elapsed / SLIDE_MS, 1)
+      if (fillRef.current) fillRef.current.style.transform = `scaleX(${progress})`
+
+      if (progress >= 1) {
+        setIndex((current) => (current + 1) % reviews.length)
+        return
+      }
+
+      frame = requestAnimationFrame(tick)
+    }
+
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [index, reduced])
 
   return (
     <Section
@@ -29,15 +62,17 @@ export default function Reviews() {
     >
       <div
         className="mt-16"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocusCapture={() => setPaused(true)}
-        onBlurCapture={() => setPaused(false)}
+        onPointerEnter={() => {
+          paused.current = true
+        }}
+        onPointerLeave={() => {
+          paused.current = false
+        }}
       >
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-9">
             {/* Высота зафиксирована: иначе на смене отзыва прыгает вся секция. */}
-            <div className="relative min-h-56 sm:min-h-48">
+            <div className="relative min-h-64 sm:min-h-52">
               <AnimatePresence mode="wait">
                 <motion.figure
                   key={review.id}
@@ -71,7 +106,7 @@ export default function Reviews() {
             </div>
           </div>
 
-          <div className="flex items-end justify-between gap-6 lg:col-span-3 lg:flex-col lg:items-end lg:justify-end">
+          <div className="flex flex-wrap items-end justify-between gap-6 lg:col-span-3 lg:flex-col lg:items-end lg:justify-end">
             <p className="font-mono text-3xl leading-none">
               <span className="text-accent">{String(index + 1).padStart(2, '0')}</span>
               <span className="text-muted"> / {String(reviews.length).padStart(2, '0')}</span>
@@ -90,24 +125,16 @@ export default function Reviews() {
                     aria-label={`Отзыв ${i + 1}`}
                     onClick={() => setIndex(i)}
                     className={`h-2 overflow-hidden rounded-full bg-line-strong transition-all duration-500 ${
-                      active ? 'w-16' : 'w-2 hover:bg-muted'
+                      active ? 'w-14' : 'w-2 hover:bg-muted'
                     }`}
                   >
-                    {active && !reduced && (
-                      // Заливка отсчитывает время до следующего отзыва и сама
-                      // переключает его — поэтому пауза на наведении честно
-                      // останавливает и анимацию, и смену.
+                    {active && (
                       <span
-                        key={index}
-                        onAnimationEnd={next}
-                        style={{
-                          animation: `dot-fill ${SLIDE_MS}ms linear forwards`,
-                          animationPlayState: paused ? 'paused' : 'running',
-                        }}
+                        ref={reduced ? undefined : fillRef}
                         className="block h-full w-full origin-left rounded-full bg-accent"
+                        style={{ transform: reduced ? 'scaleX(1)' : 'scaleX(0)' }}
                       />
                     )}
-                    {active && reduced && <span className="block h-full w-full bg-accent" />}
                   </button>
                 )
               })}
