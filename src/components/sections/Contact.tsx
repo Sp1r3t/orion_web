@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, Copy, Pencil } from 'lucide-react'
+import { Check, Copy, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 
@@ -56,7 +56,7 @@ function Chips({
 }) {
   return (
     <fieldset>
-      <legend className="label-mono text-muted">{label}</legend>
+      <legend className="text-display text-base text-text">{label}</legend>
       <div className="mt-4 flex flex-wrap gap-2">
         {items.map((item) => {
           const active = value === item
@@ -83,7 +83,7 @@ function Chips({
 
 /** Расчёт, прикреплённый к заявке кнопкой «Обсудить смету». */
 function EstimateCard() {
-  const { type, urgency, chosen, totals } = useEstimate()
+  const { type, urgency, chosen, totals, setCount } = useEstimate()
 
   return (
     <motion.div
@@ -134,10 +134,20 @@ function EstimateCard() {
           {chosen.map(({ option, count }) => (
             <li
               key={option.id}
-              className="rounded-full border border-line px-3 py-1 text-xs text-muted"
+              className="flex items-center gap-1 rounded-full border border-line py-1 pr-1 pl-3 text-xs text-muted transition-colors hover:border-accent/50"
             >
-              {option.title}
-              {count > 1 && <span className="text-accent"> ×{count}</span>}
+              <span>
+                {option.title}
+                {count > 1 && <span className="text-accent"> ×{count}</span>}
+              </span>
+              <button
+                type="button"
+                onClick={() => setCount(option.id, () => 0)}
+                aria-label={`Убрать «${option.title}» из заявки`}
+                className="flex size-6 items-center justify-center rounded-full transition-colors hover:bg-accent/15 hover:text-accent"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
             </li>
           ))}
         </ul>
@@ -312,11 +322,11 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
               <div className="grid gap-8 sm:grid-cols-2">
                 <label className="block">
-                  <span className="label-mono text-muted">Как вас зовут</span>
+                  <span className="text-display text-base text-text">Как вас зовут</span>
                   <input name="name" required placeholder="Имя" className={`${fieldClass} mt-3`} />
                 </label>
                 <label className="block">
-                  <span className="label-mono text-muted">Как связаться</span>
+                  <span className="text-display text-base text-text">Как связаться</span>
                   <input
                     name="contact"
                     required
@@ -330,7 +340,7 @@ export default function Contact() {
               <Chips label="Бюджет" items={budgetChips} value={budget} onChange={setBudgetChoice} />
 
               <label className="block">
-                <span className="label-mono text-muted">О задаче</span>
+                <span className="text-display text-base text-text">О задаче</span>
                 <textarea
                   name="message"
                   rows={3}
