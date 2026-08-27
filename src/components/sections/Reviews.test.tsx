@@ -32,16 +32,15 @@ describe('Reviews', () => {
     expect(activeLabel()).toBe('Отзыв 3')
   })
 
-  it('лежащий на блоке курсор не останавливает отсчёт навсегда', () => {
+  it('курсор на блоке отсчёт не останавливает', () => {
     const { container } = render(<Reviews />)
     const block = container.querySelector('.mt-16') as HTMLElement
 
-    // Курсор заехал на блок и больше не двигается — так бывает, когда секция
-    // проезжает под неподвижной мышью при прокрутке.
     fireEvent.pointerEnter(block)
+    fireEvent.pointerMove(block)
 
     act(() => {
-      vi.advanceTimersByTime(9000)
+      vi.advanceTimersByTime(7200)
     })
 
     expect(activeLabel()).toBe('Отзыв 2')

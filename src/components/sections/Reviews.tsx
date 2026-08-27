@@ -16,15 +16,13 @@ export default function Reviews() {
   )
 
   const fillRef = useRef<HTMLSpanElement>(null)
-  // Состояние паузы живёт в ref: цикл читает его каждый кадр, перерисовка не нужна.
-  const hovering = useRef(false)
-  const lastMove = useRef(0)
 
   const review = reviews[index]
 
   /**
    * Отсчёт до следующего отзыва ведём сами, а не событием окончания CSS-анимации:
    * анимацию мог прервать любой перерендер, и полоса застывала на середине.
+   * Пауз нет: полоса идёт всегда, что бы ни делал курсор.
    */
   useEffect(() => {
     if (reduced) return
@@ -34,13 +32,10 @@ export default function Reviews() {
     let elapsed = 0
 
     function tick(now: number) {
+      // Шаг ограничен: вернувшись из фоновой вкладки, слайдер не проглотит отзыв разом.
       const delta = Math.min(now - last, 100)
       last = now
-
-      // Пауза только пока курсором действительно пользуются. Просто лежащий
-      // на блоке курсор (страница проехала под ним) отсчёт не останавливает.
-      const holding = hovering.current && now - lastMove.current < 1600
-      if (!holding) elapsed += delta
+      elapsed += delta
 
       const progress = Math.min(elapsed / SLIDE_MS, 1)
       if (fillRef.current) fillRef.current.style.transform = `scaleX(${progress})`
@@ -65,19 +60,7 @@ export default function Reviews() {
       title={<>Что говорят клиенты</>}
       lead="Истории проектов и то, как менялись цифры после запуска."
     >
-      <div
-        className="mt-16"
-        onPointerEnter={() => {
-          hovering.current = true
-          lastMove.current = performance.now()
-        }}
-        onPointerMove={() => {
-          lastMove.current = performance.now()
-        }}
-        onPointerLeave={() => {
-          hovering.current = false
-        }}
-      >
+      <div className="mt-16">
         <div className="grid gap-10 lg:grid-cols-12">
           <div className="lg:col-span-9">
             {/* Высота зафиксирована: иначе на смене отзыва прыгает вся секция. */}
