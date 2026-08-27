@@ -236,6 +236,12 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         resize()
       }
 
+      // Первый экран уехал из вида — кадры на него больше не тратим.
+      if (window.scrollY > height + 40) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+
       // Взаимодействие живёт только пока страница в самом верху.
       const interactive = atTop && !reduced
 

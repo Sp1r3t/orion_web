@@ -62,7 +62,7 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    /* Плавность даёт Lenis: своя CSS-прокрутка с ним конфликтует. */
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -158,10 +158,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   *,
   *::before,
   *::after {

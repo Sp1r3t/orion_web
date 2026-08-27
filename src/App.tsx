@@ -11,8 +11,11 @@ import Reviews from '@/components/sections/Reviews'
 import Services from '@/components/sections/Services'
 import Stack from '@/components/sections/Stack'
 import EstimateProvider from '@/context/EstimateProvider'
+import { useSmoothScroll } from '@/hooks/useSmoothScroll'
 
 export default function App() {
+  useSmoothScroll()
+
   return (
     <EstimateProvider>
       <div className="grain">

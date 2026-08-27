@@ -32,6 +32,15 @@ vi.stubGlobal(
   })),
 )
 
+// jsdom не реализует ResizeObserver — его ждут Lenis и звёздное поле.
+class ResizeObserverStub implements ResizeObserver {
+  observe = vi.fn()
+  unobserve = vi.fn()
+  disconnect = vi.fn()
+}
+
+vi.stubGlobal('ResizeObserver', ResizeObserverStub)
+
 // jsdom не умеет canvas — звёздное поле в тестах просто не рисуется.
 vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null as never)
 
