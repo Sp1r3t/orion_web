@@ -12,7 +12,6 @@ type Particle = {
   toScale: number
   delay: number
   arc: number
-  seed: number
 }
 
 /** Длительность перетекания одного слова в другое и ширина волны задержек, мс. */
@@ -32,9 +31,14 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 
-/** Цвет пикселя: слева акцент, справа — тёплый ember. */
-function bucketColor(index: number) {
-  const t = index / (BUCKETS - 1)
+/**
+ * Цвет пикселя: градиент от акцента к тёплому ember, медленно бегущий по слову.
+ * Так буквы не выглядят статичной картинкой, но ни одна точка не двигается.
+ */
+function bucketColor(index: number, time: number) {
+  const shifted = (index / BUCKETS + time / 7000) % 1
+  // Треугольная волна — иначе на стыке цикла виден шов.
+  const t = 1 - Math.abs(1 - 2 * shifted)
   return `rgb(255 ${Math.round(lerp(106, 176, t))} ${Math.round(lerp(0, 32, t))})`
 }
 
@@ -179,7 +183,6 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
           toScale: 1,
           delay: (target[0] / cssWidth) * SPREAD + Math.random() * 120,
           arc: (Math.random() - 0.5) * pixel * 5,
-          seed: Math.random() * Math.PI * 2,
         }
       })
 
@@ -260,7 +263,7 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
       for (let b = 0; b < BUCKETS; b += 1) {
         const from = Math.floor((b * pool) / BUCKETS)
         const to = Math.floor(((b + 1) * pool) / BUCKETS)
-        const color = bucketColor(b)
+        const color = bucketColor(b, now)
 
         for (let pass = withBloom ? 0 : 1; pass < 2; pass += 1) {
           // Первый проход — мягкое свечение, второй — сами пиксели.
@@ -272,13 +275,17 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
             const particle = particles[i]
             if (particle.scale <= 0.01) continue
 
-            // Пока слово стоит на месте, пиксели едва заметно дышат.
-            const idle = morphing ? 0 : 1
-            const x = particle.x + Math.sin(now / 700 + particle.seed) * 0.6 * idle
-            const y = particle.y + Math.cos(now / 900 + particle.seed) * 0.6 * idle
+            // Собранное слово стоит неподвижно: любой сдвиг точек рвёт края букв.
             const size = (pixel - 1) * particle.scale * (bloom ? 2.4 : 1)
+            const left = particle.x - size / 2
+            const top = particle.y - size / 2
 
-            context.fillRect(x - size / 2, y - size / 2, size, size)
+            // В покое квадраты кладём на целые координаты — края букв остаются резкими.
+            if (morphing) {
+              context.fillRect(left, top, size, size)
+            } else {
+              context.fillRect(Math.round(left), Math.round(top), size, size)
+            }
           }
         }
       }
