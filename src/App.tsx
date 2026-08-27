@@ -10,24 +10,27 @@ import Promises from '@/components/sections/Promises'
 import Reviews from '@/components/sections/Reviews'
 import Services from '@/components/sections/Services'
 import Stack from '@/components/sections/Stack'
+import EstimateProvider from '@/context/EstimateProvider'
 
 export default function App() {
   return (
-    <div className="grain">
-      <Header />
-      <main>
-        <Hero />
-        <Services />
-        <Cases />
-        <Process />
-        <Stack />
-        <Pricing />
-        <Promises />
-        <Reviews />
-        <Faq />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <EstimateProvider>
+      <div className="grain">
+        <Header />
+        <main>
+          <Hero />
+          <Services />
+          <Cases />
+          <Process />
+          <Stack />
+          <Pricing />
+          <Promises />
+          <Reviews />
+          <Faq />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
+    </EstimateProvider>
   )
 }

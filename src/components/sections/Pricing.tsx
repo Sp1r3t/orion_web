@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Boxes, Building2, Check, Layers, Minus, Plus, ShoppingBag, Zap } from 'lucide-react'
-import { useMemo, useState } from 'react'
 import type { ComponentType, MouseEvent } from 'react'
 
 import Button from '@/components/ui/Button'
@@ -13,6 +12,7 @@ import {
   urgencyModes,
   type PricingOption,
 } from '@/content/pricing'
+import { useEstimate } from '@/context/estimateContext'
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
 
 const typeIcons: Record<string, ComponentType<{ className?: string }>> = {
@@ -130,42 +130,22 @@ function OptionRow({
 }
 
 export default function Pricing() {
-  const [typeId, setTypeId] = useState(projectTypes[0].id)
-  const [urgencyId, setUrgencyId] = useState(urgencyModes[0].id)
-  const [counts, setCounts] = useState<Record<string, number>>({})
+  const {
+    type,
+    urgency,
+    counts,
+    chosen,
+    totals,
+    setTypeId,
+    setUrgencyId,
+    setCount,
+    resetCounts,
+    attach,
+  } = useEstimate()
 
-  const type = projectTypes.find((item) => item.id === typeId) ?? projectTypes[0]
-  const urgency = urgencyModes.find((item) => item.id === urgencyId) ?? urgencyModes[0]
-
-  const chosen = useMemo(
-    () => pricingOptions.filter((option) => (counts[option.id] ?? 0) > 0),
-    [counts],
-  )
-
-  const estimate = useMemo(() => {
-    const extraPrice = chosen.reduce(
-      (sum, option) => sum + option.price * (counts[option.id] ?? 0),
-      0,
-    )
-    const extraWeeks = chosen.reduce(
-      (sum, option) => sum + option.weeks * (counts[option.id] ?? 0),
-      0,
-    )
-
-    const min = (type.base + extraPrice) * urgency.priceFactor
-    const max = (type.base * type.spread + extraPrice) * urgency.priceFactor
-
-    return {
-      min: Math.round(min / 1000) * 1000,
-      max: Math.round(max / 1000) * 1000,
-      weeksMin: Math.max(1, Math.round((type.weeks[0] + extraWeeks) * urgency.timeFactor)),
-      weeksMax: Math.max(2, Math.round((type.weeks[1] + extraWeeks) * urgency.timeFactor)),
-      surcharge:
-        Math.round(((min / urgency.priceFactor) * (urgency.priceFactor - 1)) / 1000) * 1000,
-    }
-  }, [type, urgency, chosen, counts])
-
-  const animatedMin = useAnimatedNumber(estimate.min)
+  const typeId = type.id
+  const urgencyId = urgency.id
+  const animatedMin = useAnimatedNumber(totals.min)
 
   return (
     <Section
@@ -306,12 +286,7 @@ export default function Pricing() {
                           key={option.id}
                           option={option}
                           count={counts[option.id] ?? 0}
-                          onChange={(update) =>
-                            setCounts((prev) => ({
-                              ...prev,
-                              [option.id]: update(prev[option.id] ?? 0),
-                            }))
-                          }
+                          onChange={(update) => setCount(option.id, update)}
                         />
                       ))}
                   </div>
@@ -335,7 +310,7 @@ export default function Pricing() {
               </div>
 
               <p className="text-display mt-5 text-4xl lg:text-5xl">{money.format(animatedMin)}</p>
-              <p className="mt-2 text-muted">до {money.format(estimate.max)}</p>
+              <p className="mt-2 text-muted">до {money.format(totals.max)}</p>
 
               <div className="my-7 border-t border-dashed border-line-strong" />
 
@@ -346,8 +321,7 @@ export default function Pricing() {
                 </li>
 
                 <AnimatePresence initial={false}>
-                  {chosen.map((option) => {
-                    const count = counts[option.id] ?? 0
+                  {chosen.map(({ option, count }) => {
                     return (
                       <motion.li
                         key={option.id}
@@ -374,7 +348,7 @@ export default function Pricing() {
                 {urgency.priceFactor > 1 && (
                   <li className="flex justify-between gap-4 text-accent">
                     <span>Срочность +{Math.round((urgency.priceFactor - 1) * 100)}%</span>
-                    <span className="label-mono shrink-0">{money.format(estimate.surcharge)}</span>
+                    <span className="label-mono shrink-0">{money.format(totals.surcharge)}</span>
                   </li>
                 )}
               </ul>
@@ -383,7 +357,7 @@ export default function Pricing() {
                 <div className="flex justify-between gap-4">
                   <span className="text-muted">Срок</span>
                   <span>
-                    {estimate.weeksMin}–{estimate.weeksMax} недель
+                    {totals.weeksMin}–{totals.weeksMax} недель
                   </span>
                 </div>
                 <div className="flex justify-between gap-4">
@@ -392,14 +366,15 @@ export default function Pricing() {
                 </div>
               </div>
 
-              <Button href="#contact" size="lg" className="mt-8 w-full">
+              {/* Клик прикрепляет расчёт к форме — она покажет его и отправит вместе с контактами. */}
+              <Button href="#contact" size="lg" className="mt-8 w-full" onClick={attach}>
                 Обсудить смету
               </Button>
 
               {chosen.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => setCounts({})}
+                  onClick={resetCounts}
                   className="label-mono mt-4 w-full text-muted transition-colors hover:text-accent"
                 >
                   Сбросить опции

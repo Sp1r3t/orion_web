@@ -1,0 +1,68 @@
+import { useCallback, useMemo, useState } from 'react'
+import type { ReactNode } from 'react'
+
+import { pricingOptions, projectTypes, urgencyModes } from '@/content/pricing'
+import { EstimateContext } from '@/context/estimateContext'
+import type { EstimateValue } from '@/context/estimateContext'
+
+/**
+ * Состояние калькулятора живёт здесь, а не внутри секции тарифов:
+ * форма заявки показывает тот же расчёт и отправляет его вместе с контактами.
+ */
+export default function EstimateProvider({ children }: { children: ReactNode }) {
+  const [typeId, setTypeId] = useState(projectTypes[0].id)
+  const [urgencyId, setUrgencyId] = useState(urgencyModes[0].id)
+  const [counts, setCounts] = useState<Record<string, number>>({})
+  const [attached, setAttached] = useState(false)
+
+  const type = projectTypes.find((item) => item.id === typeId) ?? projectTypes[0]
+  const urgency = urgencyModes.find((item) => item.id === urgencyId) ?? urgencyModes[0]
+
+  const chosen = useMemo(
+    () =>
+      pricingOptions
+        .map((option) => ({ option, count: counts[option.id] ?? 0 }))
+        .filter((item) => item.count > 0),
+    [counts],
+  )
+
+  const totals = useMemo(() => {
+    const extraPrice = chosen.reduce((sum, item) => sum + item.option.price * item.count, 0)
+    const extraWeeks = chosen.reduce((sum, item) => sum + item.option.weeks * item.count, 0)
+
+    const clean = type.base + extraPrice
+    const min = clean * urgency.priceFactor
+    const max = (type.base * type.spread + extraPrice) * urgency.priceFactor
+
+    return {
+      min: Math.round(min / 1000) * 1000,
+      max: Math.round(max / 1000) * 1000,
+      weeksMin: Math.max(1, Math.round((type.weeks[0] + extraWeeks) * urgency.timeFactor)),
+      weeksMax: Math.max(2, Math.round((type.weeks[1] + extraWeeks) * urgency.timeFactor)),
+      surcharge: Math.round((clean * (urgency.priceFactor - 1)) / 1000) * 1000,
+    }
+  }, [type, urgency, chosen])
+
+  const setCount = useCallback((id: string, update: (current: number) => number) => {
+    setCounts((prev) => ({ ...prev, [id]: update(prev[id] ?? 0) }))
+  }, [])
+
+  const value: EstimateValue = useMemo(
+    () => ({
+      type,
+      urgency,
+      counts,
+      chosen,
+      totals,
+      attached,
+      setTypeId,
+      setUrgencyId,
+      setCount,
+      resetCounts: () => setCounts({}),
+      attach: () => setAttached(true),
+    }),
+    [type, urgency, counts, chosen, totals, attached, setCount],
+  )
+
+  return <EstimateContext.Provider value={value}>{children}</EstimateContext.Provider>
+}
