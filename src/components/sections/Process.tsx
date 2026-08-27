@@ -27,6 +27,8 @@ const CURVE = 'M 60 200 C 220 200 260 60 420 60 S 640 200 780 200 S 1000 60 1140
 /** Доли пути, на которых стоят узлы этапов. */
 const NODE_T = [0.03, 0.35, 0.66, 0.98]
 
+const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
+
 type NodePosition = { left: number; top: number }
 
 export default function Process() {
@@ -37,9 +39,15 @@ export default function Process() {
   const [nodes, setNodes] = useState<NodePosition[]>([])
   const [active, setActive] = useState(0)
 
-  // Позиция бегущей точки в координатах viewBox.
+  // Позиция бегущей точки в координатах viewBox и её прозрачность:
+  // внутри круга этапа точку не должно быть видно вовсе.
   const dotX = useMotionValue(60)
   const dotY = useMotionValue(200)
+  const dotFade = useMotionValue(1)
+
+  /** Узлы в координатах viewBox и радиус притяжения — считаются при замере. */
+  const nodePoints = useRef<Array<{ x: number; y: number }>>([])
+  const snapRadius = useRef(26)
 
   // Пока идёт прокрутка внутри закреплённого экрана, progress меняется от 0 до 1.
   const { scrollYProgress } = useScroll({
@@ -77,9 +85,38 @@ export default function Process() {
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     const path = pathRef.current
     if (path && typeof path.getTotalLength === 'function') {
-      const point = path.getPointAtLength(path.getTotalLength() * progress)
-      dotX.set(point.x)
-      dotY.set(point.y)
+      // Путь точки ограничен крайними узлами — иначе в начале и в конце
+      // она вылезает за первый и последний круг.
+      const span = NODE_T[NODE_T.length - 1] - NODE_T[0]
+      const point = path.getPointAtLength(path.getTotalLength() * (NODE_T[0] + progress * span))
+
+      let x = point.x
+      let y = point.y
+      let nearest = 0
+
+      nodePoints.current.forEach((node) => {
+        const distance = Math.hypot(node.x - x, node.y - y)
+        if (
+          distance <
+          Math.hypot(nodePoints.current[nearest].x - x, nodePoints.current[nearest].y - y)
+        ) {
+          nearest = nodePoints.current.indexOf(node)
+        }
+      })
+
+      const target = nodePoints.current[nearest]
+      if (target) {
+        const distance = Math.hypot(target.x - x, target.y - y)
+        const raw = clamp01(1 - distance / snapRadius.current)
+        // Сглаживание, чтобы точка входила в круг плавно, а не притягивалась рывком.
+        const pull = raw * raw * (3 - 2 * raw)
+        x += (target.x - x) * pull
+        y += (target.y - y) * pull
+        dotFade.set(1 - pull)
+      }
+
+      dotX.set(x)
+      dotY.set(y)
     }
 
     // Этап считается достигнутым чуть раньше узла — иначе подпись меняется с запозданием.
@@ -107,7 +144,7 @@ export default function Process() {
       {/* Высокая обёртка задаёт длину прокрутки: 4 этапа ≈ по экрану на каждый. */}
       <div ref={wrapperRef} className="relative lg:h-[420vh]">
         <div className="lg:sticky lg:top-0 lg:flex lg:h-dvh lg:items-center lg:overflow-hidden">
-          <div className="container-page w-full py-24 lg:py-0">
+          <div className="container-page w-full py-24 lg:pt-10 lg:pb-0">
             <div className="flex flex-wrap items-end justify-between gap-8">
               <div>
                 <div className="flex items-baseline gap-4">
@@ -189,7 +226,7 @@ export default function Process() {
                   style={{ pathLength: scrollYProgress }}
                 />
 
-                <motion.g style={{ x: dotX, y: dotY }}>
+                <motion.g style={{ x: dotX, y: dotY, opacity: dotFade }}>
                   <circle r="26" fill="rgba(255,106,0,0.12)" />
                   <circle r="14" fill="rgba(255,106,0,0.22)" />
                   <circle r="6" fill="#ff6a00" filter="url(#process-glow)" />
@@ -224,12 +261,12 @@ export default function Process() {
                       {done ? <Check className="size-5" /> : <NodeIcon className="size-5" />}
                     </span>
 
-                    {current && (
-                      <motion.span
-                        layoutId="process-ring"
-                        className="pointer-events-none absolute inset-0 -m-2 rounded-full border border-accent/40"
-                      />
-                    )}
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute inset-0 -m-2 rounded-full border border-accent/40 transition-opacity duration-500 ${
+                        current ? 'opacity-100' : 'opacity-0'
+                      }`}
+                    />
 
                     <span
                       className={`label-mono absolute left-1/2 -translate-x-1/2 whitespace-nowrap transition-colors duration-500 ${
@@ -244,7 +281,7 @@ export default function Process() {
             </div>
 
             {/* Описание активного этапа. */}
-            <div className="mt-16 hidden min-h-44 lg:block">
+            <div className="mt-14 hidden min-h-28 lg:block">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={step.index}
