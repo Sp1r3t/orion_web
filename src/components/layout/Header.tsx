@@ -88,14 +88,6 @@ export default function Header() {
               transition={glide}
               className={`flex items-center ${scrolled ? 'gap-3' : 'gap-4'}`}
             >
-              <a
-                href={site.telegram}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="hidden text-sm text-muted transition-colors duration-300 hover:text-text xl:inline"
-              >
-                Telegram
-              </a>
               <Button
                 href="#contact"
                 variant="light"
