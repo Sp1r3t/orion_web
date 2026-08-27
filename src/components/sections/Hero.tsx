@@ -1,6 +1,6 @@
 import Button from '@/components/ui/Button'
 import PixelWord from '@/components/ui/PixelWord'
-import StarField from '@/components/ui/StarField'
+import Constellation from '@/components/ui/Constellation'
 import { site, stats } from '@/content/site'
 
 const rotatingWords = ['создание', 'выполнение', 'креатив']
@@ -17,7 +17,7 @@ export default function Hero() {
         <div className="grid items-center gap-14 lg:grid-cols-12">
           {/* Слева — звёздное небо и кнопки. */}
           <div className="order-2 lg:order-1 lg:col-span-4">
-            <StarField className="pointer-events-none h-56 w-full sm:h-64 lg:h-72" />
+            <Constellation className="h-64 w-full sm:h-72 lg:h-[22rem]" />
 
             {/* Колонка стала уже — на десктопе кнопки стоят в столбик во всю её ширину. */}
             <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:flex-col">
