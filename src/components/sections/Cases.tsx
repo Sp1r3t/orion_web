@@ -1,27 +1,88 @@
-import { AnimatePresence, motion, useMotionValue, useSpring } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import Section from '@/components/ui/Section'
 import { cases } from '@/content/cases'
+import type { CaseItem } from '@/content/cases'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
+
+/** Колонки текут с разной скоростью — так поток не выглядит марширующим строем. */
+const COLUMN_SPEED = [52, 44]
+
+function Card({ item }: { item: CaseItem }) {
+  return (
+    <a
+      href="#contact"
+      data-case=""
+      aria-label={`${item.name} — ${item.field}`}
+      className="group relative block aspect-square overflow-hidden rounded-card border border-line transition-colors duration-500 hover:border-accent/50 focus-visible:border-accent/50"
+    >
+      <img
+        src={item.image}
+        alt=""
+        // Без ленивой загрузки: копии списка лежат за краем обрезки, и лениво
+        // они подгрузились бы только в момент, когда уже въехали в кадр.
+        decoding="async"
+        className="size-full object-cover brightness-[0.55] grayscale-[45%] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-90 group-hover:grayscale-0 group-focus-visible:scale-[1.06] group-focus-visible:brightness-90 group-focus-visible:grayscale-0"
+      />
+
+      {/* Затемнение снизу, чтобы текст читался поверх любого снимка. */}
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent transition-opacity duration-500 lg:opacity-70 lg:group-hover:opacity-100" />
+
+      <span className="label-mono pointer-events-none absolute top-4 left-5 text-text/70">
+        {item.index}
+      </span>
+
+      <ArrowUpRight className="pointer-events-none absolute top-4 right-4 size-5 text-text/50 transition-all duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent" />
+
+      {/* На тач-экранах наведения нет — там подпись видна всегда. */}
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col gap-2 p-5 lg:translate-y-2 lg:opacity-0 lg:transition-all lg:duration-500 lg:group-hover:translate-y-0 lg:group-hover:opacity-100 lg:group-focus-visible:translate-y-0 lg:group-focus-visible:opacity-100">
+        <span className="text-display text-xl leading-tight lg:text-2xl">{item.name}</span>
+
+        <span className="label-mono text-muted">
+          {item.field} · {item.year}
+        </span>
+
+        <span className="mt-1 hidden text-sm leading-snug text-text/85 lg:block">
+          {item.improved}
+        </span>
+
+        <span className="mt-2 flex items-center gap-2 self-start rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs text-accent">
+          {item.result}
+        </span>
+      </span>
+    </a>
+  )
+}
 
 export default function Cases() {
-  const [hovered, setHovered] = useState<string | null>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+  const [paused, setPaused] = useState(false)
+  const [reduced] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
+  )
 
-  const x = useMotionValue(0)
-  const y = useMotionValue(0)
-  const springX = useSpring(x, { stiffness: 260, damping: 28, mass: 0.4 })
-  const springY = useSpring(y, { stiffness: 260, damping: 28, mass: 0.4 })
+  // На узком экране две колонки дают квадраты по 160 px — там поток идёт одной лентой.
+  const wide = useMediaQuery('(min-width: 640px)')
+  const columns = wide
+    ? [cases.filter((_, i) => i % 2 === 0), cases.filter((_, i) => i % 2 === 1)]
+    : [cases]
 
-  function handleMove(event: React.MouseEvent<HTMLDivElement>) {
-    const bounds = listRef.current?.getBoundingClientRect()
-    if (!bounds) return
-    x.set(event.clientX - bounds.left + 24)
-    y.set(event.clientY - bounds.top - 110)
-  }
+  /**
+   * Пауза определяется по элементу под курсором, а не парой enter/leave:
+   * непарное событие оставило бы поток стоять навсегда. Слушаем документ —
+   * тогда любое движение мыши где угодно возвращает поток в движение.
+   */
+  useEffect(() => {
+    function onMove(event: PointerEvent) {
+      const target = event.target as Element | null
+      setPaused(Boolean(target?.closest?.('[data-case]')))
+    }
 
-  const active = cases.find((item) => item.id === hovered)
+    document.addEventListener('pointermove', onMove, { passive: true })
+    return () => document.removeEventListener('pointermove', onMove)
+  }, [])
 
   return (
     <Section
@@ -35,75 +96,47 @@ export default function Cases() {
           уже работают
         </>
       }
-      lead="Наведите на строку, чтобы увидеть проект. Результат — цифры клиента через три месяца после запуска."
+      lead="Поток останавливается, стоит навести курсор: на снимке появится, что это за проект, из какой он сферы и что изменилось после запуска."
     >
-      <div ref={listRef} onMouseMove={handleMove} className="relative mt-16 border-t border-line">
-        {cases.map((item) => (
-          <a
-            key={item.id}
-            href="#contact"
-            onMouseEnter={() => setHovered(item.id)}
-            onMouseLeave={() => setHovered(null)}
-            className="group block border-b border-line py-8 transition-colors duration-500 hover:bg-surface/60"
-          >
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
-              <span className="label-mono text-muted transition-colors group-hover:text-accent">
-                {item.index}
-              </span>
-
-              <div className="flex-1">
-                <h3 className="text-display text-3xl transition-transform duration-500 group-hover:translate-x-2 lg:text-5xl">
-                  {item.name}
-                </h3>
-                <p className="mt-3 max-w-md text-sm text-muted">{item.description}</p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-8 gap-y-3 lg:w-80 lg:justify-end">
-                <span className="label-mono text-muted">{item.field}</span>
-                <span className="label-mono text-muted">{item.type}</span>
-                <span className="rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs text-accent">
-                  {item.result}
-                </span>
-              </div>
-
-              <ArrowUpRight className="size-6 shrink-0 text-muted transition-all duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-accent" />
-            </div>
-
-            {/* На мобильных превью показываем прямо в строке — курсора там нет. */}
-            <div
-              className={`mt-5 h-32 rounded-card bg-gradient-to-br ${item.gradient} opacity-80 lg:hidden`}
-              aria-hidden="true"
-            />
-          </a>
-        ))}
-
-        {/* Превью, которое следует за курсором. */}
-        <AnimatePresence>
-          {active && (
-            <motion.div
-              className="pointer-events-none absolute top-0 left-0 z-20 hidden lg:block"
-              style={{ x: springX, y: springY }}
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.92 }}
-              transition={{ duration: 0.25 }}
-            >
+      <div
+        className="relative mx-auto mt-16 h-[min(780px,78vh)] max-w-[860px] min-h-[460px] overflow-hidden"
+        // Верх и низ растворяются — карточки будто вытекают из-за края секции.
+        style={{
+          maskImage: 'linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)',
+          WebkitMaskImage:
+            'linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)',
+        }}
+      >
+        <div
+          className={`grid gap-4 lg:gap-6 ${wide ? 'grid-cols-2' : 'grid-cols-1'}`}
+          onFocusCapture={() => setPaused(true)}
+          onBlurCapture={() => setPaused(false)}
+        >
+          {columns.map((column, index) => (
+            <div key={index} className={index === 1 ? '-mt-20 lg:-mt-32' : ''}>
               <div
-                className={`flex h-56 w-80 flex-col justify-between rounded-card bg-gradient-to-br p-5 ${active.gradient}`}
+                className="flex flex-col gap-4 will-change-transform lg:gap-6"
+                style={
+                  reduced
+                    ? undefined
+                    : {
+                        animation: `waterfall ${COLUMN_SPEED[index]}s linear infinite`,
+                        animationPlayState: paused ? 'paused' : 'running',
+                      }
+                }
               >
-                <span className="label-mono text-bg/80">{active.year}</span>
-                <div>
-                  <p className="font-display text-2xl text-bg">{active.name}</p>
-                  <p className="mt-1 text-sm text-bg/80">{active.type}</p>
-                </div>
+                {/* Список продублирован: на стыке копий поток выглядит бесконечным. */}
+                {[...column, ...column].map((item, i) => (
+                  <Card key={`${item.id}-${i}`} item={item} />
+                ))}
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          ))}
+        </div>
       </div>
 
       <p className="mt-8 text-sm text-muted">
-        Показаны 5 из 40+ проектов. Полное портфолио пришлём в ответ на заявку.
+        Показаны 8 проектов из 40+. Полное портфолио пришлём в ответ на заявку.
       </p>
     </Section>
   )
