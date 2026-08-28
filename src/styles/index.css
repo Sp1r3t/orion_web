@@ -65,6 +65,11 @@
 :root {
   --bg-dark: #050505;
   --bg-light: #f4f3f0;
+
+  /* Плотность звёздной пыли на плитках. */
+  --dust-low: 0.1;
+  --dust-high: 0.4;
+  --dust-hover: 0.35;
 }
 
 /**
@@ -82,6 +87,11 @@
   --color-muted: #5f6068;
   --color-ember: #d97706;
   --color-ink: #17171a;
+
+  /* Тёмная точка на светлом фоне бледнее светлой на тёмном — поднимаем плотность. */
+  --dust-low: 0.22;
+  --dust-high: 0.62;
+  --dust-hover: 0.6;
 }
 
 [data-theme='dark'] {
@@ -188,10 +198,10 @@
 @keyframes glyph-dust {
   0%,
   100% {
-    opacity: 0.1;
+    opacity: var(--dust-low);
   }
   50% {
-    opacity: 0.4;
+    opacity: var(--dust-high);
   }
 }
 
@@ -216,7 +226,7 @@
   position: absolute;
   border-radius: 9999px;
   background-color: var(--color-ink);
-  opacity: 0.14;
+  opacity: var(--dust-low);
   animation: glyph-dust 7s ease-in-out infinite;
   animation-delay: calc(var(--i, 0) * -0.43s);
 }
@@ -234,14 +244,14 @@
 .group:focus-visible .glyph-star {
   animation: none;
   opacity: 1;
-  fill: #fff2e2;
+  fill: var(--color-accent);
   filter: drop-shadow(0 0 5px rgb(255 176 32 / 0.8));
 }
 
 .group:hover .glyph-dust,
 .group:focus-visible .glyph-dust {
   animation: none;
-  opacity: 0.35;
+  opacity: var(--dust-hover);
 }
 
 @media (prefers-reduced-motion: reduce) {

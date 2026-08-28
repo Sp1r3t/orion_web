@@ -236,7 +236,7 @@ export default function Process() {
                   ref={pathRef}
                   d={CURVE}
                   fill="none"
-                  stroke="rgba(255,255,255,0.14)"
+                  stroke="var(--color-line-strong)"
                   strokeWidth="2"
                   strokeDasharray="6 8"
                   strokeLinecap="round"
