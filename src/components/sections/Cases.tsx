@@ -6,8 +6,11 @@ import { cases } from '@/content/cases'
 import type { CaseItem } from '@/content/cases'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 
-/** Колонки текут с разной скоростью — так поток не выглядит марширующим строем. */
-const COLUMN_SPEED = [52, 44]
+/** Левая колонка идёт снизу вверх, правая — сверху вниз, и с разной скоростью. */
+const COLUMNS = [
+  { animation: 'waterfall-up', seconds: 54 },
+  { animation: 'waterfall-down', seconds: 44 },
+]
 
 function Card({ item }: { item: CaseItem }) {
   return (
@@ -56,7 +59,8 @@ function Card({ item }: { item: CaseItem }) {
 }
 
 export default function Cases() {
-  const [paused, setPaused] = useState(false)
+  // Останавливается только та колонка, на которую навели.
+  const [hovered, setHovered] = useState<number | null>(null)
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -77,7 +81,8 @@ export default function Cases() {
   useEffect(() => {
     function onMove(event: PointerEvent) {
       const target = event.target as Element | null
-      setPaused(Boolean(target?.closest?.('[data-case]')))
+      const column = target?.closest?.('[data-column]')
+      setHovered(column ? Number(column.getAttribute('data-column')) : null)
     }
 
     document.addEventListener('pointermove', onMove, { passive: true })
@@ -99,7 +104,7 @@ export default function Cases() {
       lead="Поток останавливается, стоит навести курсор: на снимке появится, что это за проект, из какой он сферы и что изменилось после запуска."
     >
       <div
-        className="relative mx-auto mt-16 h-[min(780px,78vh)] max-w-[860px] min-h-[460px] overflow-hidden"
+        className="relative mt-16 h-[min(860px,80vh)] min-h-[460px] overflow-hidden"
         // Верх и низ растворяются — карточки будто вытекают из-за края секции.
         style={{
           maskImage: 'linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)',
@@ -109,19 +114,25 @@ export default function Cases() {
       >
         <div
           className={`grid gap-4 lg:gap-6 ${wide ? 'grid-cols-2' : 'grid-cols-1'}`}
-          onFocusCapture={() => setPaused(true)}
-          onBlurCapture={() => setPaused(false)}
+          onBlurCapture={() => setHovered(null)}
         >
           {columns.map((column, index) => (
-            <div key={index} className={index === 1 ? '-mt-20 lg:-mt-32' : ''}>
+            <div
+              key={index}
+              data-column={index}
+              onFocusCapture={() => setHovered(index)}
+              className={index === 1 ? '-mt-20 lg:-mt-32' : ''}
+            >
               <div
                 className="flex flex-col gap-4 will-change-transform lg:gap-6"
                 style={
                   reduced
                     ? undefined
                     : {
-                        animation: `waterfall ${COLUMN_SPEED[index]}s linear infinite`,
-                        animationPlayState: paused ? 'paused' : 'running',
+                        animation: `${COLUMNS[index % COLUMNS.length].animation} ${
+                          COLUMNS[index % COLUMNS.length].seconds
+                        }s linear infinite`,
+                        animationPlayState: hovered === index ? 'paused' : 'running',
                       }
                 }
               >

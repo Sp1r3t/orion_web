@@ -27,7 +27,6 @@
 
   --animate-marquee: marquee 40s linear infinite;
   --animate-marquee-reverse: marquee-reverse 40s linear infinite;
-  --animate-pulse-dot: pulse-dot 2.4s ease-in-out infinite;
   --animate-breathe: breathe 2.6s ease-in-out infinite;
 
   @keyframes marquee {
@@ -48,27 +47,6 @@
     }
   }
 
-  /* Портфолио: колонка едет сверху вниз. Список продублирован, поэтому сдвиг
-     на половину высоты возвращает поток в исходное положение незаметно. */
-  @keyframes waterfall {
-    from {
-      transform: translateY(-50%);
-    }
-    to {
-      transform: translateY(0);
-    }
-  }
-
-  /* Заливка активной точки в отзывах: показывает, сколько осталось до смены. */
-  @keyframes dot-fill {
-    from {
-      transform: scaleX(0);
-    }
-    to {
-      transform: scaleX(1);
-    }
-  }
-
   /* Кнопка едва заметно дышит — зовёт нажать, но не мигает. */
   @keyframes breathe {
     0%,
@@ -77,18 +55,6 @@
     }
     50% {
       transform: scale(1.04);
-    }
-  }
-
-  @keyframes pulse-dot {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.4;
-      transform: scale(0.7);
     }
   }
 }
@@ -119,6 +85,26 @@
   :focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 3px;
+  }
+}
+
+/* Портфолио: колонки текут навстречу друг другу. Список продублирован,
+   поэтому сдвиг ровно на половину высоты возвращает поток в исходное незаметно. */
+@keyframes waterfall-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes waterfall-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
   }
 }
 
