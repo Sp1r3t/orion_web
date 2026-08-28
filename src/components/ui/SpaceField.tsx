@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 
-import { useTheme } from '@/hooks/useTheme'
-
 type Star = {
   bx: number
   by: number
@@ -106,21 +104,34 @@ function channels(hex: string, fallback: string) {
  */
 export default function SpaceField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { theme } = useTheme()
-
   // Палитра живёт в ref: цикл читает её каждый кадр и не перезапускается,
   // поэтому смена темы не пересобирает звёздное поле заново.
   const palette = useRef({ ink: '245, 245, 244', deep: '5, 5, 5' })
   const repaint = useRef<(() => void) | null>(null)
 
+  /**
+   * Тему берём прямо из атрибута html и следим за ним наблюдателем.
+   * Хук useTheme держит своё состояние у каждого вызывающего — поле про
+   * переключение из хедера так бы и не узнало и осталось бы белым на белом.
+   */
   useEffect(() => {
-    const root = getComputedStyle(document.documentElement)
-    palette.current = {
-      ink: channels(root.getPropertyValue('--color-ink'), '245, 245, 244'),
-      deep: channels(root.getPropertyValue('--color-bg'), '5, 5, 5'),
+    function read() {
+      const root = getComputedStyle(document.documentElement)
+      palette.current = {
+        ink: channels(root.getPropertyValue('--color-ink'), '245, 245, 244'),
+        deep: channels(root.getPropertyValue('--color-bg'), '5, 5, 5'),
+      }
+      repaint.current?.()
     }
-    repaint.current?.()
-  }, [theme])
+
+    read()
+    const observer = new MutationObserver(read)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    })
+    return () => observer.disconnect()
+  }, [])
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&

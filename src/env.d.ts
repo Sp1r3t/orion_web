@@ -8,3 +8,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+/** View Transitions ещё нет в стандартных типах DOM этой версии TypeScript. */
+interface ViewTransition {
+  readonly ready: Promise<void>
+  readonly finished: Promise<void>
+  skipTransition(): void
+}
+
+interface Document {
+  startViewTransition?: (callback: () => void) => ViewTransition
+}

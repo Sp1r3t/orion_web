@@ -96,6 +96,22 @@
   --color-ink: #f5f5f4;
 }
 
+/* Снимки старой и новой темы не растворяются сами: новую открывает маска
+   из растущих окружностей, старая остаётся под ней. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
 @layer base {
   html {
     /* Плавность даёт Lenis: своя CSS-прокрутка с ним конфликтует. */
