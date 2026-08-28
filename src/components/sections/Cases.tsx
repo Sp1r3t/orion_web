@@ -22,7 +22,7 @@ function Card({ item }: { item: CaseItem }) {
       href="#contact"
       data-case=""
       aria-label={`${item.name} — ${item.field}`}
-      className="group relative block aspect-square overflow-hidden rounded-card border border-line transition-colors duration-500 hover:border-accent/50 focus-visible:border-accent/50"
+      className="group relative block aspect-square overflow-hidden rounded-card border border-line ring-0 ring-accent/45 transition-all duration-500 hover:border-accent/80 hover:ring-2 focus-visible:border-accent/80 focus-visible:ring-2"
     >
       <img
         src={item.image}
@@ -229,12 +229,6 @@ export default function Cases() {
       <div
         ref={windowRef}
         className="relative mt-16 h-[min(860px,80vh)] min-h-[460px] overflow-hidden"
-        // Верх и низ растворяются — карточки будто вытекают из-за края секции.
-        style={{
-          maskImage: 'linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)',
-          WebkitMaskImage:
-            'linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent)',
-        }}
       >
         <div
           className={`grid gap-4 lg:gap-6 ${wide ? 'grid-cols-2' : 'grid-cols-1'}`}
@@ -253,6 +247,12 @@ export default function Cases() {
             />
           ))}
         </div>
+
+        {/* Шторки вместо маски: маска делала полупрозрачной саму карточку,
+            и сквозь фотографию просвечивала фоновая сетка. Градиент цветом
+            фона закрывает у краёв и карточки, и сетку. */}
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-bg via-bg/80 to-transparent lg:h-32" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg via-bg/80 to-transparent lg:h-32" />
       </div>
 
       <p className="mt-8 text-sm text-muted">
