@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
 
+import HatchBackdrop from '@/components/ui/HatchBackdrop'
 import Section from '@/components/ui/Section'
 import { faq } from '@/content/reviews'
 import { site } from '@/content/site'
@@ -17,7 +18,7 @@ export default function Faq() {
       lead="Если вопроса здесь нет — напишите в Telegram, ответим за час."
     >
       {/* Диагональная штриховка на фоне секции — под аккордеоном и карточкой. */}
-      <div aria-hidden="true" className="hatch-backdrop pointer-events-none absolute inset-0" />
+      <HatchBackdrop className="hatch-backdrop" />
 
       <div className="relative mt-16 grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-8">
