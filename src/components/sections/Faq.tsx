@@ -16,7 +16,10 @@ export default function Faq() {
       title={<>Отвечаем заранее</>}
       lead="Если вопроса здесь нет — напишите в Telegram, ответим за час."
     >
-      <div className="mt-16 grid gap-10 lg:grid-cols-12">
+      {/* Диагональная штриховка на фоне секции — под аккордеоном и карточкой. */}
+      <div aria-hidden="true" className="hatch-backdrop pointer-events-none absolute inset-0" />
+
+      <div className="relative mt-16 grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-8">
           <div className="border-t border-line">
             {faq.map((item, index) => {
