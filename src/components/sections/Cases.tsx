@@ -13,8 +13,13 @@ const COLUMNS = [
   { direction: -1, seconds: 24 },
 ]
 
-/** Доля высоты окна, на которую карточка должна отступить от краёв, чтобы читаться. */
-const SAFE_EDGE = 0.1
+/**
+ * Высота шторки у края потока и отступ, на который карточка отодвигается от края
+ * при наведении. Отступ чуть больше шторки — иначе подтянутая карточка всё равно
+ * оказывалась бы под затемнением.
+ */
+const VEIL = 64
+const EDGE_PAD = VEIL + 12
 
 function Card({ item }: { item: CaseItem }) {
   return (
@@ -131,9 +136,9 @@ function Column({
 
             let shift = 0
             if (box) {
-              const pad = box.height * SAFE_EDGE
-              if (rect.top < box.top + pad) shift = -(box.top + pad - rect.top)
-              else if (rect.bottom > box.bottom - pad) shift = rect.bottom - (box.bottom - pad)
+              if (rect.top < box.top + EDGE_PAD) shift = -(box.top + EDGE_PAD - rect.top)
+              else if (rect.bottom > box.bottom - EDGE_PAD)
+                shift = rect.bottom - (box.bottom - EDGE_PAD)
             }
 
             target = offset + shift
@@ -251,8 +256,8 @@ export default function Cases() {
         {/* Шторки вместо маски: маска делала полупрозрачной саму карточку,
             и сквозь фотографию просвечивала фоновая сетка. Градиент цветом
             фона закрывает у краёв и карточки, и сетку. */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-bg via-bg/80 to-transparent lg:h-32" />
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-bg via-bg/80 to-transparent lg:h-32" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-bg via-bg/85 to-transparent lg:h-16" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-bg via-bg/85 to-transparent lg:h-16" />
       </div>
 
       <p className="mt-8 text-sm text-muted">
