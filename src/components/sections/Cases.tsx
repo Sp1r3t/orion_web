@@ -223,6 +223,9 @@ export default function Cases() {
       }
       lead="Наведите на карточку: колонка остановится, подтянет снимок в кадр и покажет, что это за проект, из какой он сферы и что изменилось после запуска."
     >
+      {/* Сетка на фоне всей секции — под потоком и текстом. */}
+      <div aria-hidden="true" className="grid-backdrop pointer-events-none absolute inset-0" />
+
       <div
         ref={windowRef}
         className="relative mt-16 h-[min(860px,80vh)] min-h-[460px] overflow-hidden"
