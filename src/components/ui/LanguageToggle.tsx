@@ -10,18 +10,19 @@ import type { Lang } from '@/i18n/types'
  * внутри рамки, поэтому её толщину нужно вычесть — иначе подсветка букв
  * разъезжается с бегунком на пару пикселей.
  */
-const WIDTH = 84
-const HEIGHT = 36
+const WIDTH = 72
+const HEIGHT = 32
 const BORDER = 1
 const PAD = 3
 const TRACK = WIDTH - BORDER * 2
 const HALF = (TRACK - PAD * 2) / 2
 const THUMB_H = HEIGHT - BORDER * 2 - PAD * 2
+const THUMB_R = 7
 
 const ORDER: Lang[] = ['ru', 'en']
 
-/** Пружина плотная: бегунок доезжает быстро, но без рывка в конце. */
-const SPRING = { stiffness: 420, damping: 34, mass: 0.8 }
+/** Мягкая пружина: бегунок скользит и едва заметно доводится, без щелчка в конце. */
+const SPRING = { stiffness: 260, damping: 30, mass: 0.9 }
 
 export default function LanguageToggle({ className = '' }: { className?: string }) {
   const { lang, setLang, content } = useLanguage()
@@ -36,18 +37,23 @@ export default function LanguageToggle({ className = '' }: { className?: string 
 
   const x = useTransform(progress, (value) => value * HALF)
 
-  /** На разгоне бегунок слегка растягивается — движение читается живым, а не линейным. */
+  /**
+   * Разгон вытягивает бегунок за собой: точка опоры — на хвосте, поэтому передний
+   * край стоит на месте, а тянется след. Это то самое «живое» движение, из-за
+   * которого скольжение читается мягким, а не как перестановка блока.
+   */
   const velocity = useVelocity(progress)
-  const scaleX = useTransform(velocity, (value) => 1 + Math.min(Math.abs(value) * 0.05, 0.16))
+  const scaleX = useTransform(velocity, (value) => 1 + Math.min(Math.abs(value) * 0.035, 0.1))
+  const origin = useTransform(velocity, (value) => (value >= 0 ? 'right center' : 'left center'))
 
   /**
-   * Верхний слой подписей обрезан ровно по бегунку: буквы перекрашиваются в тёмное
-   * по мере того, как он на них наезжает. Перекрашивания целиком по клику не видно —
-   * цвет меняется постепенно вместе с движением.
+   * Верхний слой подписей обрезан ровно по бегунку: буква разгорается акцентом ровно
+   * там, где он на неё наехал. Оба слоя набраны одинаково — иначе на границе обрезки
+   * глифы разной ширины давали бы двоение.
    */
   const clip = useTransform(progress, (value) => {
     const left = PAD + value * HALF
-    return `inset(${PAD}px ${TRACK - left - HALF}px ${PAD}px ${left}px round 9px)`
+    return `inset(${PAD}px ${TRACK - left - HALF}px ${PAD}px ${left}px round ${THUMB_R}px)`
   })
 
   function switchTo(next: Lang) {
@@ -86,38 +92,48 @@ export default function LanguageToggle({ className = '' }: { className?: string 
       role="group"
       aria-label={content.ui.header.language}
       style={{ width: WIDTH, height: HEIGHT }}
-      className={`relative flex shrink-0 items-center overflow-hidden rounded-[11px] border border-line bg-surface/70 transition-colors duration-500 ${className}`.trim()}
+      className={`group/lang relative flex shrink-0 items-center overflow-hidden rounded-[10px] border border-line bg-surface/40 backdrop-blur-sm transition-colors duration-500 hover:border-line-strong ${className}`.trim()}
     >
       <motion.span
         aria-hidden="true"
-        style={{ x, scaleX, width: HALF, height: THUMB_H, left: PAD, top: PAD }}
-        className="pointer-events-none absolute overflow-hidden rounded-[9px] bg-gradient-to-br from-accent to-ember shadow-[0_8px_20px_-8px_rgb(255_106_0/0.9)]"
+        style={{
+          x,
+          scaleX,
+          transformOrigin: origin,
+          width: HALF,
+          height: THUMB_H,
+          left: PAD,
+          top: PAD,
+          borderRadius: THUMB_R,
+        }}
+        className="pointer-events-none absolute border border-accent/45 bg-accent/12 shadow-[0_0_14px_-3px_rgb(255_106_0/0.5)]"
       >
-        {/* Блик пробегает по бегунку на каждом переключении. */}
+        {/* На каждом переключении из бегунка расходится короткая волна. */}
         <motion.span
           key={lang}
-          initial={{ x: '-180%' }}
-          animate={{ x: '180%' }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-y-0 w-1/2 bg-white/40 blur-[5px]"
+          initial={{ opacity: 0.5, scale: 0.5 }}
+          animate={{ opacity: 0, scale: 1.5 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{ borderRadius: THUMB_R }}
+          className="absolute inset-0 bg-accent/45 blur-[6px]"
         />
       </motion.span>
 
       <span
         aria-hidden="true"
-        className="label-mono pointer-events-none absolute inset-0 grid grid-cols-2 items-center text-center text-muted"
+        className="pointer-events-none absolute inset-0 grid grid-cols-2 items-center text-center font-mono text-[10px] font-medium tracking-[0.12em] text-muted uppercase transition-colors duration-300 group-hover/lang:text-text"
       >
-        <span className="pl-[0.18em]">RU</span>
-        <span className="pl-[0.18em]">EN</span>
+        <span className="pl-[0.12em]">RU</span>
+        <span className="pl-[0.12em]">EN</span>
       </span>
 
       <motion.span
         aria-hidden="true"
         style={{ clipPath: clip, WebkitClipPath: clip }}
-        className="label-mono pointer-events-none absolute inset-0 grid grid-cols-2 items-center text-center font-semibold text-bg"
+        className="pointer-events-none absolute inset-0 grid grid-cols-2 items-center text-center font-mono text-[10px] font-medium tracking-[0.12em] text-accent uppercase"
       >
-        <span className="pl-[0.18em]">RU</span>
-        <span className="pl-[0.18em]">EN</span>
+        <span className="pl-[0.12em]">RU</span>
+        <span className="pl-[0.12em]">EN</span>
       </motion.span>
 
       {/* Настоящие кнопки лежат сверху и прозрачны: подписи рисуют слои выше. */}
@@ -127,7 +143,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
           type="button"
           onClick={() => switchTo(code)}
           aria-pressed={lang === code}
-          className="relative z-10 h-full flex-1 rounded-[9px]"
+          className="relative z-10 h-full flex-1 rounded-[7px]"
         >
           <span className="sr-only">{code === 'ru' ? 'Русский' : 'English'}</span>
         </button>
