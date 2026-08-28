@@ -1,4 +1,4 @@
-import { stack } from '@/content/site'
+import { useContent } from '@/i18n/context'
 
 function Row({ items, reverse = false }: { items: string[]; reverse?: boolean }) {
   const track = [...items, ...items]
@@ -25,12 +25,13 @@ function Row({ items, reverse = false }: { items: string[]; reverse?: boolean })
 
 /** Две встречные ленты со стеком — визуальная пауза между тяжёлыми секциями. */
 export default function Stack() {
+  const { stack, ui } = useContent()
   const half = Math.ceil(stack.length / 2)
 
   return (
     <section className="relative overflow-hidden border-t border-line py-16">
       <div className="container-page">
-        <p className="label-mono text-muted">Работаем на этом</p>
+        <p className="label-mono text-muted">{ui.stack.title}</p>
       </div>
       <div className="mt-8 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]">
         <Row items={stack.slice(0, half)} />

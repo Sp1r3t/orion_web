@@ -12,28 +12,31 @@ import Services from '@/components/sections/Services'
 import Stack from '@/components/sections/Stack'
 import EstimateProvider from '@/context/EstimateProvider'
 import { useSmoothScroll } from '@/hooks/useSmoothScroll'
+import LanguageProvider from '@/i18n/LanguageProvider'
 
 export default function App() {
   useSmoothScroll()
 
   return (
-    <EstimateProvider>
-      <div className="grain">
-        <Header />
-        <main>
-          <Hero />
-          <Services />
-          <Cases />
-          <Process />
-          <Stack />
-          <Pricing />
-          <Promises />
-          <Reviews />
-          <Faq />
-          <Contact />
-        </main>
-        <Footer />
-      </div>
-    </EstimateProvider>
+    <LanguageProvider>
+      <EstimateProvider>
+        <div className="grain">
+          <Header />
+          <main>
+            <Hero />
+            <Services />
+            <Cases />
+            <Process />
+            <Stack />
+            <Pricing />
+            <Promises />
+            <Reviews />
+            <Faq />
+            <Contact />
+          </main>
+          <Footer />
+        </div>
+      </EstimateProvider>
+    </LanguageProvider>
   )
 }

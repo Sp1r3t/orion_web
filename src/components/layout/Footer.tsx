@@ -1,26 +1,26 @@
 import { ArrowUp } from 'lucide-react'
 
-import { navItems, site } from '@/content/site'
+import { useContent } from '@/i18n/context'
 
 export default function Footer() {
+  const { site, navItems, ui } = useContent()
+
   return (
     <footer className="relative overflow-hidden border-t border-line pt-20">
       <div className="container-page">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
-            <p className="max-w-sm text-lg text-balance">
-              Собираем сайты и сервисы, которые считаются в деньгах.
-            </p>
+            <p className="max-w-sm text-lg text-balance">{ui.footer.line}</p>
             <a
               href="#contact"
               className="mt-6 inline-flex items-center gap-2 text-accent transition-colors hover:text-accent-hover"
             >
-              Создать сайт →
+              {ui.footer.cta}
             </a>
           </div>
 
-          <nav className="lg:col-span-3" aria-label="Разделы в подвале">
-            <p className="label-mono text-muted">Разделы</p>
+          <nav className="lg:col-span-3" aria-label={ui.footer.sections}>
+            <p className="label-mono text-muted">{ui.footer.sections}</p>
             <ul className="mt-5 flex flex-col gap-3 text-sm">
               {navItems.map((item) => (
                 <li key={item.id}>
@@ -33,7 +33,7 @@ export default function Footer() {
           </nav>
 
           <div className="lg:col-span-4">
-            <p className="label-mono text-muted">Контакты</p>
+            <p className="label-mono text-muted">{ui.footer.contacts}</p>
             <ul className="mt-5 flex flex-col gap-3 text-sm">
               <li>
                 <a href={`mailto:${site.email}`} className="transition-colors hover:text-accent">
@@ -74,14 +74,14 @@ export default function Footer() {
 
         <div className="flex flex-col gap-3 border-t border-line py-7 text-xs text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {site.name}. Все права защищены.
+            © {new Date().getFullYear()} {site.name}. {ui.footer.rights}
           </p>
           <a
             href="#top"
             className="inline-flex items-center gap-2 transition-colors hover:text-accent"
           >
             <ArrowUp className="size-3.5" />
-            Наверх
+            {ui.footer.top}
           </a>
         </div>
       </div>

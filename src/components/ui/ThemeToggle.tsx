@@ -5,6 +5,7 @@ import { flushSync } from 'react-dom'
 import type { MouseEvent } from 'react'
 
 import { useTheme } from '@/hooks/useTheme'
+import { useContent } from '@/i18n/context'
 
 /** Сетка, по которой рассыпаются круги: 4×3 клетки покрывают экран целиком. */
 const COLS = 4
@@ -25,6 +26,7 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 
 export default function ThemeToggle({ className = '' }: { className?: string }) {
   const { theme, setTheme } = useTheme()
+  const { ui } = useContent()
   const running = useRef(false)
   const dark = theme === 'dark'
 
@@ -60,6 +62,8 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     }
 
     running.current = true
+    // Класс включает правила перехода темы: снимки не растворяются, их открывает маска.
+    document.documentElement.classList.add('theme-switch')
 
     // flushSync нужен, чтобы React применил тему внутри перехода: снимок
     // «после» браузер делает сразу по возвращении из коллбэка.
@@ -99,6 +103,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
       })
       .finally(() => {
         window.setTimeout(() => {
+          document.documentElement.classList.remove('theme-switch')
           running.current = false
         }, DURATION)
       })
@@ -108,7 +113,7 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     <button
       type="button"
       onClick={switchTheme}
-      aria-label={dark ? 'Включить светлую тему' : 'Включить тёмную тему'}
+      aria-label={dark ? ui.header.toLight : ui.header.toDark}
       className={`relative flex size-9 items-center justify-center rounded-full text-muted transition-colors duration-300 hover:text-accent ${className}`.trim()}
     >
       <AnimatePresence mode="wait" initial={false}>

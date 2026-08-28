@@ -107,19 +107,46 @@
 }
 
 /* Снимки старой и новой темы не растворяются сами: новую открывает маска
-   из растущих окружностей, старая остаётся под ней. */
-::view-transition-old(root),
-::view-transition-new(root) {
+   из растущих окружностей, старая остаётся под ней. Правило привязано к классу —
+   иначе оно погасило бы и переход смены языка, у которого своя анимация. */
+:root.theme-switch::view-transition-old(root),
+:root.theme-switch::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 }
 
-::view-transition-old(root) {
+:root.theme-switch::view-transition-old(root) {
   z-index: 1;
 }
 
-::view-transition-new(root) {
+:root.theme-switch::view-transition-new(root) {
   z-index: 2;
+}
+
+/* Смена языка: старый текст расфокусируется и уходит вверх, новый собирается снизу.
+   Работаем со снимками страницы, поэтому вёрстку никто не пересчитывает. */
+:root.lang-switch::view-transition-old(root) {
+  animation: lang-out 0.4s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+:root.lang-switch::view-transition-new(root) {
+  animation: lang-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes lang-out {
+  to {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes lang-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(10px);
+  }
 }
 
 @layer base {

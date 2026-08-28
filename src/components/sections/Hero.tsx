@@ -1,11 +1,11 @@
 import Button from '@/components/ui/Button'
 import PixelWord from '@/components/ui/PixelWord'
 import SpaceField from '@/components/ui/SpaceField'
-import { site, stats } from '@/content/site'
-
-const rotatingWords = ['создание', 'качество', 'креатив']
+import { useContent } from '@/i18n/context'
 
 export default function Hero() {
+  const { site, stats, ui } = useContent()
+
   return (
     <section
       id="top"
@@ -22,11 +22,11 @@ export default function Hero() {
               с ним было «на», строка стоила на четверть дороже и кегль приходилось резать. */}
           <div className="@container lg:col-span-8 lg:col-start-5 lg:text-right">
             <h1 className="text-display text-[clamp(1.75rem,min(11.9cqw,12vh),6.5rem)]">
-              Держим
+              {ui.hero.lineOne}
               <br />
-              курс на
+              {ui.hero.lineTwo}
               <br />
-              <PixelWord words={rotatingWords} interval={3000} />
+              <PixelWord key={ui.hero.words.join()} words={ui.hero.words} interval={3000} />
             </h1>
 
             <p className="mt-8 text-base text-muted lg:ml-auto lg:max-w-2xl lg:text-lg">
@@ -38,10 +38,10 @@ export default function Hero() {
         {/* Кнопки прижаты к низу экрана — созвездие остаётся выше них. */}
         <div className="mt-auto flex flex-col gap-3 pt-10 sm:flex-row">
           <Button href="#contact" size="lg" className="w-full sm:w-auto">
-            Создать сайт
+            {ui.hero.cta}
           </Button>
           <Button href="#portfolio" variant="outline" size="lg" className="w-full sm:w-auto">
-            Смотреть работы
+            {ui.hero.portfolio}
           </Button>
         </div>
       </div>

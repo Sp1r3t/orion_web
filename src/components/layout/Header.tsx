@@ -4,10 +4,12 @@ import { useState } from 'react'
 
 import MobileMenu from '@/components/layout/MobileMenu'
 import Button from '@/components/ui/Button'
+import LanguageToggle from '@/components/ui/LanguageToggle'
 import ThemeToggle from '@/components/ui/ThemeToggle'
-import { navItems, site, spySectionIds } from '@/content/site'
+import { spySectionIds } from '@/content/site'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { useContent } from '@/i18n/context'
 
 /**
  * Пружина для сборки хедера. Layout-анимация framer-motion меряет положение
@@ -20,6 +22,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const scrolled = useScrolled()
   const activeId = useScrollSpy(spySectionIds)
+  const { site, navItems, ui } = useContent()
 
   return (
     <>
@@ -56,7 +59,7 @@ export default function Header() {
               layout
               transition={glide}
               className={`hidden items-center lg:flex ${scrolled ? 'gap-6' : 'gap-9'}`}
-              aria-label="Разделы сайта"
+              aria-label={ui.header.nav}
             >
               {navItems.map((item) => {
                 const active = activeId === item.id
@@ -87,19 +90,20 @@ export default function Header() {
               transition={glide}
               className={`flex items-center ${scrolled ? 'gap-3' : 'gap-4'}`}
             >
+              <LanguageToggle />
               <ThemeToggle />
-              <Button
-                href="#contact"
-                variant="light"
-                size={scrolled ? 'sm' : 'md'}
-                className="hidden lg:inline-flex"
-              >
-                Создать сайт
-              </Button>
+              {/* Прячем обёрткой: у самой кнопки в базовых классах есть inline-flex,
+                  и он перебивает hidden — на телефоне кнопка выдавливала бургер за экран.
+                  На десктопе contents убирает лишний бокс, раскладка не меняется. */}
+              <span className="hidden lg:contents">
+                <Button href="#contact" variant="light" size={scrolled ? 'sm' : 'md'}>
+                  {ui.header.cta}
+                </Button>
+              </span>
               <button
                 type="button"
                 onClick={() => setMenuOpen(true)}
-                aria-label="Открыть меню"
+                aria-label={ui.header.openMenu}
                 aria-expanded={menuOpen}
                 className="p-2 text-text transition-colors duration-300 hover:text-accent lg:hidden"
               >

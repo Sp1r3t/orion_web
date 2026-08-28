@@ -3,8 +3,8 @@ import { X } from 'lucide-react'
 import { useEffect } from 'react'
 
 import Button from '@/components/ui/Button'
-import { navItems, site } from '@/content/site'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
+import { useContent } from '@/i18n/context'
 
 type MobileMenuProps = {
   open: boolean
@@ -13,6 +13,7 @@ type MobileMenuProps = {
 }
 
 export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps) {
+  const { site, navItems, ui } = useContent()
   useLockBodyScroll(open)
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
           transition={{ duration: 0.25 }}
           role="dialog"
           aria-modal="true"
-          aria-label="Меню"
+          aria-label={ui.header.menu}
         >
           <div className="container-page flex h-20 items-center justify-between">
             <span className="font-display text-2xl font-bold tracking-[-0.02em] uppercase">
@@ -46,14 +47,14 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
             <button
               type="button"
               onClick={onClose}
-              aria-label="Закрыть меню"
+              aria-label={ui.header.closeMenu}
               className="p-2 text-text transition-colors duration-300 hover:text-accent"
             >
               <X className="size-6" />
             </button>
           </div>
 
-          <nav className="container-page mt-8 flex flex-col gap-2" aria-label="Разделы сайта">
+          <nav className="container-page mt-8 flex flex-col gap-2" aria-label={ui.header.nav}>
             {navItems.map((item, index) => (
               <motion.a
                 key={item.id}
@@ -73,7 +74,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
 
           <div className="container-page mt-10 flex flex-col gap-4">
             <Button href="#contact" size="lg" onClick={onClose}>
-              Создать сайт
+              {ui.header.cta}
             </Button>
             <Button href={site.telegram} variant="outline" size="lg">
               Telegram

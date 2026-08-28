@@ -3,9 +3,9 @@ import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 
 import Section from '@/components/ui/Section'
-import { cases } from '@/content/cases'
 import type { CaseItem } from '@/content/cases'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { useContent } from '@/i18n/context'
 
 /** Левая колонка идёт снизу вверх, правая — сверху вниз, и с разной скоростью. */
 const COLUMNS = [
@@ -185,6 +185,7 @@ function Column({
 }
 
 export default function Cases() {
+  const { cases, ui } = useContent()
   const [hovered, setHovered] = useState<HTMLElement | null>(null)
   const windowRef = useRef<HTMLDivElement>(null)
   const [reduced] = useState(
@@ -218,15 +219,15 @@ export default function Cases() {
     <Section
       id="portfolio"
       index="02"
-      eyebrow="Портфолио"
+      eyebrow={ui.cases.eyebrow}
       title={
         <>
-          Проекты, которые
+          {ui.cases.title[0]}
           <br />
-          уже работают
+          {ui.cases.title[1]}
         </>
       }
-      lead="Наведите на карточку: колонка остановится, подтянет снимок в кадр и покажет, что это за проект, из какой он сферы и что изменилось после запуска."
+      lead={ui.cases.lead}
     >
       {/* Сетка на фоне всей секции — под потоком и текстом. */}
       <div aria-hidden="true" className="grid-backdrop pointer-events-none absolute inset-0" />
@@ -260,9 +261,7 @@ export default function Cases() {
         <span className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-bg via-bg/85 to-transparent lg:h-11" />
       </div>
 
-      <p className="mt-8 text-sm text-muted">
-        Показаны 8 проектов из 40+. Полное портфолио пришлём в ответ на заявку.
-      </p>
+      <p className="mt-8 text-sm text-muted">{ui.cases.note}</p>
     </Section>
   )
 }

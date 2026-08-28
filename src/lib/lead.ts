@@ -1,4 +1,7 @@
 import type { EstimateValue } from '@/context/estimateContext'
+import { money } from '@/i18n/format'
+import { ru } from '@/i18n/ru'
+import type { Ui } from '@/i18n/types'
 
 export type LeadEstimate = {
   projectType: string
@@ -28,12 +31,6 @@ export class LeadNotConfiguredError extends Error {
   }
 }
 
-const money = new Intl.NumberFormat('ru-RU', {
-  style: 'currency',
-  currency: 'RUB',
-  maximumFractionDigits: 0,
-})
-
 /** Снимок расчёта в том виде, в котором он уходит вместе с заявкой. */
 export function toLeadEstimate(estimate: EstimateValue): LeadEstimate {
   return {
@@ -51,30 +48,42 @@ export function toLeadEstimate(estimate: EstimateValue): LeadEstimate {
   }
 }
 
-/** Читаемый текст заявки — уходит в тело письма и лежит под кнопкой «скопировать». */
-export function formatLead(payload: LeadPayload): string {
+/**
+ * Читаемый текст заявки — уходит в тело письма и лежит под кнопкой «скопировать».
+ * Подписи берутся из активного языка; по умолчанию русские, чтобы функцию можно
+ * было звать и там, где до контекста не дотянуться.
+ */
+export function formatLead(
+  payload: LeadPayload,
+  strings: Ui['leadMail'] = ru.ui.leadMail,
+  locale: string = ru.ui.locale,
+): string {
+  const format = money(locale)
+
   const lines = [
-    `Имя: ${payload.name}`,
-    `Контакт: ${payload.contact}`,
-    payload.task && `Задача: ${payload.task}`,
-    payload.budget && `Бюджет: ${payload.budget}`,
-    payload.message && `Комментарий: ${payload.message}`,
+    `${strings.name}: ${payload.name}`,
+    `${strings.contact}: ${payload.contact}`,
+    payload.task && `${strings.task}: ${payload.task}`,
+    payload.budget && `${strings.budget}: ${payload.budget}`,
+    payload.message && `${strings.comment}: ${payload.message}`,
   ].filter(Boolean) as string[]
 
   if (payload.estimate) {
     const { estimate } = payload
-    lines.push('', '--- Расчёт из калькулятора ---')
-    lines.push(`Тип проекта: ${estimate.projectType}`)
-    lines.push(`Темп: ${estimate.pace}`)
+    lines.push('', `--- ${strings.estimate} ---`)
+    lines.push(`${strings.projectType}: ${estimate.projectType}`)
+    lines.push(`${strings.pace}: ${estimate.pace}`)
     lines.push(
       estimate.options.length > 0
-        ? `Опции: ${estimate.options
+        ? `${strings.options}: ${estimate.options
             .map((item) => `${item.title}${item.count > 1 ? ` ×${item.count}` : ''}`)
             .join(', ')}`
-        : 'Опции: не выбраны',
+        : `${strings.options}: ${strings.noOptions}`,
     )
-    lines.push(`Вилка: ${money.format(estimate.priceMin)} — ${money.format(estimate.priceMax)}`)
-    lines.push(`Срок: ${estimate.weeksMin}–${estimate.weeksMax} недель`)
+    lines.push(
+      `${strings.range}: ${format.format(estimate.priceMin)} — ${format.format(estimate.priceMax)}`,
+    )
+    lines.push(`${strings.term}: ${estimate.weeksMin}–${estimate.weeksMax} ${strings.weeks}`)
   }
 
   return lines.join('\n')

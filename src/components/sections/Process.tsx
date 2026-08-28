@@ -10,7 +10,7 @@ import { Check, ClipboardList, Code2, LayoutGrid, MouseIcon, Rocket } from 'luci
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ComponentType } from 'react'
 
-import { processSteps } from '@/content/process'
+import { useContent } from '@/i18n/context'
 
 const icons: Record<string, ComponentType<{ className?: string }>> = {
   brief: ClipboardList,
@@ -40,6 +40,7 @@ const DOT_GLOW = 34
 type NodePosition = { left: number; top: number }
 
 export default function Process() {
+  const { processSteps, ui } = useContent()
   const wrapperRef = useRef<HTMLDivElement>(null)
   const pathRef = useRef<SVGPathElement>(null)
   const svgRef = useRef<SVGSVGElement>(null)
@@ -178,13 +179,13 @@ export default function Process() {
                     03
                   </span>
                   <span className="font-mono text-sm tracking-[0.16em] text-muted uppercase lg:text-base">
-                    Процесс
+                    {ui.process.eyebrow}
                   </span>
                 </div>
                 <h2 className="text-display mt-6 text-[clamp(2rem,4vw,3.25rem)]">
-                  Четыре этапа
+                  {ui.process.title[0]}
                   <br />
-                  без сюрпризов
+                  {ui.process.title[1]}
                 </h2>
               </div>
 
@@ -204,7 +205,7 @@ export default function Process() {
                   className="label-mono mt-4 hidden items-center gap-2 text-muted lg:flex"
                 >
                   <MouseIcon className="size-3.5" />
-                  Крутите — точка пойдёт по пути
+                  {ui.process.hint}
                 </motion.p>
               </div>
             </div>
@@ -273,7 +274,7 @@ export default function Process() {
                     onClick={() => goToStep(index)}
                     style={{ left: node.left, top: node.top }}
                     className="group absolute -translate-x-1/2 -translate-y-1/2"
-                    aria-label={`Этап ${processSteps[index].index}: ${processSteps[index].title}`}
+                    aria-label={`${ui.process.stage} ${processSteps[index].index}: ${processSteps[index].title}`}
                   >
                     <span
                       className={`flex size-14 items-center justify-center rounded-full border transition-all duration-500 ${

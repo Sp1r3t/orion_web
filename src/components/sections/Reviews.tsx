@@ -2,12 +2,13 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
 import Section from '@/components/ui/Section'
-import { reviews } from '@/content/reviews'
+import { useContent } from '@/i18n/context'
 
 /** Сколько держится один отзыв. Столько же длится заливка активной точки. */
 const SLIDE_MS = 7000
 
 export default function Reviews() {
+  const { reviews, ui } = useContent()
   const [index, setIndex] = useState(0)
   const [reduced] = useState(
     () =>
@@ -50,15 +51,15 @@ export default function Reviews() {
 
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [index, reduced])
+  }, [index, reduced, reviews.length])
 
   return (
     <Section
       id="testimonials"
       index="06"
-      eyebrow="Отзывы"
-      title={<>Что говорят клиенты</>}
-      lead="Истории проектов и то, как менялись цифры после запуска."
+      eyebrow={ui.reviews.eyebrow}
+      title={ui.reviews.title}
+      lead={ui.reviews.lead}
     >
       <div className="mt-16">
         <div className="grid gap-10 lg:grid-cols-12">
@@ -104,7 +105,7 @@ export default function Reviews() {
               <span className="text-muted"> / {String(reviews.length).padStart(2, '0')}</span>
             </p>
 
-            <div className="flex items-center gap-2" role="tablist" aria-label="Отзывы">
+            <div className="flex items-center gap-2" role="tablist" aria-label={ui.reviews.list}>
               {reviews.map((item, i) => {
                 const active = i === index
 
@@ -114,7 +115,7 @@ export default function Reviews() {
                     type="button"
                     role="tab"
                     aria-selected={active}
-                    aria-label={`Отзыв ${i + 1}`}
+                    aria-label={`${ui.reviews.item} ${i + 1}`}
                     onClick={() => setIndex(i)}
                     className={`h-2 overflow-hidden rounded-full bg-line-strong transition-all duration-500 ${
                       active ? 'w-14' : 'w-2 hover:bg-muted'

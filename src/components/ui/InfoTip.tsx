@@ -2,6 +2,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
 import { useId, useState } from 'react'
 
+import { useContent } from '@/i18n/context'
+
 type InfoTipProps = {
   label: string
   text: string
@@ -12,6 +14,7 @@ type InfoTipProps = {
  * на тач-устройствах — по нажатию: там события наведения не приходят.
  */
 export default function InfoTip({ label, text }: InfoTipProps) {
+  const { ui } = useContent()
   const [open, setOpen] = useState(false)
   const id = useId()
 
@@ -19,7 +22,7 @@ export default function InfoTip({ label, text }: InfoTipProps) {
     <span className="relative inline-flex">
       <button
         type="button"
-        aria-label={`Что такое «${label}»`}
+        aria-label={`${ui.pricing.what} ${label}`}
         aria-expanded={open}
         aria-describedby={open ? id : undefined}
         onMouseEnter={() => setOpen(true)}

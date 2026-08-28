@@ -1,15 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import { pricingOptions, projectTypes, urgencyModes } from '@/content/pricing'
 import { EstimateContext } from '@/context/estimateContext'
 import type { EstimateValue } from '@/context/estimateContext'
+import { useContent } from '@/i18n/context'
 
 /**
  * Состояние калькулятора живёт здесь, а не внутри секции тарифов:
  * форма заявки показывает тот же расчёт и отправляет его вместе с контактами.
  */
 export default function EstimateProvider({ children }: { children: ReactNode }) {
+  // Данные калькулятора берём из активного языка: id опций в обеих версиях
+  // одинаковые, поэтому выбор посетителя переживает смену языка.
+  const { pricingOptions, projectTypes, urgencyModes } = useContent()
+
   const [typeId, setTypeId] = useState(projectTypes[0].id)
   const [urgencyId, setUrgencyId] = useState(urgencyModes[0].id)
   const [counts, setCounts] = useState<Record<string, number>>({})
@@ -23,7 +27,7 @@ export default function EstimateProvider({ children }: { children: ReactNode }) 
       pricingOptions
         .map((option) => ({ option, count: counts[option.id] ?? 0 }))
         .filter((item) => item.count > 0),
-    [counts],
+    [counts, pricingOptions],
   )
 
   const totals = useMemo(() => {

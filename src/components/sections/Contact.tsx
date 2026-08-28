@@ -4,41 +4,29 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 
 import Section from '@/components/ui/Section'
-import { site } from '@/content/site'
 import { useEstimate } from '@/context/estimateContext'
+import { useContent, useMoney } from '@/i18n/context'
 import { formatLead, LeadNotConfiguredError, sendLead, toLeadEstimate } from '@/lib/lead'
 import type { LeadPayload } from '@/lib/lead'
 
-const taskChips = [
-  'Лендинг',
-  'Корпоративный сайт',
-  'Магазин',
-  'Веб-сервис',
-  'Редизайн',
-  'Ещё не решил',
-]
-const budgetChips = ['до 50 000 ₽', '50–100 000 ₽', '100–300 000 ₽', 'больше 300 000 ₽', 'не знаю']
-
-/** Тип проекта из калькулятора → готовый вариант в форме. */
-const taskByType: Record<string, string> = {
-  landing: 'Лендинг',
-  corporate: 'Корпоративный сайт',
-  ecommerce: 'Магазин',
-  product: 'Веб-сервис',
+/**
+ * Выбор в чипах храним номером, а не подписью: при смене языка подписи другие,
+ * и отмеченный вариант иначе бы слетал.
+ */
+const taskIndexByType: Record<string, number> = {
+  landing: 0,
+  corporate: 1,
+  ecommerce: 2,
+  product: 3,
 }
 
-function budgetByPrice(price: number) {
-  if (price < 50_000) return budgetChips[0]
-  if (price < 100_000) return budgetChips[1]
-  if (price < 300_000) return budgetChips[2]
-  return budgetChips[3]
+/** Вилка бюджета подставляется по нижней границе расчёта. */
+function budgetIndexByPrice(price: number) {
+  if (price < 50_000) return 0
+  if (price < 100_000) return 1
+  if (price < 300_000) return 2
+  return 3
 }
-
-const money = new Intl.NumberFormat('ru-RU', {
-  style: 'currency',
-  currency: 'RUB',
-  maximumFractionDigits: 0,
-})
 
 const fieldClass =
   'w-full border-b border-line bg-transparent py-3 text-base transition-colors duration-300 placeholder:text-muted/60 focus:border-accent focus:outline-none'
@@ -51,20 +39,20 @@ function Chips({
 }: {
   label: string
   items: string[]
-  value: string
-  onChange: (next: string) => void
+  value: number | null
+  onChange: (next: number | null) => void
 }) {
   return (
     <fieldset>
       <legend className="text-display text-base text-text">{label}</legend>
       <div className="mt-4 flex flex-wrap gap-2">
-        {items.map((item) => {
-          const active = value === item
+        {items.map((item, index) => {
+          const active = value === index
           return (
             <button
               key={item}
               type="button"
-              onClick={() => onChange(active ? '' : item)}
+              onClick={() => onChange(active ? null : index)}
               aria-pressed={active}
               className={`rounded-full border px-4 py-2 text-sm transition-colors duration-300 ${
                 active
@@ -84,6 +72,8 @@ function Chips({
 /** Расчёт, прикреплённый к заявке кнопкой «Обсудить смету». */
 function EstimateCard() {
   const { type, urgency, chosen, totals, setCount } = useEstimate()
+  const { ui } = useContent()
+  const money = useMoney()
 
   return (
     <motion.div
@@ -93,13 +83,13 @@ function EstimateCard() {
       className="mb-10 rounded-card border border-accent/30 bg-accent/6 p-6"
     >
       <div className="flex items-center justify-between gap-4">
-        <p className="label-mono text-accent">Ваш расчёт — отправим вместе с заявкой</p>
+        <p className="label-mono text-accent">{ui.contact.attached}</p>
         <a
           href="#pricing"
           className="label-mono flex items-center gap-1.5 text-muted transition-colors hover:text-accent"
         >
           <Pencil className="size-3" />
-          изменить
+          {ui.contact.edit}
         </a>
       </div>
 
@@ -110,22 +100,22 @@ function EstimateCard() {
 
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
         <div className="flex justify-between gap-4 sm:block">
-          <dt className="text-muted">Тип проекта</dt>
+          <dt className="text-muted">{ui.contact.projectType}</dt>
           <dd className="sm:mt-1">{type.title}</dd>
         </div>
         <div className="flex justify-between gap-4 sm:block">
-          <dt className="text-muted">Темп</dt>
+          <dt className="text-muted">{ui.contact.pace}</dt>
           <dd className="sm:mt-1">{urgency.title}</dd>
         </div>
         <div className="flex justify-between gap-4 sm:block">
-          <dt className="text-muted">Срок</dt>
+          <dt className="text-muted">{ui.contact.term}</dt>
           <dd className="sm:mt-1">
-            {totals.weeksMin}–{totals.weeksMax} недель
+            {totals.weeksMin}–{totals.weeksMax} {ui.contact.weeks}
           </dd>
         </div>
         <div className="flex justify-between gap-4 sm:block">
-          <dt className="text-muted">Опций</dt>
-          <dd className="sm:mt-1">{chosen.length === 0 ? 'без дополнений' : chosen.length}</dd>
+          <dt className="text-muted">{ui.contact.options}</dt>
+          <dd className="sm:mt-1">{chosen.length === 0 ? ui.contact.noOptions : chosen.length}</dd>
         </div>
       </dl>
 
@@ -143,7 +133,7 @@ function EstimateCard() {
               <button
                 type="button"
                 onClick={() => setCount(option.id, () => 0)}
-                aria-label={`Убрать «${option.title}» из заявки`}
+                aria-label={`${ui.pricing.remove} ${option.title}`}
                 className="flex size-6 items-center justify-center rounded-full transition-colors hover:bg-accent/15 hover:text-accent"
               >
                 <Trash2 className="size-3.5" />
@@ -159,17 +149,21 @@ function EstimateCard() {
 export default function Contact() {
   const estimate = useEstimate()
   const { attached, type, totals } = estimate
+  const { site, ui } = useContent()
 
-  const [taskChoice, setTaskChoice] = useState<string | null>(null)
-  const [budgetChoice, setBudgetChoice] = useState<string | null>(null)
+  const [taskChoice, setTaskChoice] = useState<number | null>(null)
+  const [budgetChoice, setBudgetChoice] = useState<number | null>(null)
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
   const [notConfigured, setNotConfigured] = useState(false)
   const [leadText, setLeadText] = useState('')
   const [copied, setCopied] = useState(false)
 
   // Пока посетитель не выбрал вручную, поля берутся из калькулятора и следуют за ним.
-  const task = taskChoice ?? (attached ? (taskByType[type.id] ?? '') : '')
-  const budget = budgetChoice ?? (attached ? budgetByPrice(totals.min) : '')
+  const taskIndex = taskChoice ?? (attached ? (taskIndexByType[type.id] ?? null) : null)
+  const budgetIndex = budgetChoice ?? (attached ? budgetIndexByPrice(totals.min) : null)
+
+  const task = taskIndex === null ? '' : ui.contact.taskChips[taskIndex]
+  const budget = budgetIndex === null ? '' : ui.contact.budgetChips[budgetIndex]
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -192,7 +186,7 @@ export default function Contact() {
       setStatus('sent')
     } catch (error) {
       // Заявку не теряем: показываем её текстом, чтобы человек мог отправить в Telegram.
-      setLeadText(formatLead(payload))
+      setLeadText(formatLead(payload, ui.leadMail, ui.locale))
       setNotConfigured(error instanceof LeadNotConfiguredError)
       setStatus('error')
     }
@@ -212,14 +206,15 @@ export default function Contact() {
     <Section
       id="contact"
       index="08"
-      eyebrow="Контакты"
+      eyebrow={ui.contact.eyebrow}
       title={
         <>
-          Расскажите
-          <br />о проекте
+          {ui.contact.title[0]}
+          <br />
+          {ui.contact.title[1]}
         </>
       }
-      lead="Ответим в течение часа в рабочее время, предложим решение и назовём вилку по цене и срокам."
+      lead={ui.contact.lead}
     >
       <div className="mt-16 grid gap-12 lg:grid-cols-12">
         <div className="lg:col-span-4">
@@ -257,10 +252,8 @@ export default function Contact() {
               animate={{ opacity: 1, y: 0 }}
               className="rounded-card border border-accent/40 bg-accent/8 p-10"
             >
-              <p className="text-display text-3xl text-ember">Заявка отправлена</p>
-              <p className="mt-4 max-w-md text-muted">
-                Спасибо! Свяжемся в течение часа. Если вопрос срочный — напишите в Telegram.
-              </p>
+              <p className="text-display text-3xl text-ember">{ui.contact.sentTitle}</p>
+              <p className="mt-4 max-w-md text-muted">{ui.contact.sentText}</p>
               <button
                 type="button"
                 onClick={() => {
@@ -270,7 +263,7 @@ export default function Contact() {
                 }}
                 className="label-mono mt-8 text-muted transition-colors hover:text-accent"
               >
-                Отправить ещё одну
+                {ui.contact.again}
               </button>
             </motion.div>
           ) : status === 'error' ? (
@@ -280,12 +273,10 @@ export default function Contact() {
               className="rounded-card border border-line bg-surface p-8"
             >
               <p className="text-display text-2xl">
-                {notConfigured ? 'Отправка пока не подключена' : 'Не удалось отправить'}
+                {notConfigured ? ui.contact.notConfigured : ui.contact.failed}
               </p>
               <p className="mt-4 max-w-lg text-sm text-muted">
-                {notConfigured
-                  ? 'Форма ещё не соединена с приёмником заявок. Скопируйте заявку и отправьте её в Telegram — так ничего не потеряется.'
-                  : 'Сервис приёма заявок не ответил. Скопируйте заявку и пришлите в Telegram, мы ответим так же быстро.'}
+                {notConfigured ? ui.contact.notConfiguredText : ui.contact.failedText}
               </p>
 
               <pre className="mt-6 max-h-56 overflow-auto rounded-card border border-line bg-bg p-4 text-xs whitespace-pre-wrap text-muted">
@@ -299,7 +290,7 @@ export default function Contact() {
                   className="inline-flex h-11 items-center gap-2 rounded-full border border-line px-5 text-sm transition-colors hover:border-accent hover:text-accent"
                 >
                   {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
-                  {copied ? 'Скопировано' : 'Скопировать заявку'}
+                  {copied ? ui.contact.copied : ui.contact.copy}
                 </button>
                 <a
                   href={site.telegram}
@@ -307,14 +298,14 @@ export default function Contact() {
                   rel="noreferrer noopener"
                   className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-6 text-sm font-medium text-bg transition-colors hover:bg-accent-hover"
                 >
-                  Открыть Telegram
+                  {ui.contact.openTelegram}
                 </a>
                 <button
                   type="button"
                   onClick={() => setStatus('idle')}
                   className="label-mono text-muted transition-colors hover:text-accent"
                 >
-                  Вернуться к форме
+                  {ui.contact.back}
                 </button>
               </div>
             </motion.div>
@@ -322,29 +313,44 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
               <div className="grid gap-8 sm:grid-cols-2">
                 <label className="block">
-                  <span className="text-display text-base text-text">Как вас зовут</span>
-                  <input name="name" required placeholder="Имя" className={`${fieldClass} mt-3`} />
+                  <span className="text-display text-base text-text">{ui.contact.name}</span>
+                  <input
+                    name="name"
+                    required
+                    placeholder={ui.contact.namePlaceholder}
+                    className={`${fieldClass} mt-3`}
+                  />
                 </label>
                 <label className="block">
-                  <span className="text-display text-base text-text">Как связаться</span>
+                  <span className="text-display text-base text-text">{ui.contact.contact}</span>
                   <input
                     name="contact"
                     required
-                    placeholder="Telegram, почта или телефон"
+                    placeholder={ui.contact.contactPlaceholder}
                     className={`${fieldClass} mt-3`}
                   />
                 </label>
               </div>
 
-              <Chips label="Что нужно" items={taskChips} value={task} onChange={setTaskChoice} />
-              <Chips label="Бюджет" items={budgetChips} value={budget} onChange={setBudgetChoice} />
+              <Chips
+                label={ui.contact.need}
+                items={ui.contact.taskChips}
+                value={taskIndex}
+                onChange={setTaskChoice}
+              />
+              <Chips
+                label={ui.contact.budget}
+                items={ui.contact.budgetChips}
+                value={budgetIndex}
+                onChange={setBudgetChoice}
+              />
 
               <label className="block">
-                <span className="text-display text-base text-text">О задаче</span>
+                <span className="text-display text-base text-text">{ui.contact.about}</span>
                 <textarea
                   name="message"
                   rows={3}
-                  placeholder="Пара предложений о проекте — этого достаточно"
+                  placeholder={ui.contact.aboutPlaceholder}
                   className={`${fieldClass} mt-3 resize-none`}
                 />
               </label>
@@ -355,7 +361,7 @@ export default function Contact() {
                   required
                   className="mt-0.5 size-4 shrink-0 accent-[#ff6a00]"
                 />
-                Согласен на обработку персональных данных
+                {ui.contact.consent}
               </label>
 
               <button
@@ -363,7 +369,7 @@ export default function Contact() {
                 disabled={status === 'sending'}
                 className="group inline-flex h-14 items-center justify-center gap-3 rounded-full bg-accent px-10 text-base font-medium text-bg transition-all duration-300 hover:bg-accent-hover hover:shadow-glow disabled:opacity-60 sm:self-start"
               >
-                {status === 'sending' ? 'Отправляем…' : 'Отправить заявку'}
+                {status === 'sending' ? ui.contact.sending : ui.contact.submit}
                 <span className="transition-transform duration-300 group-hover:translate-x-1">
                   →
                 </span>

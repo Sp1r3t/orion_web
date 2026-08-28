@@ -3,18 +3,19 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import Section from '@/components/ui/Section'
-import { services } from '@/content/services'
+import { useContent } from '@/i18n/context'
 
 export default function Services() {
+  const { services, ui } = useContent()
   const [openId, setOpenId] = useState<string | null>(services[0].id)
 
   return (
     <Section
       id="solutions"
       index="01"
-      eyebrow="Решения"
-      title={<>Что мы делаем и сколько это стоит</>}
-      lead="Шесть направлений, одна команда. Нажмите на строку — расскажем, что входит и сколько занимает."
+      eyebrow={ui.services.eyebrow}
+      title={ui.services.title}
+      lead={ui.services.lead}
     >
       <div className="mt-16 border-t border-line">
         {services.map((service) => {
@@ -84,7 +85,7 @@ export default function Services() {
                           ))}
                         </ul>
                         <p className="label-mono mt-5 text-muted">
-                          Срок <span className="text-text">{service.term}</span>
+                          {ui.services.term} <span className="text-text">{service.term}</span>
                           <span className="mx-3 text-line-strong">/</span>
                           <span className="text-text sm:hidden">{service.price}</span>
                         </p>

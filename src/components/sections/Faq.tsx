@@ -3,20 +3,14 @@ import { useState } from 'react'
 
 import HatchBackdrop from '@/components/ui/HatchBackdrop'
 import Section from '@/components/ui/Section'
-import { faq } from '@/content/reviews'
-import { site } from '@/content/site'
+import { useContent } from '@/i18n/context'
 
 export default function Faq() {
+  const { site, faq, ui } = useContent()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <Section
-      id="faq"
-      index="07"
-      eyebrow="Вопросы"
-      title={<>Отвечаем заранее</>}
-      lead="Если вопроса здесь нет — напишите в Telegram, ответим за час."
-    >
+    <Section id="faq" index="07" eyebrow={ui.faq.eyebrow} title={ui.faq.title} lead={ui.faq.lead}>
       {/* Диагональная штриховка на фоне секции — под аккордеоном и карточкой. */}
       <HatchBackdrop className="hatch-backdrop" />
 
@@ -69,18 +63,15 @@ export default function Faq() {
 
         <aside className="lg:col-span-4">
           <div className="rounded-card border border-line bg-surface p-7 lg:sticky lg:top-28">
-            <p className="text-lg">Остались вопросы?</p>
-            <p className="mt-3 text-sm text-muted">
-              Напишите в Telegram — разберём задачу без формальностей и скажем, во сколько она
-              обойдётся.
-            </p>
+            <p className="text-lg">{ui.faq.more}</p>
+            <p className="mt-3 text-sm text-muted">{ui.faq.moreText}</p>
             <a
               href={site.telegram}
               target="_blank"
               rel="noreferrer noopener"
               className="mt-6 inline-flex items-center gap-2 text-sm text-accent transition-colors hover:text-accent-hover"
             >
-              Написать в Telegram →
+              {ui.faq.write}
             </a>
           </div>
         </aside>

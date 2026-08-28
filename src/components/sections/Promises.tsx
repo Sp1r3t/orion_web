@@ -2,7 +2,7 @@ import Reveal from '@/components/ui/Reveal'
 import Section from '@/components/ui/Section'
 import StarDust from '@/components/ui/StarDust'
 import StarGlyph from '@/components/ui/StarGlyph'
-import { promises } from '@/content/process'
+import { useContent } from '@/i18n/context'
 
 /** Ряды складываются зеркально: длинный + короткий, короткий + длинный, во всю ширину. */
 const SPAN = {
@@ -12,13 +12,15 @@ const SPAN = {
 }
 
 export default function Promises() {
+  const { promises, ui } = useContent()
+
   return (
     <Section
       id="promises"
       index="05"
-      eyebrow="Гарантии"
-      title={<>Условия, а не обещания</>}
-      lead="Каждый пункт ниже зафиксирован в договоре — его можно с нас спросить."
+      eyebrow={ui.promises.eyebrow}
+      title={ui.promises.title}
+      lead={ui.promises.lead}
     >
       <div className="mt-16 grid gap-4 lg:grid-cols-3">
         {promises.map((item, index) => (
