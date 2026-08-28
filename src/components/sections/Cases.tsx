@@ -9,8 +9,8 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 /** Левая колонка идёт снизу вверх, правая — сверху вниз, и с разной скоростью. */
 const COLUMNS = [
-  { direction: 1, seconds: 54 },
-  { direction: -1, seconds: 44 },
+  { direction: 1, seconds: 30 },
+  { direction: -1, seconds: 24 },
 ]
 
 /** Доля высоты окна, на которую карточка должна отступить от краёв, чтобы читаться. */
