@@ -73,7 +73,7 @@ const TOUR = EDGES.reduce<number[]>((path, [from, to]) => {
 }, [])
 
 /** Скорость света автопилота, пикселей в секунду. */
-const AUTO_SPEED = 620
+const AUTO_SPEED = 330
 
 const PUSH_RADIUS = 190
 const PUSH_FORCE = 78
@@ -257,8 +257,10 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         return
       }
 
-      // Взаимодействие живёт только пока страница в самом верху.
-      const interactive = atTop && !reduced
+      // Курсор слушается только в самом верху страницы, а вот сама себя
+      // фигура рисует всегда: раньше любая прокрутка останавливала и её.
+      const alive = !reduced
+      const followsPointer = atTop && !reduced && pointer.active && idle < 3500
 
       idle += delta
 
@@ -268,11 +270,11 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         node.y = walk.y + node.v * walk.side + parallax.y * 0.8
       })
 
-      if (interactive && pointer.active && idle < 3500) {
+      if (followsPointer) {
         // За курсором свет тянется с запаздыванием — так движение мягче.
         smooth.x += (pointer.x - smooth.x) * 0.075
         smooth.y += (pointer.y - smooth.y) * 0.075
-      } else if (interactive) {
+      } else if (alive) {
         // Автопилот идёт от звезды к звезде с постоянной скоростью: сглаживание
         // к цели асимптотично и до узла не доводило, из-за чего линия зависала.
         const target = nodes[TOUR[tour] ?? 0]
@@ -302,7 +304,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         context.drawImage(backdrop, -PAD + parallax.x * 0.6, -PAD + parallax.y * 0.6)
       }
 
-      if (interactive) {
+      if (alive) {
         const haloR = PUSH_RADIUS * 1.2
         const halo = context.createRadialGradient(smooth.x, smooth.y, 0, smooth.x, smooth.y, haloR)
         halo.addColorStop(0, 'rgba(255, 106, 0, 0.10)')
@@ -323,7 +325,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         let wantX = 0
         let wantY = 0
 
-        if (interactive) {
+        if (alive) {
           const dx = baseX + star.ox - smooth.x
           const dy = baseY + star.oy - smooth.y
           const distance = Math.hypot(dx, dy)
@@ -413,7 +415,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
           return
         }
 
-        if (!interactive) return
+        if (!alive) return
 
         const distance = Math.hypot(node.x - smooth.x, node.y - smooth.y)
         if (distance < ignite) {
@@ -429,7 +431,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         if (phase === 'fading') {
           edges[index] = clamp01(edges[index] - delta / FADE_OUT)
         } else if (Math.min(nodes[a].ignition, nodes[b].ignition) > 0.35) {
-          edges[index] = clamp01(edges[index] + delta / 335)
+          edges[index] = clamp01(edges[index] + delta / 380)
         }
 
         if (edges[index] <= 0.01) return
