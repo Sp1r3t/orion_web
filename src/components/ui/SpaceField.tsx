@@ -106,7 +106,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   // Палитра живёт в ref: цикл читает её каждый кадр и не перезапускается,
   // поэтому смена темы не пересобирает звёздное поле заново.
-  const palette = useRef({ ink: '245, 245, 244', deep: '5, 5, 5' })
+  const palette = useRef({ ink: '245, 245, 244', deep: '5, 5, 5', boost: 1 })
   const repaint = useRef<(() => void) | null>(null)
 
   /**
@@ -120,6 +120,9 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       palette.current = {
         ink: channels(root.getPropertyValue('--color-ink'), '245, 245, 244'),
         deep: channels(root.getPropertyValue('--color-bg'), '5, 5, 5'),
+        // Тёмная точка на светлом фоне читается слабее светлой на тёмном —
+        // в белой теме поднимаем плотность, иначе поле выглядит пустым.
+        boost: document.documentElement.dataset.theme === 'light' ? 1.75 : 1,
       }
       repaint.current?.()
     }
@@ -402,7 +405,9 @@ export default function SpaceField({ className = '' }: { className?: string }) {
 
         const pushed = clamp01(Math.hypot(star.ox, star.oy) / 46)
         const twinkle = reduced ? 1 : 0.72 + Math.sin(now / 950 + star.phase) * 0.28
-        const alpha = clamp01(star.alpha * twinkle + pushed * 0.5 + flash * 0.35)
+        const alpha = clamp01(
+          (star.alpha * twinkle + pushed * 0.5 + flash * 0.35) * palette.current.boost,
+        )
 
         context.fillStyle =
           pushed > 0.04
@@ -528,7 +533,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         const x = box.x + point.u * box.side + parallax.x * 0.8
         const y = box.y + point.v * box.side + parallax.y * 0.8
         const twinkle = reduced ? 1 : 0.7 + Math.sin(now / 800 + index) * 0.3
-        context.fillStyle = `rgba(${palette.current.ink}, ${0.35 * twinkle + flash * 0.5})`
+        context.fillStyle = `rgba(${palette.current.ink}, ${clamp01((0.35 * twinkle + flash * 0.5) * palette.current.boost)})`
         context.beginPath()
         context.arc(x, y, 1.6 + flash * 1.4, 0, Math.PI * 2)
         context.fill()

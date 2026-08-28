@@ -9,10 +9,11 @@ import { useTheme } from '@/hooks/useTheme'
 /** Сетка, по которой рассыпаются круги: 4×3 клетки покрывают экран целиком. */
 const COLS = 4
 const ROWS = 3
-const DURATION = 900
+const DURATION = 1100
 /** Доля цикла, на которую растянуты старты кругов. */
 const WAVE = 0.35
-const STEPS = 44
+/** Кадров маски: примерно один на кадр экрана, иначе видны ступеньки. */
+const STEPS = 90
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
