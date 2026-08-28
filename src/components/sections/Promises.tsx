@@ -1,5 +1,6 @@
 import Reveal from '@/components/ui/Reveal'
 import Section from '@/components/ui/Section'
+import StarDust from '@/components/ui/StarDust'
 import StarGlyph from '@/components/ui/StarGlyph'
 import { promises } from '@/content/process'
 
@@ -23,6 +24,9 @@ export default function Promises() {
         {promises.map((item, index) => (
           <Reveal key={item.title} delay={index * 0.05} className={SPAN[item.span]}>
             <article className="group relative flex h-full min-h-48 items-start gap-5 overflow-hidden rounded-card border border-line bg-surface p-7 transition-colors duration-500 hover:border-accent/40">
+              {/* Звёзды рассыпаны по всей плитке, а не только под рисунком. */}
+              <StarDust seed={index} />
+
               {/* Свечение под созвездием разгорается вместе с ним. */}
               <span
                 aria-hidden="true"
