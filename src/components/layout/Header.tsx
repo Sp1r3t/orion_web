@@ -4,6 +4,7 @@ import { useState } from 'react'
 
 import MobileMenu from '@/components/layout/MobileMenu'
 import Button from '@/components/ui/Button'
+import ThemeToggle from '@/components/ui/ThemeToggle'
 import { navItems, site, spySectionIds } from '@/content/site'
 import { useScrolled } from '@/hooks/useScrolled'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
@@ -29,17 +30,15 @@ export default function Header() {
             layout
             transition={glide}
             animate={{
-              backgroundColor: scrolled ? 'rgba(11, 11, 13, 0.85)' : 'rgba(11, 11, 13, 0)',
-              borderColor: scrolled ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0)',
               // Наверху блюра быть не должно: он размыл бы звёздное поле под хедером.
               backdropFilter: scrolled ? 'blur(24px)' : 'blur(0px)',
             }}
             style={{ borderRadius: 999 }}
-            // Классы цвета — страховка на первый кадр: инлайновые стили framer перекроют их.
-            className={`flex items-center border border-transparent bg-transparent ${
+            // Фон и рамку ведём классами, а не значениями framer: так они следуют за темой.
+            className={`flex items-center border transition-colors duration-500 ${
               scrolled
-                ? 'h-14 gap-6 px-6 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.9)] lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
-                : 'h-20 w-full justify-between gap-6 px-0'
+                ? 'h-14 gap-6 border-line bg-bg/85 px-6 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
+                : 'h-20 w-full justify-between gap-6 border-transparent bg-transparent px-0'
             }`}
           >
             <motion.a
@@ -88,6 +87,7 @@ export default function Header() {
               transition={glide}
               className={`flex items-center ${scrolled ? 'gap-3' : 'gap-4'}`}
             >
+              <ThemeToggle />
               <Button
                 href="#contact"
                 variant="light"
