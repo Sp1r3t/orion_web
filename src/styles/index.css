@@ -123,29 +123,31 @@
   z-index: 2;
 }
 
-/* Смена языка: старый текст расфокусируется и уходит вверх, новый собирается снизу.
-   Работаем со снимками страницы, поэтому вёрстку никто не пересчитывает. */
+/**
+ * Смена языка: старые буквы расплываются и вспыхивают, из этого свечения проступают
+ * новые. Ни сдвига, ни масштаба — только прозрачность и размытие, поэтому картинка
+ * стоит на месте: любое движение здесь читалось бы как рывок экрана. Новый снимок
+ * входит с задержкой, чтобы между словами была видна секунда размытия.
+ */
 :root.lang-switch::view-transition-old(root) {
-  animation: lang-out 0.4s cubic-bezier(0.4, 0, 1, 1) both;
+  animation: lang-out 0.3s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 :root.lang-switch::view-transition-new(root) {
-  animation: lang-in 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: lang-in 0.46s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
 }
 
 @keyframes lang-out {
   to {
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(-8px);
+    filter: blur(6px) brightness(1.2);
   }
 }
 
 @keyframes lang-in {
   from {
     opacity: 0;
-    filter: blur(4px);
-    transform: translateY(10px);
+    filter: blur(6px);
   }
 }
 

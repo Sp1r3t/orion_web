@@ -2,6 +2,7 @@ import { motion, useSpring, useTransform, useVelocity } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
 
+import { getLenis } from '@/hooks/useSmoothScroll'
 import { useLanguage } from '@/i18n/context'
 import type { Lang } from '@/i18n/types'
 
@@ -20,6 +21,41 @@ const THUMB_H = HEIGHT - BORDER * 2 - PAD * 2
 const THUMB_R = 7
 
 const ORDER: Lang[] = ['ru', 'en']
+
+/** Высота фиксированного хедера: раздел под ней и считаем тем, что человек читает. */
+const HEADER = 80
+
+/** Первый раздел, который ещё виден из-под хедера. */
+function anchorSection(): HTMLElement | null {
+  for (const section of document.querySelectorAll<HTMLElement>('section[id]')) {
+    if (section.getBoundingClientRect().bottom > HEADER) return section
+  }
+  return null
+}
+
+/**
+ * Английский текст короче или длиннее русского, поэтому после подстановки блоки
+ * разъезжаются и страница под курсором прыгает. Запоминаем, где стоял видимый
+ * раздел, и возвращаем его на то же место. Снимок «после» браузер снимает уже
+ * с поправкой — в переходе прыжка не видно.
+ */
+function keepInPlace(update: () => void) {
+  const anchor = anchorSection()
+  const before = anchor?.getBoundingClientRect().top ?? 0
+
+  update()
+
+  if (!anchor) return
+
+  const delta = anchor.getBoundingClientRect().top - before
+  if (Math.abs(delta) < 1) return
+
+  const lenis = getLenis()
+
+  // Lenis ведёт прокрутку сам: правку нужно отдавать ему, иначе он вернёт своё.
+  if (lenis) lenis.scrollTo(lenis.scroll + delta, { immediate: true, force: true })
+  else window.scrollTo(0, window.scrollY + delta)
+}
 
 /** Мягкая пружина: бегунок скользит и едва заметно доводится, без щелчка в конце. */
 const SPRING = { stiffness: 260, damping: 30, mass: 0.9 }
@@ -63,7 +99,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
 
     if (!start || reduced || running.current) {
-      setLang(next)
+      keepInPlace(() => setLang(next))
       return
     }
 
@@ -74,7 +110,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
     root.classList.add('lang-switch')
 
     const transition = start(() => {
-      flushSync(() => setLang(next))
+      keepInPlace(() => flushSync(() => setLang(next)))
     })
 
     transition.finished
