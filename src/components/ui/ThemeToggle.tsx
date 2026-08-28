@@ -9,11 +9,16 @@ import { useTheme } from '@/hooks/useTheme'
 /** Сетка, по которой рассыпаются круги: 4×3 клетки покрывают экран целиком. */
 const COLS = 4
 const ROWS = 3
-const DURATION = 1100
+const DURATION = 1000
 /** Доля цикла, на которую растянуты старты кругов. */
 const WAVE = 0.35
-/** Кадров маски: примерно один на кадр экрана, иначе видны ступеньки. */
-const STEPS = 90
+/**
+ * Опорных кадров немного: clip-path из окружностей браузер интерполирует сам,
+ * промежуточные кадры он досчитает. Маску из градиентов он интерполировать не
+ * умел — приходилось задавать почти каждый кадр экрана, и полноэкранная
+ * перерисовка не успевала, отчего переход выглядел рваным.
+ */
+const STEPS = 10
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
@@ -65,33 +70,29 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
     transition.ready
       .then(() => {
         /**
-         * Маска из окружностей поверх снимка новой темы: внутри кругов видно
-         * новую страницу, снаружи просвечивает старая. Круги растут — старая
-         * тема исчезает. Кадры считаем сами: набор из дюжины градиентов
-         * браузер сам не интерполирует.
+         * Снимок новой темы обрезан окружностями: внутри круга видно новую
+         * страницу, снаружи просвечивает старая. Круги растут — старая тема
+         * исчезает. Каждая окружность записана одинаковым набором команд,
+         * поэтому кадры пути интерполируются между собой.
          */
-        const frames: string[] = []
-        for (let step = 0; step <= STEPS; step += 1) {
-          const t = step / STEPS
-          frames.push(
-            circles
-              .map((circle) => {
-                const local = clamp01((t - circle.delay) / (1 - circle.delay))
-                const size = easeOut(local) * radius
-                return `radial-gradient(circle ${size}px at ${circle.x}px ${circle.y}px, #000 0 99%, transparent 100%)`
-              })
-              .join(', '),
-          )
-        }
+        const pathAt = (t: number) =>
+          circles
+            .map((circle) => {
+              const local = clamp01((t - circle.delay) / (1 - circle.delay))
+              const size = Math.max(0.01, easeOut(local) * radius)
+              return `M ${circle.x - size} ${circle.y} a ${size} ${size} 0 1 0 ${size * 2} 0 a ${size} ${size} 0 1 0 ${-size * 2} 0`
+            })
+            .join(' ')
 
-        document.documentElement.animate(
-          { maskImage: frames, WebkitMaskImage: frames } as unknown as Keyframe[],
-          {
-            duration: DURATION,
-            easing: 'linear',
-            pseudoElement: '::view-transition-new(root)',
-          },
-        )
+        const frames = Array.from({ length: STEPS + 1 }, (_, step) => ({
+          clipPath: `path("${pathAt(step / STEPS)}")`,
+        }))
+
+        document.documentElement.animate(frames, {
+          duration: DURATION,
+          easing: 'linear',
+          pseudoElement: '::view-transition-new(root)',
+        })
       })
       .catch(() => {
         // Переход мог быть прерван — тема уже применена.
