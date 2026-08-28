@@ -18,7 +18,7 @@ const COLUMNS = [
  * при наведении. Отступ чуть больше шторки — иначе подтянутая карточка всё равно
  * оказывалась бы под затемнением.
  */
-const VEIL = 64
+const VEIL = 44
 const EDGE_PAD = VEIL + 12
 
 function Card({ item }: { item: CaseItem }) {
@@ -233,7 +233,7 @@ export default function Cases() {
 
       <div
         ref={windowRef}
-        className="relative mt-16 h-[min(860px,80vh)] min-h-[460px] overflow-hidden"
+        className="relative mt-16 h-[min(1000px,88vh)] min-h-[520px] overflow-hidden"
       >
         <div
           className={`grid gap-4 lg:gap-6 ${wide ? 'grid-cols-2' : 'grid-cols-1'}`}
@@ -256,8 +256,8 @@ export default function Cases() {
         {/* Шторки вместо маски: маска делала полупрозрачной саму карточку,
             и сквозь фотографию просвечивала фоновая сетка. Градиент цветом
             фона закрывает у краёв и карточки, и сетку. */}
-        <span className="pointer-events-none absolute inset-x-0 top-0 h-10 bg-gradient-to-b from-bg via-bg/85 to-transparent lg:h-16" />
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-bg via-bg/85 to-transparent lg:h-16" />
+        <span className="pointer-events-none absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-bg via-bg/85 to-transparent lg:h-11" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-bg via-bg/85 to-transparent lg:h-11" />
       </div>
 
       <p className="mt-8 text-sm text-muted">
