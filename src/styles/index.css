@@ -103,6 +103,16 @@
   }
 }
 
+/* Отдельная быстрая прорисовка — она играет при наведении. */
+@keyframes glyph-draw-fast {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 @keyframes glyph-star {
   0%,
   3% {
@@ -120,6 +130,17 @@
   }
 }
 
+/* Фоновые звёзды мерцают вразнобой и живут отдельно от рисунка. */
+@keyframes glyph-dust {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 .glyph-line {
   stroke: var(--color-accent);
   stroke-width: 1.4;
@@ -127,22 +148,30 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: glyph-draw 10s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.09s);
 }
 
 .glyph-star {
   fill: #ffd9b0;
   opacity: 0.2;
   animation: glyph-star 10s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.07s);
 }
 
-/* Наведение на плитку: рисунок собирается сразу и разгорается. */
+.glyph-dust {
+  fill: #f5f5f4;
+  opacity: 0.14;
+  animation: glyph-dust 7s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -0.43s);
+}
+
+/* Наведение на плитку: рисунок собирается заново, но быстро, и разгорается. */
 .group:hover .glyph-line,
 .group:focus-visible .glyph-line {
-  animation: none;
-  stroke-dashoffset: 0;
+  animation: glyph-draw-fast 0.4s ease-out both;
+  animation-delay: calc(var(--i, 0) * 0.05s);
   stroke-width: 1.8;
   filter: drop-shadow(0 0 6px rgb(255 106 0 / 0.65));
-  transition: stroke-dashoffset 0.28s ease-out;
 }
 
 .group:hover .glyph-star,
@@ -153,13 +182,20 @@
   filter: drop-shadow(0 0 5px rgb(255 176 32 / 0.8));
 }
 
+.group:hover .glyph-dust,
+.group:focus-visible .glyph-dust {
+  animation: none;
+  opacity: 0.35;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .glyph-line {
     animation: none;
     stroke-dashoffset: 0;
   }
 
-  .glyph-star {
+  .glyph-star,
+  .glyph-dust {
     animation: none;
     opacity: 1;
   }

@@ -22,24 +22,25 @@ export default function Promises() {
       <div className="mt-16 grid gap-4 lg:grid-cols-3">
         {promises.map((item, index) => (
           <Reveal key={item.title} delay={index * 0.05} className={SPAN[item.span]}>
-            <article className="group relative flex h-full min-h-48 flex-col justify-end overflow-hidden rounded-card border border-line bg-surface p-7 transition-colors duration-500 hover:border-accent/40">
+            <article className="group relative flex h-full min-h-48 items-start gap-5 overflow-hidden rounded-card border border-line bg-surface p-7 transition-colors duration-500 hover:border-accent/40">
               {/* Свечение под созвездием разгорается вместе с ним. */}
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute -top-10 -right-10 size-48 rounded-full bg-accent/0 blur-3xl transition-colors duration-700 group-hover:bg-accent/15"
               />
 
-              <StarGlyph
-                shape={item.glyph}
-                className={`pointer-events-none absolute top-1/2 right-5 -translate-y-1/2 ${
-                  item.span === 'small' ? 'w-24 lg:w-28' : 'w-28 lg:w-36'
-                }`}
-              />
-
-              <div className={`relative ${item.span === 'small' ? 'pr-20' : 'pr-32 lg:pr-40'}`}>
+              {/* Текст и созвездие — соседи по строке, поэтому наехать друг на друга не могут. */}
+              <div className="relative flex-1">
                 <h3 className="text-lg font-medium">{item.title}</h3>
                 <p className="mt-3 text-sm text-muted">{item.text}</p>
               </div>
+
+              <StarGlyph
+                shape={item.glyph}
+                className={`pointer-events-none relative shrink-0 ${
+                  item.span === 'small' ? 'w-20 lg:w-24' : 'w-24 lg:w-32'
+                }`}
+              />
             </article>
           </Reveal>
         ))}
