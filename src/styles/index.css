@@ -266,17 +266,17 @@
      фоном, а не разлиновкой. */
   .grid-backdrop {
     background-image:
-      linear-gradient(to right, rgb(255 106 0 / 0.07) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(255 106 0 / 0.07) 1px, transparent 1px),
-      linear-gradient(to right, rgb(245 245 244 / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(245 245 244 / 0.035) 1px, transparent 1px);
+      linear-gradient(to right, rgb(255 106 0 / 0.18) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 106 0 / 0.18) 1px, transparent 1px),
+      linear-gradient(to right, rgb(245 245 244 / 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(245 245 244 / 0.08) 1px, transparent 1px);
     background-size:
       480px 480px,
       480px 480px,
       120px 120px,
       120px 120px;
-    mask-image: radial-gradient(ellipse 80% 65% at 50% 45%, #000 30%, transparent 78%);
-    -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 45%, #000 30%, transparent 78%);
+    mask-image: radial-gradient(ellipse 92% 78% at 50% 45%, #000 50%, transparent 94%);
+    -webkit-mask-image: radial-gradient(ellipse 92% 78% at 50% 45%, #000 50%, transparent 94%);
   }
 
   .hairline {
