@@ -6,12 +6,9 @@ import { site, stats } from '@/content/site'
 const rotatingWords = ['создание', 'качество', 'креатив']
 
 export default function Hero() {
-  // data-theme="dark" держит первый экран ночным и в светлой теме:
-  // на светлом фоне звёздного поля попросту не видно.
   return (
     <section
       id="top"
-      data-theme="dark"
       className="relative flex min-h-dvh flex-col overflow-hidden bg-bg pt-20 text-text"
     >
       {/* Космос занимает весь первый экран и живёт под контентом — границы не видно. */}

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { useTheme } from '@/hooks/useTheme'
+
 type Star = {
   bx: number
   by: number
@@ -88,6 +90,13 @@ const FADE_OUT = 1300
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
 
+/** #rrggbb → «r, g, b»: цвета берём из токенов темы, а рисуем через rgba(). */
+function channels(hex: string, fallback: string) {
+  const match = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex.trim())
+  if (!match) return fallback
+  return `${parseInt(match[1], 16)}, ${parseInt(match[2], 16)}, ${parseInt(match[3], 16)}`
+}
+
 /**
  * Фон первого экрана: звёздное поле во всю секцию, без видимых границ.
  * Курсор расталкивает звёзды и зажигает Орион — линии остаются, пока
@@ -97,6 +106,21 @@ const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
  */
 export default function SpaceField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const { theme } = useTheme()
+
+  // Палитра живёт в ref: цикл читает её каждый кадр и не перезапускается,
+  // поэтому смена темы не пересобирает звёздное поле заново.
+  const palette = useRef({ ink: '245, 245, 244', deep: '5, 5, 5' })
+  const repaint = useRef<(() => void) | null>(null)
+
+  useEffect(() => {
+    const root = getComputedStyle(document.documentElement)
+    palette.current = {
+      ink: channels(root.getPropertyValue('--color-ink'), '245, 245, 244'),
+      deep: channels(root.getPropertyValue('--color-bg'), '5, 5, 5'),
+    }
+    repaint.current?.()
+  }, [theme])
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -197,7 +221,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       const disc = ctx.createRadialGradient(px - pr * 0.4, py - pr * 0.4, pr * 0.1, px, py, pr)
       disc.addColorStop(0, 'rgba(255, 133, 36, 0.22)')
       disc.addColorStop(0.6, 'rgba(60, 26, 6, 0.5)')
-      disc.addColorStop(1, 'rgba(5, 5, 5, 0.75)')
+      disc.addColorStop(1, `rgba(${palette.current.deep}, 0.75)`)
       ctx.fillStyle = disc
       ctx.beginPath()
       ctx.arc(px, py, pr, 0, Math.PI * 2)
@@ -230,6 +254,9 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       }))
 
       backdrop = paintBackdrop()
+      repaint.current = () => {
+        backdrop = paintBackdrop()
+      }
       smooth.x = width * 0.2
       smooth.y = height * 0.5
     }
@@ -369,7 +396,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         context.fillStyle =
           pushed > 0.04
             ? `rgba(255, ${Math.round(176 - pushed * 60)}, ${Math.round(120 - pushed * 110)}, ${alpha})`
-            : `rgba(245, 245, 244, ${alpha})`
+            : `rgba(${palette.current.ink}, ${alpha})`
 
         const size = star.r * (1 + pushed * 0.7 + flash * 0.5)
         context.fillRect(x - size / 2, y - size / 2, size, size)
@@ -402,8 +429,8 @@ export default function SpaceField({ className = '' }: { className?: string }) {
             shooting.x - shooting.vx * tail,
             shooting.y - shooting.vy * tail,
           )
-          gradient.addColorStop(0, `rgba(255, 244, 232, ${0.85 * fade})`)
-          gradient.addColorStop(1, 'rgba(255, 244, 232, 0)')
+          gradient.addColorStop(0, `rgba(${palette.current.ink}, ${0.85 * fade})`)
+          gradient.addColorStop(1, `rgba(${palette.current.ink}, 0)`)
           context.strokeStyle = gradient
           context.lineWidth = 1.5
           context.beginPath()
@@ -479,7 +506,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
           context.fill()
         }
 
-        context.fillStyle = glow > 0.2 ? '#ffb020' : 'rgba(245, 245, 244, 0.85)'
+        context.fillStyle = glow > 0.2 ? '#ffb020' : `rgba(${palette.current.ink}, 0.85)`
         context.beginPath()
         context.arc(node.x, node.y, radius, 0, Math.PI * 2)
         context.fill()
@@ -490,7 +517,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         const x = box.x + point.u * box.side + parallax.x * 0.8
         const y = box.y + point.v * box.side + parallax.y * 0.8
         const twinkle = reduced ? 1 : 0.7 + Math.sin(now / 800 + index) * 0.3
-        context.fillStyle = `rgba(255, 214, 170, ${0.35 * twinkle + flash * 0.5})`
+        context.fillStyle = `rgba(${palette.current.ink}, ${0.35 * twinkle + flash * 0.5})`
         context.beginPath()
         context.arc(x, y, 1.6 + flash * 1.4, 0, Math.PI * 2)
         context.fill()
