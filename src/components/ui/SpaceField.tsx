@@ -61,6 +61,20 @@ const SWORD: Array<{ u: number; v: number }> = [
   { u: 0.46, v: 0.73 },
 ]
 
+/**
+ * Маршрут автопилота: идём по списку линий, при разрыве перелетая к началу
+ * следующей. Так свет гарантированно проходит через каждую звезду — прежняя
+ * фигура Лиссажу мимо крайних просто не проходила, и линии не соединялись.
+ */
+const TOUR = EDGES.reduce<number[]>((path, [from, to]) => {
+  if (path[path.length - 1] !== from) path.push(from)
+  path.push(to)
+  return path
+}, [])
+
+/** Скорость света автопилота, пикселей в секунду. */
+const AUTO_SPEED = 620
+
 const PUSH_RADIUS = 190
 const PUSH_FORCE = 78
 const PARALLAX = 26
@@ -105,7 +119,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     const smooth = { x: 0, y: 0 }
     const parallax = { x: 0, y: 0 }
     let idle = 0
-    let auto = 0
+    let tour = 0
     let atTop = true
 
     // Жизненный цикл созвездия: рисуем → вспышка → пауза → гаснет.
@@ -224,6 +238,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       })
       phase = 'drawing'
       phaseTime = 0
+      tour = 0
     }
 
     function draw(now: number) {
@@ -246,24 +261,35 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       const interactive = atTop && !reduced
 
       idle += delta
-      let targetX = smooth.x
-      let targetY = smooth.y
 
-      if (interactive) {
-        if (pointer.active && idle < 3500) {
-          targetX = pointer.x
-          targetY = pointer.y
+      const walk = region()
+      nodes.forEach((node) => {
+        node.x = walk.x + node.u * walk.side + parallax.x * 0.8
+        node.y = walk.y + node.v * walk.side + parallax.y * 0.8
+      })
+
+      if (interactive && pointer.active && idle < 3500) {
+        // За курсором свет тянется с запаздыванием — так движение мягче.
+        smooth.x += (pointer.x - smooth.x) * 0.075
+        smooth.y += (pointer.y - smooth.y) * 0.075
+      } else if (interactive) {
+        // Автопилот идёт от звезды к звезде с постоянной скоростью: сглаживание
+        // к цели асимптотично и до узла не доводило, из-за чего линия зависала.
+        const target = nodes[TOUR[tour] ?? 0]
+        const dx = target.x - smooth.x
+        const dy = target.y - smooth.y
+        const distance = Math.hypot(dx, dy)
+        const step = (AUTO_SPEED * delta) / 1000
+
+        if (distance <= step || distance < 2) {
+          smooth.x = target.x
+          smooth.y = target.y
+          tour = (tour + 1) % TOUR.length
         } else {
-          // Пока мышью не водят (и на телефоне) свет гуляет сам.
-          auto += delta
-          const walk = region()
-          targetX = walk.x + walk.side * (0.5 + Math.sin(auto / 3400) * 0.44)
-          targetY = walk.y + walk.side * (0.5 + Math.sin(auto / 2100 + 1.2) * 0.42)
+          smooth.x += (dx / distance) * step
+          smooth.y += (dy / distance) * step
         }
       }
-
-      smooth.x += (targetX - smooth.x) * 0.075
-      smooth.y += (targetY - smooth.y) * 0.075
 
       const nx = clamp01(smooth.x / (width || 1)) - 0.5
       const ny = clamp01(smooth.y / (height || 1)) - 0.5
@@ -382,9 +408,6 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       const ignite = Math.min(150, Math.max(80, box.side * 0.22))
 
       nodes.forEach((node) => {
-        node.x = box.x + node.u * box.side + parallax.x * 0.8
-        node.y = box.y + node.v * box.side + parallax.y * 0.8
-
         if (phase === 'fading') {
           node.ignition = clamp01(node.ignition - delta / FADE_OUT)
           return
@@ -394,11 +417,11 @@ export default function SpaceField({ className = '' }: { className?: string }) {
 
         const distance = Math.hypot(node.x - smooth.x, node.y - smooth.y)
         if (distance < ignite) {
-          node.ignition = clamp01(node.ignition + delta / 240)
-        } else if (phase === 'drawing') {
-          // Задетая, но ни с чем не соединённая звезда медленно остывает.
-          node.ignition = clamp01(node.ignition - delta / 3200)
+          node.ignition = clamp01(node.ignition + delta / 190)
         }
+        // Остывания во время сборки нет: звезда, зажжённая в начале обхода,
+        // успевала погаснуть до того, как загорится её дальняя пара, и линия
+        // между ними не появлялась вовсе. Всё гаснет разом на фазе fading.
       })
 
       // Линии: зажглась — держится, пока созвездие не погаснет целиком.
@@ -406,7 +429,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         if (phase === 'fading') {
           edges[index] = clamp01(edges[index] - delta / FADE_OUT)
         } else if (Math.min(nodes[a].ignition, nodes[b].ignition) > 0.35) {
-          edges[index] = clamp01(edges[index] + delta / 420)
+          edges[index] = clamp01(edges[index] + delta / 335)
         }
 
         if (edges[index] <= 0.01) return
