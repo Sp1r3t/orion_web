@@ -88,26 +88,6 @@
   }
 }
 
-/* Портфолио: колонки текут навстречу друг другу. Список продублирован,
-   поэтому сдвиг ровно на половину высоты возвращает поток в исходное незаметно. */
-@keyframes waterfall-down {
-  from {
-    transform: translateY(-50%);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-
-@keyframes waterfall-up {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
 /* Побуквенное появление заголовка в hero. */
 @keyframes fade-up {
   from {

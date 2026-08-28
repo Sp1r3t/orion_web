@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { RefObject } from 'react'
 
 import Section from '@/components/ui/Section'
 import { cases } from '@/content/cases'
@@ -8,9 +9,12 @@ import { useMediaQuery } from '@/hooks/useMediaQuery'
 
 /** Левая колонка идёт снизу вверх, правая — сверху вниз, и с разной скоростью. */
 const COLUMNS = [
-  { animation: 'waterfall-up', seconds: 54 },
-  { animation: 'waterfall-down', seconds: 44 },
+  { direction: 1, seconds: 54 },
+  { direction: -1, seconds: 44 },
 ]
+
+/** Доля высоты окна, на которую карточка должна отступить от краёв, чтобы читаться. */
+const SAFE_EDGE = 0.1
 
 function Card({ item }: { item: CaseItem }) {
   return (
@@ -58,9 +62,126 @@ function Card({ item }: { item: CaseItem }) {
   )
 }
 
+type ColumnProps = {
+  items: CaseItem[]
+  direction: number
+  seconds: number
+  offsetTop: boolean
+  reduced: boolean
+  hovered: HTMLElement | null
+  windowRef: RefObject<HTMLDivElement | null>
+}
+
+/**
+ * Колонка-лента. Смещением управляет свой цикл, а не CSS-анимация: только так
+ * можно и вести поток равномерно, и подтянуть карточку, если на неё навели,
+ * когда она наполовину уехала за край.
+ */
+function Column({
+  items,
+  direction,
+  seconds,
+  offsetTop,
+  reduced,
+  hovered,
+  windowRef,
+}: ColumnProps) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const hoveredRef = useRef<HTMLElement | null>(null)
+
+  // Цикл читает наведение из ref, поэтому не перезапускается на каждое движение мыши.
+  useEffect(() => {
+    hoveredRef.current = hovered
+  }, [hovered])
+
+  useEffect(() => {
+    if (reduced) return
+
+    const track = trackRef.current
+    if (!track) return
+
+    let frame = 0
+    let last = performance.now()
+    let offset = 0
+    let target: number | null = null
+    let measured: HTMLElement | null = null
+
+    function tick(now: number) {
+      if (!track) return
+      const delta = Math.min(now - last, 100)
+      last = now
+
+      // Период — это высота одной копии вместе с отступом до следующей.
+      // Просто половина высоты ленты дала бы промах на половину зазора,
+      // и на стыке копий поток дёргался бы.
+      const gap = parseFloat(getComputedStyle(track).rowGap) || 0
+      const period = (track.scrollHeight + gap) / 2
+
+      if (period > 0) {
+        const card = hoveredRef.current
+        const mine = card !== null && track.contains(card)
+
+        if (mine) {
+          // Курсор встал на карточку этой колонки: считаем, насколько её нужно
+          // подтянуть, чтобы она целиком вышла из-под растворяющегося края.
+          if (measured !== card) {
+            measured = card
+            const box = windowRef.current?.getBoundingClientRect()
+            const rect = card.getBoundingClientRect()
+
+            let shift = 0
+            if (box) {
+              const pad = box.height * SAFE_EDGE
+              if (rect.top < box.top + pad) shift = -(box.top + pad - rect.top)
+              else if (rect.bottom > box.bottom - pad) shift = rect.bottom - (box.bottom - pad)
+            }
+
+            target = offset + shift
+
+            // Сдвиг вниз не должен увести ленту выше её начала — иначе сверху
+            // откроется пустота. Работаем на копию ниже.
+            if (target < 0) {
+              target += period
+              offset += period
+            }
+          }
+
+          if (target !== null) {
+            offset += (target - offset) * 0.2
+            if (Math.abs(target - offset) < 0.4) offset = target
+          }
+        } else {
+          measured = null
+          target = null
+          offset += direction * (period / (seconds * 1000)) * delta
+          offset = ((offset % period) + period) % period
+        }
+
+        track.style.transform = `translateY(${-offset}px)`
+      }
+
+      frame = requestAnimationFrame(tick)
+    }
+
+    frame = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(frame)
+  }, [direction, seconds, reduced, windowRef])
+
+  return (
+    <div className={offsetTop ? '-mt-20 lg:-mt-32' : ''}>
+      <div ref={trackRef} className="flex flex-col gap-4 will-change-transform lg:gap-6">
+        {/* Список продублирован: на стыке копий поток выглядит бесконечным. */}
+        {[...items, ...items].map((item, i) => (
+          <Card key={`${item.id}-${i}`} item={item} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Cases() {
-  // Останавливается только та колонка, на которую навели.
-  const [hovered, setHovered] = useState<number | null>(null)
+  const [hovered, setHovered] = useState<HTMLElement | null>(null)
+  const windowRef = useRef<HTMLDivElement>(null)
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -74,15 +195,14 @@ export default function Cases() {
     : [cases]
 
   /**
-   * Пауза определяется по элементу под курсором, а не парой enter/leave:
+   * Карточку под курсором определяем по цели события, а не парой enter/leave:
    * непарное событие оставило бы поток стоять навсегда. Слушаем документ —
    * тогда любое движение мыши где угодно возвращает поток в движение.
    */
   useEffect(() => {
     function onMove(event: PointerEvent) {
       const target = event.target as Element | null
-      const column = target?.closest?.('[data-column]')
-      setHovered(column ? Number(column.getAttribute('data-column')) : null)
+      setHovered((target?.closest?.('[data-case]') as HTMLElement | null) ?? null)
     }
 
     document.addEventListener('pointermove', onMove, { passive: true })
@@ -101,9 +221,10 @@ export default function Cases() {
           уже работают
         </>
       }
-      lead="Поток останавливается, стоит навести курсор: на снимке появится, что это за проект, из какой он сферы и что изменилось после запуска."
+      lead="Наведите на карточку: колонка остановится, подтянет снимок в кадр и покажет, что это за проект, из какой он сферы и что изменилось после запуска."
     >
       <div
+        ref={windowRef}
         className="relative mt-16 h-[min(860px,80vh)] min-h-[460px] overflow-hidden"
         // Верх и низ растворяются — карточки будто вытекают из-за края секции.
         style={{
@@ -117,31 +238,16 @@ export default function Cases() {
           onBlurCapture={() => setHovered(null)}
         >
           {columns.map((column, index) => (
-            <div
+            <Column
               key={index}
-              data-column={index}
-              onFocusCapture={() => setHovered(index)}
-              className={index === 1 ? '-mt-20 lg:-mt-32' : ''}
-            >
-              <div
-                className="flex flex-col gap-4 will-change-transform lg:gap-6"
-                style={
-                  reduced
-                    ? undefined
-                    : {
-                        animation: `${COLUMNS[index % COLUMNS.length].animation} ${
-                          COLUMNS[index % COLUMNS.length].seconds
-                        }s linear infinite`,
-                        animationPlayState: hovered === index ? 'paused' : 'running',
-                      }
-                }
-              >
-                {/* Список продублирован: на стыке копий поток выглядит бесконечным. */}
-                {[...column, ...column].map((item, i) => (
-                  <Card key={`${item.id}-${i}`} item={item} />
-                ))}
-              </div>
-            </div>
+              items={column}
+              direction={COLUMNS[index % COLUMNS.length].direction}
+              seconds={COLUMNS[index % COLUMNS.length].seconds}
+              offsetTop={index === 1}
+              reduced={reduced}
+              hovered={hovered}
+              windowRef={windowRef}
+            />
           ))}
         </div>
       </div>
