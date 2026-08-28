@@ -75,6 +75,9 @@ const TOUR = EDGES.reduce<number[]>((path, [from, to]) => {
 /** Скорость света автопилота, пикселей в секунду. */
 const AUTO_SPEED = 330
 
+/** Пауза после сброса: столько созвездие стоит пустым, прежде чем рисоваться заново. */
+const START_DELAY = 4000
+
 const PUSH_RADIUS = 190
 const PUSH_FORCE = 78
 const PARALLAX = 26
@@ -120,6 +123,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     const parallax = { x: 0, y: 0 }
     let idle = 0
     let tour = 0
+    let hold = START_DELAY
     let atTop = true
 
     // Жизненный цикл созвездия: рисуем → вспышка → пауза → гаснет.
@@ -239,6 +243,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       phase = 'drawing'
       phaseTime = 0
       tour = 0
+      hold = START_DELAY
     }
 
     function draw(now: number) {
@@ -274,6 +279,9 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         // За курсором свет тянется с запаздыванием — так движение мягче.
         smooth.x += (pointer.x - smooth.x) * 0.075
         smooth.y += (pointer.y - smooth.y) * 0.075
+      } else if (alive && hold > 0) {
+        // Пауза после сброса: свет стоит, созвездие остаётся пустым.
+        hold -= delta
       } else if (alive) {
         // Автопилот идёт от звезды к звезде с постоянной скоростью: сглаживание
         // к цели асимптотично и до узла не доводило, из-за чего линия зависала.
@@ -415,7 +423,8 @@ export default function SpaceField({ className = '' }: { className?: string }) {
           return
         }
 
-        if (!alive) return
+        // Во время паузы разогревать звёзды может только курсор.
+        if (!alive || (hold > 0 && !followsPointer)) return
 
         const distance = Math.hypot(node.x - smooth.x, node.y - smooth.y)
         if (distance < ignite) {
