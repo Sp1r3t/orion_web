@@ -88,6 +88,83 @@
   }
 }
 
+/* Созвездия на плитках гарантий: линии прочерчиваются волной, держатся
+   почти весь десятисекундный круг и к концу гаснут — потом всё заново. */
+@keyframes glyph-draw {
+  0% {
+    stroke-dashoffset: 1;
+  }
+  14%,
+  90% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes glyph-star {
+  0%,
+  3% {
+    opacity: 0.2;
+    r: 1.4;
+  }
+  14%,
+  90% {
+    opacity: 1;
+    r: 2;
+  }
+  100% {
+    opacity: 0.2;
+    r: 1.4;
+  }
+}
+
+.glyph-line {
+  stroke: var(--color-accent);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: glyph-draw 10s ease-in-out infinite;
+}
+
+.glyph-star {
+  fill: #ffd9b0;
+  opacity: 0.2;
+  animation: glyph-star 10s ease-in-out infinite;
+}
+
+/* Наведение на плитку: рисунок собирается сразу и разгорается. */
+.group:hover .glyph-line,
+.group:focus-visible .glyph-line {
+  animation: none;
+  stroke-dashoffset: 0;
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 6px rgb(255 106 0 / 0.65));
+  transition: stroke-dashoffset 0.28s ease-out;
+}
+
+.group:hover .glyph-star,
+.group:focus-visible .glyph-star {
+  animation: none;
+  opacity: 1;
+  fill: #fff2e2;
+  filter: drop-shadow(0 0 5px rgb(255 176 32 / 0.8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph-line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .glyph-star {
+    animation: none;
+    opacity: 1;
+  }
+}
+
 /* Побуквенное появление заголовка в hero. */
 @keyframes fade-up {
   from {
