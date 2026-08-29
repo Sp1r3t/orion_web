@@ -6,9 +6,9 @@ export const site = {
     'Стратегия, дизайн, разработка, запуск.',
     'Делаем сайты, которые приводят клиентов и остаются в памяти.',
   ],
-  telegram: 'https://t.me/orion',
-  email: 'hello@orion.ru',
-  phone: '+7 000 000-00-00',
+  telegram: 'https://t.me/sp1retdev',
+  email: 'orion.company.web@gmail.com',
+  phone: '+7-995-410-73-35',
   city: 'Работаем удалённо по всему миру',
 } as const
 

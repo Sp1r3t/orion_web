@@ -14,9 +14,9 @@ export const en: Bundle = {
       'Strategy, design, development, launch.',
       'We build sites that win customers and stay in mind.',
     ],
-    telegram: 'https://t.me/orion',
-    email: 'hello@orion.ru',
-    phone: '+7 000 000-00-00',
+    telegram: 'https://t.me/sp1retdev',
+    email: 'orion.company.web@gmail.com',
+    phone: '+7-995-410-73-35',
     city: 'Working remotely, worldwide',
   },
 
