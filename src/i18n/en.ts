@@ -57,7 +57,7 @@ export const en: Bundle = {
       details:
         'We unpack the offer and the objections, then build the structure around a single action. Every screen answers the question a visitor has at that exact moment.',
       deliverables: ['Wireframe and copy', 'Original design', 'Motion', 'Form and analytics'],
-      price: 'from ₽30,000',
+      priceFrom: 30_000,
       term: '5–7 days',
     },
     {
@@ -68,7 +68,7 @@ export const en: Bundle = {
       details:
         'We design the structure so anyone finds what they need in two clicks, and wire up an admin panel so you can edit the content without us.',
       deliverables: ['Up to 7 pages', 'Admin panel', 'SEO structure', 'CRM integrations'],
-      price: 'from ₽50,000',
+      priceFrom: 50_000,
       term: '2–4 weeks',
     },
     {
@@ -79,7 +79,7 @@ export const en: Bundle = {
       details:
         'We build the store around the way people actually buy: filters, product page, cart on one screen. Payments, delivery services and stock sync included.',
       deliverables: ['Catalogue and filters', 'Cart and checkout', 'Delivery', 'Stock sync'],
-      price: 'from ₽120,000',
+      priceFrom: 120_000,
       term: '3–8 weeks',
     },
     {
@@ -90,7 +90,7 @@ export const en: Bundle = {
       details:
         'For work an ordinary site cannot close: calculations, roles, API integrations. We start with an MVP and grow it on data rather than guesses.',
       deliverables: ['Architecture', 'Client dashboards', 'API integrations', 'Roles and access'],
-      price: 'from ₽180,000',
+      priceFrom: 180_000,
       term: '6–12 weeks',
     },
     {
@@ -101,7 +101,7 @@ export const en: Bundle = {
       details:
         'We read the analytics and session recordings to find where people drop off, then rebuild the interface while keeping your search rankings and content.',
       deliverables: ['Audit and metrics', 'New interface', 'Content migration', 'SEO preserved'],
-      price: 'from ₽40,000',
+      priceFrom: 40_000,
       term: '2–4 weeks',
     },
   ],
@@ -497,7 +497,7 @@ export const en: Bundle = {
     {
       question: 'How much does a site cost?',
       answer:
-        'A landing page starts at ₽30,000, a corporate site at ₽50,000, a store at ₽120,000. We name the exact figure after the brief: it depends on the scope, the integrations and who writes the copy. Use the calculator above for a range.',
+        'A landing page starts at $350, a corporate site at $580, a store at $1,390. We name the exact figure after the brief: it depends on the scope, the integrations and who writes the copy. Use the calculator above for a range.',
     },
     {
       question: 'How long does development take?',
@@ -670,7 +670,7 @@ export const en: Bundle = {
         'Redesign',
         'Not sure yet',
       ],
-      budgetChips: ['under ₽50,000', '₽50–100k', '₽100–300k', 'over ₽300,000', 'not sure'],
+      budgetChips: ['under $600', '$600–1,200', '$1,200–3,500', 'over $3,500', 'not sure'],
     },
     footer: {
       line: 'A site that works — from the brief to the first requests.',

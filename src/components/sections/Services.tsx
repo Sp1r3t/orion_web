@@ -3,10 +3,14 @@ import { Plus } from 'lucide-react'
 import { useState } from 'react'
 
 import Section from '@/components/ui/Section'
+import { useMoney } from '@/context/currencyContext'
 import { useContent } from '@/i18n/context'
 
 export default function Services() {
   const { services, ui } = useContent()
+  // Цены услуг идут через тот же форматтер, что и смета: в английской версии
+  // они по умолчанию в долларах, в русской — в рублях, и следуют за выбором валюты.
+  const money = useMoney()
   const [openId, setOpenId] = useState<string | null>(services[0].id)
 
   return (
@@ -52,7 +56,9 @@ export default function Services() {
                   {service.summary}
                 </span>
 
-                <span className="label-mono hidden text-text sm:block">{service.price}</span>
+                <span className="label-mono hidden text-text sm:block">
+                  {ui.pricing.from} {money.format(service.priceFrom)}
+                </span>
 
                 <Plus
                   className={`size-5 shrink-0 text-muted transition-transform duration-500 group-hover:text-accent ${
@@ -87,7 +93,9 @@ export default function Services() {
                         <p className="label-mono mt-5 text-muted">
                           {ui.services.term} <span className="text-text">{service.term}</span>
                           <span className="mx-3 text-line-strong">/</span>
-                          <span className="text-text sm:hidden">{service.price}</span>
+                          <span className="text-text sm:hidden">
+                            {ui.pricing.from} {money.format(service.priceFrom)}
+                          </span>
                         </p>
                       </div>
                     </div>
