@@ -369,8 +369,17 @@ export default function Pricing() {
         </div>
 
         <div className="lg:col-span-5">
-          <div className="rounded-card bg-gradient-to-b from-accent/50 via-line to-line p-px lg:sticky lg:top-28">
-            <div className="rounded-card bg-surface p-8">
+          <div className="rounded-card relative p-px lg:sticky lg:top-28">
+            {/* Рамка отдельным слоем: обрезка живёт на ней, а не на панели —
+                иначе список валют, который раскрывается вниз, срезался бы краем. */}
+            <span
+              aria-hidden="true"
+              className="rounded-card pointer-events-none absolute inset-0 overflow-hidden bg-gradient-to-b from-accent/50 via-line to-line"
+            >
+              <span className="beam" />
+            </span>
+
+            <div className="rounded-card relative bg-surface p-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <p className="label-mono text-muted">{ui.pricing.estimate}</p>

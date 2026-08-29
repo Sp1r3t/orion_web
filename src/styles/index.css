@@ -332,6 +332,37 @@
   }
 }
 
+/**
+ * Свет, бегущий по рамке панели сметы. Крутится конический градиент целиком,
+ * трансформацией: сам градиент растрируется один раз, и кадр стоит дёшево —
+ * анимировать угол в самом градиенте значило бы перерисовывать его каждый кадр.
+ * Квадрат заведомо больше рамки, иначе при повороте оголялись бы углы.
+ */
+@keyframes beam-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.beam {
+  position: absolute;
+  inset: -100%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 58%,
+    color-mix(in srgb, var(--color-accent) 70%, transparent) 76%,
+    var(--color-ember) 86%,
+    transparent 94%
+  );
+  animation: beam-spin 8s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam {
+    animation: none;
+  }
+}
+
 /* Побуквенное появление заголовка в hero. */
 @keyframes fade-up {
   from {
