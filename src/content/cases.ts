@@ -81,7 +81,7 @@ export const cases: CaseItem[] = [
     index: '06',
     name: 'Forge Supply',
     field: 'Оптовые поставки',
-    type: 'Каталог с выгрузкой из 1С',
+    type: 'Каталог с выгрузкой из Excel',
     year: '2025',
     improved: 'Четыре тысячи позиций с остатками обновляются автоматически',
     result: '4 000 SKU',

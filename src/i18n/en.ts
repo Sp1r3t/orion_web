@@ -167,7 +167,7 @@ export const en: Bundle = {
       index: '06',
       name: 'Forge Supply',
       field: 'Wholesale supply',
-      type: 'Catalogue synced with 1C',
+      type: 'Catalogue synced with Excel',
       year: '2025',
       improved: 'Four thousand items with live stock levels update themselves',
       result: '4,000 SKUs',
@@ -444,7 +444,7 @@ export const en: Bundle = {
     {
       id: 'r2',
       quote:
-        'I asked for an ordinary site and ended up with a kitchen configurator. The sales team stopped quoting in spreadsheets: a request now arrives with the price and the materials already in it. The first month was an adjustment, now nobody wants to go back.',
+        'I asked for an ordinary site and got something incredible. Thanks to the ORION team the sales managers stopped quoting in spreadsheets — a request now arrives with the price and the materials already in it.',
       author: 'Dmitry V.',
       role: 'Commercial director, furniture manufacturing',
       result: 'Leads ×2.4',
@@ -455,23 +455,23 @@ export const en: Bundle = {
         'What I liked most is that the work is visible every day: a link, a task board. I never once had to write "so how is it going". The one thing — collecting the texts on our side took two weeks, and that is what held us up.',
       author: 'Ilya M.',
       role: 'Marketing lead, transport company',
-      result: 'Calls −35%',
+      result: 'Leads ×1.8',
     },
     {
       id: 'r4',
       quote:
-        'We are a small roastery and the budget was modest. Nobody tried to sell us extras: they built a store with a bean subscription, and that was it. Three months on, the subscription brings a third of our revenue.',
+        'We are a small coffee shop and the budget was modest. Nobody tried to sell us extras: they built a store with sharp-looking promotion, and that was it. The site brought us 28% more customers',
       author: 'Olga T.',
-      role: 'Co-owner, coffee roastery',
-      result: 'Order value +28%',
+      role: 'Co-owner, coffee shop',
+      result: 'Customers +28%',
     },
     {
       id: 'r5',
       quote:
-        'I know nothing about websites and expected to be buried in jargon. Everything was explained in plain words, every decision with a why and a price. Now I change the prices in the admin panel myself, without calling anyone.',
+        'I know nothing about websites and was afraid of being buried in jargon. Every decision was explained in plain words — what it is for and what it costs. Now I change the prices in the admin panel myself, without calling anyone.',
       author: 'Sergey P.',
       role: 'Owner, car service',
-      result: 'Mobile leads ×3',
+      result: 'Leads ×3',
     },
     {
       id: 'r6',
@@ -484,7 +484,7 @@ export const en: Bundle = {
     {
       id: 'r7',
       quote:
-        'A four-thousand-item catalogue synced with 1C is not a pleasant job; two studios had already turned us down. This team took it, broke it into stages and finished it. Deadlines moved a couple of times, but we always knew in advance.',
+        'A four-thousand-item catalogue synced with Excel is not a pleasant job; two studios had already turned us down. This team took it, broke it into stages and finished it. Deadlines moved a couple of times, but we always knew in advance.',
       author: 'Artem Zh.',
       role: 'Development director, wholesale supply',
       result: '4,000 items in the catalogue',
