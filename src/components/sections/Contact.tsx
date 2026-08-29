@@ -222,21 +222,24 @@ export default function Contact() {
       }
       lead={ui.contact.lead}
     >
-      <div className="mt-16 grid gap-x-12 gap-y-12 lg:grid-cols-12">
-        {/* Контакты идут строкой над формой: в узкой боковой колонке длинная
-            почта дисплейным шрифтом не помещалась и наезжала на её текст.
-            Перенос по любому месту — страховка на самых узких экранах. */}
-        <div className="lg:col-span-12">
-          <div className="flex flex-wrap items-baseline gap-x-10 gap-y-5 border-b border-line pb-10">
+      <div className="mt-16 grid gap-12 lg:grid-cols-12">
+        {/* Колонка приподнята относительно формы, а длинная почта переносится
+            по любому месту: дисплейным шрифтом её строка шире колонки, и без
+            переноса она вылезала на текст формы. Межстрочный интервал у неё
+            свой и задан значением, а не классом: leading-* лежит в одном слое
+            с .text-display, где стоит 0.9, и перенесённые строки слипались бы. */}
+        <div className="lg:col-span-4 lg:-mt-8">
+          <div className="flex flex-col gap-6">
             <a
               href={`mailto:${site.email}`}
-              className="text-display text-xl text-accent transition-colors [overflow-wrap:anywhere] hover:text-text lg:text-2xl"
+              style={{ lineHeight: 1.2 }}
+              className="text-display text-2xl text-accent transition-colors [overflow-wrap:anywhere] hover:text-text"
             >
               {site.email}
             </a>
             <a
               href={`tel:${site.phone.replace(/[^+\d]/g, '')}`}
-              className="text-display text-xl text-accent transition-colors hover:text-text lg:text-2xl"
+              className="text-display text-2xl text-accent transition-colors hover:text-text"
             >
               {site.phone}
             </a>
@@ -244,11 +247,11 @@ export default function Contact() {
               href={site.telegram}
               target="_blank"
               rel="noreferrer noopener"
-              className="text-display text-xl text-accent transition-colors hover:text-text lg:text-2xl"
+              className="text-display text-2xl text-accent transition-colors hover:text-text"
             >
               Telegram
             </a>
-            <p className="label-mono text-muted">{site.city}</p>
+            <p className="label-mono mt-4 text-muted">{site.city}</p>
           </div>
         </div>
 
