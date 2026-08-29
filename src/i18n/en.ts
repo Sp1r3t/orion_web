@@ -11,7 +11,7 @@ export const en: Bundle = {
     name: 'ORION',
     tagline: 'Full-cycle web studio',
     description:
-      'Strategy, design, development and support. We build sites and services that bring in leads instead of just looking good.',
+      'Strategy, design, development, launch. We build sites that win customers and stay in mind.',
     telegram: 'https://t.me/orion',
     email: 'hello@orion.ru',
     phone: '+7 000 000-00-00',
@@ -413,16 +413,6 @@ export const en: Bundle = {
       price: 20_000,
       weeks: 1,
     },
-    {
-      id: 'support',
-      group: 'After launch',
-      title: 'Three months of development hours',
-      hint: 'Growing the site after launch, not fixing it',
-      explain:
-        'This is not the warranty: bugs in our code are fixed free for 12 months and you never pay for that. These are paid hours for development — add a block or a page, build a landing for a new service, change the structure, connect a service, finish what you thought of after launch. The hours are bought upfront at a reduced rate: the same work ordered later as separate tasks costs more. Anything unused rolls over to the next month.',
-      price: 45_000,
-      weeks: 0,
-    },
   ],
 
   urgencyModes: [
@@ -560,14 +550,14 @@ export const en: Bundle = {
     services: {
       eyebrow: 'Solutions',
       title: 'What we do and what it costs',
-      lead: 'Six formats, from a one-page site to a service with dashboards and integrations. Prices are a starting point — the exact figure comes after the brief.',
+      lead: 'Five formats, from a one-page site to a service with dashboards and integrations. Prices are a starting point — the exact figure comes after the brief.',
       term: 'Timeline',
     },
     cases: {
       eyebrow: 'Work',
       title: ['Projects', 'and what changed'],
-      lead: 'Hover a card: the column stops, pulls the shot into frame and shows what the project is, which field it is from and what changed after launch.',
-      note: 'Showing 8 of 40+ projects.',
+      lead: 'We judge our work by what changed for the client after launch, not by how the mockups looked. These are the projects we answer for with numbers.',
+      note: 'Showing 8 of 40+ projects',
     },
     process: {
       eyebrow: 'Process',
