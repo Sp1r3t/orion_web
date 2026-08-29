@@ -69,7 +69,7 @@ export const en: Bundle = {
         'We design the structure so anyone finds what they need in two clicks, and wire up an admin panel so you can edit the content without us.',
       deliverables: ['Up to 7 pages', 'Admin panel', 'SEO structure', 'CRM integrations'],
       price: 'from ₽50,000',
-      term: '2–3 weeks',
+      term: '2–4 weeks',
     },
     {
       id: 'ecommerce',
@@ -80,7 +80,7 @@ export const en: Bundle = {
         'We build the store around the way people actually buy: filters, product page, cart on one screen. Payments, delivery services and stock sync included.',
       deliverables: ['Catalogue and filters', 'Cart and checkout', 'Delivery', 'Stock sync'],
       price: 'from ₽120,000',
-      term: '3–5 weeks',
+      term: '3–8 weeks',
     },
     {
       id: 'product',
@@ -91,7 +91,7 @@ export const en: Bundle = {
         'For work an ordinary site cannot close: calculations, roles, API integrations. We start with an MVP and grow it on data rather than guesses.',
       deliverables: ['Architecture', 'Client dashboards', 'API integrations', 'Roles and access'],
       price: 'from ₽180,000',
-      term: 'from 6 weeks',
+      term: '6–12 weeks',
     },
     {
       id: 'redesign',
@@ -286,8 +286,9 @@ export const en: Bundle = {
       icon: 'corporate',
       base: 50_000,
       spread: 1.8,
-      weeks: [2, 3],
-      includes: ['Up to 7 pages', 'Original design', 'Basic SEO', 'Hosting and domain'],
+      weeks: [2, 4],
+      includes: ['Up to 7 pages', 'Original design', 'Hosting and domain'],
+      includedOptions: ['account', 'payments', 'seo'],
     },
     {
       id: 'ecommerce',
@@ -295,7 +296,7 @@ export const en: Bundle = {
       hint: 'Catalogue, cart, payments and delivery',
       icon: 'shop',
       base: 120_000,
-      weeks: [3, 5],
+      weeks: [3, 8],
       includes: ['Catalogue and filters', 'Cart', 'Delivery', 'Stock sync'],
     },
     {
@@ -304,8 +305,9 @@ export const en: Bundle = {
       hint: 'Dashboards, calculations, API integrations',
       icon: 'product',
       base: 180_000,
-      weeks: [6, 10],
+      weeks: [6, 12],
       includes: ['Architecture', 'Roles and access', 'API integrations', 'Documentation'],
+      includedOptions: ['account', 'payments', 'seo', 'admin'],
     },
   ],
 
@@ -329,7 +331,7 @@ export const en: Bundle = {
       hint: 'Edit the content yourself, without us',
       explain:
         'A CMS is a content management system: a private area behind a login where you edit texts, images, prices, products and news through ordinary fields, no code. We tailor it to your blocks and show you how to use it.',
-      price: 35_000,
+      price: 25_000,
       weeks: 1.5,
     },
     {
@@ -339,7 +341,7 @@ export const en: Bundle = {
       hint: 'A language switch on the site',
       explain:
         'A full copy of the interface in a second language with a switch in the header. You supply the texts, or we translate them for an extra fee. Search engines get the correct language tags, so the versions do not compete with each other.',
-      price: 22_000,
+      price: 15_000,
       weeks: 1,
     },
     {
@@ -349,7 +351,7 @@ export const en: Bundle = {
       hint: 'Calculator, configurator, finder, map',
       explain:
         'A widget is an interactive block that does real work on the page: a price calculator, a product configurator, a search by parameters, a map with filters, a booking slot picker. Each one is designed and coded separately, so we count them by the piece.',
-      price: 12_000,
+      price: 8_000,
       weeks: 0.5,
       quantity: { max: 6, unit: 'pcs' },
     },
@@ -360,7 +362,7 @@ export const en: Bundle = {
       hint: 'Sign-in, history, documents',
       explain:
         'A section customers log into: order history, statuses, invoices and documents, saved details. It takes "where is my order" and "please resend the invoice" off your managers.',
-      price: 45_000,
+      price: 30_000,
       weeks: 2,
     },
     {
@@ -390,7 +392,7 @@ export const en: Bundle = {
       hint: 'So the site can be found in search',
       explain:
         'SEO is preparing the site for search. We collect the queries people look for you with, write page titles and descriptions, add Schema.org markup (which produces rich snippets), and set up robots.txt and the sitemap.',
-      price: 25_000,
+      price: 8_000,
       weeks: 1,
     },
     {
@@ -400,7 +402,7 @@ export const en: Bundle = {
       hint: 'We write the texts, not you',
       explain:
         'We take on the copy for every screen: the offer, service descriptions, answers to objections, button labels. Written after an interview with you, so it sounds like you and not like filler.',
-      price: 15_000,
+      price: 10_000,
       weeks: 0.5,
     },
     {
@@ -427,7 +429,7 @@ export const en: Bundle = {
       id: 'fast',
       title: 'Rush launch',
       hint: 'Top priority, work runs in parallel',
-      priceFactor: 1.3,
+      priceFactor: 1.2,
       timeFactor: 0.65,
     },
   ],
@@ -500,7 +502,7 @@ export const en: Bundle = {
     {
       question: 'How long does development take?',
       answer:
-        'A landing page takes 5–7 days, a corporate site 2–3 weeks, a store 3–5 weeks. Deadlines go into the contract. The longest part is usually not development but approving texts and materials on your side.',
+        'A landing page takes 5–7 days, a corporate site 2–4 weeks, a store 3–8 weeks. Deadlines go into the contract. The longest part is usually not development but approving texts and materials on your side.',
     },
     {
       question: 'What if I do not like the design?',

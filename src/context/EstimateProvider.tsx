@@ -22,13 +22,18 @@ export default function EstimateProvider({ children }: { children: ReactNode }) 
   const type = projectTypes.find((item) => item.id === typeId) ?? projectTypes[0]
   const urgency = urgencyModes.find((item) => item.id === urgencyId) ?? urgencyModes[0]
 
-  const chosen = useMemo(
-    () =>
-      pricingOptions
-        .map((option) => ({ option, count: counts[option.id] ?? 0 }))
-        .filter((item) => item.count > 0),
-    [counts, pricingOptions],
-  )
+  /**
+   * Опции, которые тип закрывает сам, из расчёта выпадают — даже если посетитель
+   * отметил их на другом типе и потом переключился. Иначе он платил бы дважды
+   * за то, что уже входит в цену.
+   */
+  const chosen = useMemo(() => {
+    const included = new Set(type.includedOptions ?? [])
+
+    return pricingOptions
+      .map((option) => ({ option, count: counts[option.id] ?? 0 }))
+      .filter((item) => item.count > 0 && !included.has(item.option.id))
+  }, [counts, pricingOptions, type])
 
   const totals = useMemo(() => {
     const extraPrice = chosen.reduce((sum, item) => sum + item.option.price * item.count, 0)

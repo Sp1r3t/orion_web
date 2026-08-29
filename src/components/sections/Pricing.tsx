@@ -156,6 +156,12 @@ export default function Pricing() {
   // снимаем, иначе всплывающие подсказки обрезаются краем блока.
   const [revealed, setRevealed] = useState(false)
 
+  // Что тип закрывает сам: эти опции не предлагаем доплатой, а показываем в составе.
+  const included = type.includedOptions ?? []
+  const includedTitles = included
+    .map((id) => pricingOptions.find((option) => option.id === id)?.title)
+    .filter((title): title is string => Boolean(title))
+
   const typeId = type.id
   const urgencyId = urgency.id
   const animatedMin = useAnimatedNumber(totals.min)
@@ -243,6 +249,16 @@ export default function Pricing() {
                   {item}
                 </span>
               ))}
+              {/* Закрытые типом опции отмечаем акцентом: это то, за что не доплачивают. */}
+              {includedTitles.map((item) => (
+                <span
+                  key={item}
+                  className="flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/8 px-3 py-1 text-xs text-accent"
+                >
+                  <Check className="size-3" />
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
 
@@ -304,13 +320,19 @@ export default function Pricing() {
                   <p className="label-mono text-muted">{ui.pricing.stepOptions}</p>
 
                   <div className="mt-5 flex flex-col gap-10">
-                    {optionGroups.map((group) => (
-                      <div key={group}>
-                        <p className="label-mono text-accent/70">{group}</p>
-                        <div className="mt-3 border-t border-line">
-                          {pricingOptions
-                            .filter((option) => option.group === group)
-                            .map((option) => (
+                    {optionGroups.map((group) => {
+                      const rows = pricingOptions.filter(
+                        (option) => option.group === group && !included.includes(option.id),
+                      )
+
+                      // Группа могла остаться пустой: заголовок без строк не рисуем.
+                      if (rows.length === 0) return null
+
+                      return (
+                        <div key={group}>
+                          <p className="label-mono text-accent/70">{group}</p>
+                          <div className="mt-3 border-t border-line">
+                            {rows.map((option) => (
                               <OptionRow
                                 key={option.id}
                                 option={option}
@@ -318,9 +340,10 @@ export default function Pricing() {
                                 onChange={(update) => setCount(option.id, update)}
                               />
                             ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               </motion.div>
