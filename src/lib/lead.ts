@@ -6,6 +6,8 @@ import type { Ui } from '@/i18n/types'
 export type LeadEstimate = {
   projectType: string
   pace: string
+  /** Валюта, в которой смету видел посетитель. Суммы ниже всегда в рублях. */
+  currency?: string
   options: Array<{ title: string; count: number; price: number }>
   priceMin: number
   priceMax: number
@@ -32,10 +34,11 @@ export class LeadNotConfiguredError extends Error {
 }
 
 /** Снимок расчёта в том виде, в котором он уходит вместе с заявкой. */
-export function toLeadEstimate(estimate: EstimateValue): LeadEstimate {
+export function toLeadEstimate(estimate: EstimateValue, currency?: string): LeadEstimate {
   return {
     projectType: estimate.type.title,
     pace: estimate.urgency.title,
+    currency,
     options: estimate.chosen.map(({ option, count }) => ({
       title: option.title,
       count,
@@ -57,9 +60,8 @@ export function formatLead(
   payload: LeadPayload,
   strings: Ui['leadMail'] = ru.ui.leadMail,
   locale: string = ru.ui.locale,
+  format: (rubles: number) => string = (value) => money(locale).format(value),
 ): string {
-  const format = money(locale)
-
   const lines = [
     `${strings.name}: ${payload.name}`,
     `${strings.contact}: ${payload.contact}`,
@@ -80,8 +82,16 @@ export function formatLead(
             .join(', ')}`
         : `${strings.options}: ${strings.noOptions}`,
     )
+    // Смету показываем в валюте посетителя, а рядом оставляем рубли: курс
+    // плавает, договор всё равно рублёвый.
+    const rubles = money(ru.ui.locale)
+    const original =
+      estimate.currency && estimate.currency !== 'RUB'
+        ? ` (${rubles.format(estimate.priceMin)} — ${rubles.format(estimate.priceMax)})`
+        : ''
+
     lines.push(
-      `${strings.range}: ${format.format(estimate.priceMin)} — ${format.format(estimate.priceMax)}`,
+      `${strings.range}: ${format(estimate.priceMin)} — ${format(estimate.priceMax)}${original}`,
     )
     lines.push(`${strings.term}: ${estimate.weeksMin}–${estimate.weeksMax} ${strings.weeks}`)
   }

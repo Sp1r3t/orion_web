@@ -14,12 +14,14 @@ import { useState } from 'react'
 import type { ComponentType, MouseEvent } from 'react'
 
 import Button from '@/components/ui/Button'
+import CurrencyPicker from '@/components/ui/CurrencyPicker'
 import InfoTip from '@/components/ui/InfoTip'
 import Section from '@/components/ui/Section'
 import type { PricingOption } from '@/content/pricing'
 import { useEstimate } from '@/context/estimateContext'
 import { useAnimatedNumber } from '@/hooks/useAnimatedNumber'
-import { useContent, useMoney } from '@/i18n/context'
+import { useMoney } from '@/context/currencyContext'
+import { useContent } from '@/i18n/context'
 
 const typeIcons: Record<string, ComponentType<{ className?: string }>> = {
   landing: Layers,
@@ -346,13 +348,18 @@ export default function Pricing() {
           <div className="rounded-card bg-gradient-to-b from-accent/50 via-line to-line p-px lg:sticky lg:top-28">
             <div className="rounded-card bg-surface p-8">
               <div className="flex items-center justify-between">
-                <p className="label-mono text-muted">{ui.pricing.estimate}</p>
-                {urgency.priceFactor > 1 && (
-                  <span className="label-mono flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-accent">
-                    <Zap className="size-3" />
-                    {ui.pricing.rush}
-                  </span>
-                )}
+                <div className="flex items-center gap-3">
+                  <p className="label-mono text-muted">{ui.pricing.estimate}</p>
+                  {urgency.priceFactor > 1 && (
+                    <span className="label-mono flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-accent">
+                      <Zap className="size-3" />
+                      {ui.pricing.rush}
+                    </span>
+                  )}
+                </div>
+
+                {/* Валюта сметы: пересчёт идёт по живому курсу. */}
+                <CurrencyPicker />
               </div>
 
               <p className="text-display mt-5 text-4xl lg:text-5xl">{money.format(animatedMin)}</p>

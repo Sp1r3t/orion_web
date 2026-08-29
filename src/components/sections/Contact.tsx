@@ -5,7 +5,8 @@ import type { FormEvent } from 'react'
 
 import Section from '@/components/ui/Section'
 import { useEstimate } from '@/context/estimateContext'
-import { useContent, useMoney } from '@/i18n/context'
+import { useCurrency, useMoney } from '@/context/currencyContext'
+import { useContent } from '@/i18n/context'
 import { formatLead, LeadNotConfiguredError, sendLead, toLeadEstimate } from '@/lib/lead'
 import type { LeadPayload } from '@/lib/lead'
 
@@ -150,6 +151,8 @@ export default function Contact() {
   const estimate = useEstimate()
   const { attached, type, totals } = estimate
   const { site, ui } = useContent()
+  const { currency } = useCurrency()
+  const money = useMoney()
 
   const [taskChoice, setTaskChoice] = useState<number | null>(null)
   const [budgetChoice, setBudgetChoice] = useState<number | null>(null)
@@ -175,7 +178,7 @@ export default function Contact() {
       task,
       budget,
       message: String(data.get('message') ?? ''),
-      estimate: attached ? toLeadEstimate(estimate) : null,
+      estimate: attached ? toLeadEstimate(estimate, currency.code) : null,
       page: window.location.href,
       sentAt: new Date().toISOString(),
     }
@@ -186,7 +189,7 @@ export default function Contact() {
       setStatus('sent')
     } catch (error) {
       // Заявку не теряем: показываем её текстом, чтобы человек мог отправить в Telegram.
-      setLeadText(formatLead(payload, ui.leadMail, ui.locale))
+      setLeadText(formatLead(payload, ui.leadMail, ui.locale, money.format))
       setNotConfigured(error instanceof LeadNotConfiguredError)
       setStatus('error')
     }

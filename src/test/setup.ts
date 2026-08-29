@@ -44,6 +44,16 @@ vi.stubGlobal('ResizeObserver', ResizeObserverStub)
 // jsdom не умеет canvas — звёздное поле в тестах просто не рисуется.
 vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null as never)
 
+/**
+ * Сеть в тестах закрыта: курсы валют тянутся из внешних сервисов, и без заглушки
+ * каждый рендер приложения уходил бы в реальный запрос. Тесты, которым fetch нужен,
+ * подменяют его сами через vi.stubGlobal.
+ */
+vi.stubGlobal(
+  'fetch',
+  vi.fn(() => Promise.reject(new Error('Сеть в тестах отключена'))),
+)
+
 afterEach(() => {
   cleanup()
 })

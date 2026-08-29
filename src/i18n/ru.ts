@@ -94,6 +94,15 @@ export const ru: Bundle = {
       add: 'Добавить',
       remove: 'Убрать',
       rushNote: 'к цене · срок короче',
+      currency: 'Валюта сметы',
+      rateAt: 'Курс на',
+      currencies: {
+        rub: 'Рубль',
+        usd: 'Доллар',
+        eur: 'Евро',
+        cny: 'Юань',
+        btc: 'Биткойн',
+      },
     },
     promises: {
       eyebrow: 'Гарантии',

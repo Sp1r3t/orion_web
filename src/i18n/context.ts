@@ -1,7 +1,6 @@
 import { createContext, useContext } from 'react'
 
 import { en } from './en'
-import { money } from './format'
 import { ru } from './ru'
 import type { Bundle, Lang } from './types'
 
@@ -25,8 +24,4 @@ export function useLanguage(): LanguageValue {
 
 export function useContent(): Bundle {
   return useLanguage().content
-}
-
-export function useMoney(): Intl.NumberFormat {
-  return money(useContent().ui.locale)
 }

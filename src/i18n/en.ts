@@ -664,6 +664,15 @@ export const en: Bundle = {
       add: 'Add',
       remove: 'Remove',
       rushNote: 'Priority slot, work runs in parallel',
+      currency: 'Estimate currency',
+      rateAt: 'Rate as of',
+      currencies: {
+        rub: 'Russian ruble',
+        usd: 'US dollar',
+        eur: 'Euro',
+        cny: 'Chinese yuan',
+        btc: 'Bitcoin',
+      },
     },
     promises: {
       eyebrow: 'Guarantees',

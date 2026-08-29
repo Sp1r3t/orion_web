@@ -191,11 +191,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Хедер фиксирован на 80px — якоря не должны уезжать под него. */
-  section[id] {
-    scroll-margin-top: 5rem;
-  }
-
   ::selection {
     background-color: var(--color-accent);
     color: #050505;

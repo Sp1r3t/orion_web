@@ -4,6 +4,7 @@ import type { ProcessStep, PromiseItem } from '@/content/process'
 import type { FaqItem, Review } from '@/content/reviews'
 import type { Service } from '@/content/services'
 import type { NavItem } from '@/content/site'
+import type { CurrencyId } from '@/lib/currency'
 
 export type Lang = 'ru' | 'en'
 
@@ -52,6 +53,9 @@ export type Ui = {
     add: string
     remove: string
     rushNote: string
+    currency: string
+    rateAt: string
+    currencies: Record<CurrencyId, string>
   }
   promises: { eyebrow: string; title: string; lead: string }
   reviews: { eyebrow: string; title: string; lead: string; list: string; item: string }
