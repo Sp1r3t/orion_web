@@ -133,7 +133,8 @@ export type Bundle = {
   site: {
     name: string
     tagline: string
-    description: string
+    /** Подпись под заголовком hero: строка на предложение. */
+    description: readonly string[]
     telegram: string
     email: string
     phone: string

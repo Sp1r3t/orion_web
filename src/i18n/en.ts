@@ -10,8 +10,10 @@ export const en: Bundle = {
   site: {
     name: 'ORION',
     tagline: 'Full-cycle web studio',
-    description:
-      'Strategy, design, development, launch. We build sites that win customers and stay in mind.',
+    description: [
+      'Strategy, design, development, launch.',
+      'We build sites that win customers and stay in mind.',
+    ],
     telegram: 'https://t.me/orion',
     email: 'hello@orion.ru',
     phone: '+7 000 000-00-00',

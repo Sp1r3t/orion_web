@@ -29,8 +29,14 @@ export default function Hero() {
               <PixelWord key={ui.hero.words.join()} words={ui.hero.words} interval={3000} />
             </h1>
 
+            {/* Каждое предложение с новой строки — перенос задан, а не отдан вёрстке. */}
             <p className="mt-8 text-base text-muted lg:ml-auto lg:max-w-2xl lg:text-lg">
-              {site.description}
+              {site.description.map((line, index) => (
+                <span key={line}>
+                  {index > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </p>
           </div>
         </div>
