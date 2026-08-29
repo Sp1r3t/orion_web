@@ -427,6 +427,24 @@
     );
   }
 
+  /**
+   * Леттеринг в подвале. Буквы вырезаны из фона: сами по себе они тёмные,
+   * а под курсором в них разливается акцентная лужа света — координаты
+   * приходят переменными, поэтому за курсором следует градиент, а не
+   * перерисовка. Без наведения свет стоит по центру.
+   */
+  .wordmark {
+    background-image: radial-gradient(
+      22rem circle at var(--mx, 50%) var(--my, 50%),
+      var(--color-accent) 0%,
+      var(--color-ember) 24%,
+      color-mix(in srgb, var(--color-ink) 18%, transparent) 62%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+
   .hairline {
     background-image: linear-gradient(
       90deg,

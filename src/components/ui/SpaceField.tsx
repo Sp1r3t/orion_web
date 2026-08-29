@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
+import { channels } from '@/lib/color'
+
 type Star = {
   bx: number
   by: number
@@ -87,13 +89,6 @@ const HOLD_AFTER_COMPLETE = 7000
 const FADE_OUT = 1300
 
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
-
-/** #rrggbb → «r, g, b»: цвета берём из токенов темы, а рисуем через rgba(). */
-function channels(hex: string, fallback: string) {
-  const match = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex.trim())
-  if (!match) return fallback
-  return `${parseInt(match[1], 16)}, ${parseInt(match[2], 16)}, ${parseInt(match[3], 16)}`
-}
 
 /**
  * Фон первого экрана: звёздное поле во всю секцию, без видимых границ.
