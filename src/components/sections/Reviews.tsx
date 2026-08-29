@@ -5,7 +5,7 @@ import Section from '@/components/ui/Section'
 import { useContent } from '@/i18n/context'
 
 /** Сколько держится один отзыв. Столько же длится заливка активной точки. */
-const SLIDE_MS = 7000
+const SLIDE_MS = 10_000
 
 export default function Reviews() {
   const { reviews, ui } = useContent()
