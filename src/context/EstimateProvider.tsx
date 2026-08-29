@@ -36,7 +36,8 @@ export default function EstimateProvider({ children }: { children: ReactNode }) 
 
     const clean = type.base + extraPrice
     const min = clean * urgency.priceFactor
-    const max = (type.base * type.spread + extraPrice) * urgency.priceFactor
+    // Без коэффициента верхней границы у типа нет: потолок равен полу и не показывается.
+    const max = type.spread ? (type.base * type.spread + extraPrice) * urgency.priceFactor : min
 
     return {
       min: Math.round(min / 1000) * 1000,
@@ -58,6 +59,7 @@ export default function EstimateProvider({ children }: { children: ReactNode }) 
       counts,
       chosen,
       totals,
+      openEnded: type.spread === undefined,
       attached,
       setTypeId,
       setUrgencyId,

@@ -3,9 +3,14 @@ export type ProjectType = {
   title: string
   hint: string
   icon: 'landing' | 'corporate' | 'shop' | 'product'
-  /** Нижняя граница вилки, ₽. Верхняя считается с коэффициентом. */
+  /** Нижняя граница вилки, ₽. */
   base: number
-  spread: number
+  /**
+   * Коэффициент верхней границы. Без него у типа нет потолка: в смете
+   * показывается только «от» — так у сложных проектов вилка не превращается
+   * в пугающее число, которое всё равно ничего не обещает.
+   */
+  spread?: number
   weeks: [number, number]
   includes: string[]
 }
@@ -58,8 +63,7 @@ export const projectTypes: ProjectType[] = [
     title: 'Интернет-магазин',
     hint: 'Каталог, корзина, оплата и доставка',
     icon: 'shop',
-    base: 90_000,
-    spread: 2,
+    base: 120_000,
     weeks: [3, 5],
     includes: ['Каталог и фильтры', 'Корзина', 'Доставка', 'Выгрузка остатков'],
   },
@@ -68,8 +72,7 @@ export const projectTypes: ProjectType[] = [
     title: 'Веб-сервис',
     hint: 'Кабинеты, расчёты, интеграции по API',
     icon: 'product',
-    base: 150_000,
-    spread: 2.2,
+    base: 180_000,
     weeks: [6, 10],
     includes: ['Архитектура', 'Роли и доступы', 'API-интеграции', 'Документация'],
   },

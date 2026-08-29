@@ -18,6 +18,8 @@ export type EstimateValue = {
   counts: Record<string, number>
   chosen: ChosenOption[]
   totals: EstimateTotals
+  /** У типа нет потолка: в смете показываем только «от». */
+  openEnded: boolean
   /** true — посетитель нажал «Обсудить смету», расчёт прикреплён к форме заявки. */
   attached: boolean
   setTypeId: (id: string) => void

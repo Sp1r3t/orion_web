@@ -190,6 +190,7 @@ export const ru: Bundle = {
       options: 'Опции',
       noOptions: 'не выбраны',
       range: 'Вилка',
+      from: 'от',
       term: 'Срок',
       weeks: 'недель',
     },

@@ -72,7 +72,7 @@ function Chips({
 
 /** Расчёт, прикреплённый к заявке кнопкой «Обсудить смету». */
 function EstimateCard() {
-  const { type, urgency, chosen, totals, setCount } = useEstimate()
+  const { type, urgency, chosen, totals, openEnded, setCount } = useEstimate()
   const { ui } = useContent()
   const money = useMoney()
 
@@ -95,8 +95,11 @@ function EstimateCard() {
       </div>
 
       <p className="text-display mt-4 text-2xl">
+        {openEnded && <span className="text-base font-normal text-muted">{ui.pricing.from} </span>}
         {money.format(totals.min)}
-        <span className="text-base font-normal text-muted"> — {money.format(totals.max)}</span>
+        {!openEnded && (
+          <span className="text-base font-normal text-muted"> — {money.format(totals.max)}</span>
+        )}
       </p>
 
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">

@@ -145,6 +145,7 @@ export default function Pricing() {
     setCount,
     resetCounts,
     attach,
+    openEnded,
   } = useEstimate()
   const { optionGroups, pricingOptions, projectTypes, urgencyModes, ui } = useContent()
   const money = useMoney()
@@ -362,10 +363,17 @@ export default function Pricing() {
                 <CurrencyPicker />
               </div>
 
-              <p className="text-display mt-5 text-4xl lg:text-5xl">{money.format(animatedMin)}</p>
-              <p className="mt-2 text-muted">
-                {ui.pricing.upTo} {money.format(totals.max)}
+              <p className="text-display mt-5 text-4xl lg:text-5xl">
+                {openEnded && (
+                  <span className="text-2xl font-normal text-muted">{ui.pricing.from} </span>
+                )}
+                {money.format(animatedMin)}
               </p>
+              {!openEnded && (
+                <p className="mt-2 text-muted">
+                  {ui.pricing.upTo} {money.format(totals.max)}
+                </p>
+              )}
 
               <div className="my-7 border-t border-dashed border-line-strong" />
 

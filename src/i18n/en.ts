@@ -79,7 +79,7 @@ export const en: Bundle = {
       details:
         'We build the store around the way people actually buy: filters, product page, cart on one screen. Payments, delivery services and stock sync included.',
       deliverables: ['Catalogue and filters', 'Cart and checkout', 'Delivery', 'Stock sync'],
-      price: 'from ₽90,000',
+      price: 'from ₽120,000',
       term: '3–5 weeks',
     },
     {
@@ -90,7 +90,7 @@ export const en: Bundle = {
       details:
         'For work an ordinary site cannot close: calculations, roles, API integrations. We start with an MVP and grow it on data rather than guesses.',
       deliverables: ['Architecture', 'Client dashboards', 'API integrations', 'Roles and access'],
-      price: 'from ₽150,000',
+      price: 'from ₽180,000',
       term: 'from 6 weeks',
     },
     {
@@ -294,8 +294,7 @@ export const en: Bundle = {
       title: 'Online store',
       hint: 'Catalogue, cart, payments and delivery',
       icon: 'shop',
-      base: 90_000,
-      spread: 2,
+      base: 120_000,
       weeks: [3, 5],
       includes: ['Catalogue and filters', 'Cart', 'Delivery', 'Stock sync'],
     },
@@ -304,8 +303,7 @@ export const en: Bundle = {
       title: 'Web service',
       hint: 'Dashboards, calculations, API integrations',
       icon: 'product',
-      base: 150_000,
-      spread: 2.2,
+      base: 180_000,
       weeks: [6, 10],
       includes: ['Architecture', 'Roles and access', 'API integrations', 'Documentation'],
     },
@@ -497,7 +495,7 @@ export const en: Bundle = {
     {
       question: 'How much does a site cost?',
       answer:
-        'A landing page starts at ₽30,000, a corporate site at ₽50,000, a store at ₽90,000. We name the exact figure after the brief: it depends on the scope, the integrations and who writes the copy. Use the calculator above for a range.',
+        'A landing page starts at ₽30,000, a corporate site at ₽50,000, a store at ₽120,000. We name the exact figure after the brief: it depends on the scope, the integrations and who writes the copy. Use the calculator above for a range.',
     },
     {
       question: 'How long does development take?',
@@ -692,6 +690,7 @@ export const en: Bundle = {
       options: 'Options',
       noOptions: 'no extras',
       range: 'Range',
+      from: 'from',
       term: 'Timeline',
       weeks: 'weeks',
     },

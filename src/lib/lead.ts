@@ -8,6 +8,8 @@ export type LeadEstimate = {
   pace: string
   /** Валюта, в которой смету видел посетитель. Суммы ниже всегда в рублях. */
   currency?: string
+  /** У типа проекта нет верхней границы: в вилке осмысленно только «от». */
+  openEnded?: boolean
   options: Array<{ title: string; count: number; price: number }>
   priceMin: number
   priceMax: number
@@ -39,6 +41,7 @@ export function toLeadEstimate(estimate: EstimateValue, currency?: string): Lead
     projectType: estimate.type.title,
     pace: estimate.urgency.title,
     currency,
+    openEnded: estimate.openEnded,
     options: estimate.chosen.map(({ option, count }) => ({
       title: option.title,
       count,
@@ -82,17 +85,23 @@ export function formatLead(
             .join(', ')}`
         : `${strings.options}: ${strings.noOptions}`,
     )
-    // Смету показываем в валюте посетителя, а рядом оставляем рубли: курс
-    // плавает, договор всё равно рублёвый.
+    /**
+     * Смету показываем в валюте посетителя, а рядом оставляем рубли: курс
+     * плавает, договор всё равно рублёвый. У типов без потолка пишем «от»:
+     * верхняя граница там не считается.
+     */
     const rubles = money(ru.ui.locale)
+    const span = (as: (value: number) => string) =>
+      estimate.openEnded
+        ? `${strings.from} ${as(estimate.priceMin)}`
+        : `${as(estimate.priceMin)} — ${as(estimate.priceMax)}`
+
     const original =
       estimate.currency && estimate.currency !== 'RUB'
-        ? ` (${rubles.format(estimate.priceMin)} — ${rubles.format(estimate.priceMax)})`
+        ? ` (${span((value) => rubles.format(value))})`
         : ''
 
-    lines.push(
-      `${strings.range}: ${format(estimate.priceMin)} — ${format(estimate.priceMax)}${original}`,
-    )
+    lines.push(`${strings.range}: ${span(format)}${original}`)
     lines.push(`${strings.term}: ${estimate.weeksMin}–${estimate.weeksMax} ${strings.weeks}`)
   }
 

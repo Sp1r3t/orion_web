@@ -124,6 +124,7 @@ export type Ui = {
     options: string
     noOptions: string
     range: string
+    from: string
     term: string
     weeks: string
   }
