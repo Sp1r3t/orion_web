@@ -39,12 +39,9 @@ export const stack = [
   'Node.js',
   'PostgreSQL',
   'Figma',
-  'Tailwind',
   'Motion',
   'Vite',
   'Docker',
   'Яндекс.Метрика',
-  'amoCRM',
   'Telegram Bot API',
-  'Битрикс24',
 ]

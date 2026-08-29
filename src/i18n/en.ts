@@ -39,14 +39,11 @@ export const en: Bundle = {
     'Node.js',
     'PostgreSQL',
     'Figma',
-    'Tailwind',
     'Motion',
     'Vite',
     'Docker',
     'Yandex.Metrica',
-    'amoCRM',
     'Telegram Bot API',
-    'Bitrix24',
   ],
 
   services: [
@@ -218,7 +215,7 @@ export const en: Bundle = {
       title: 'Brief and discovery',
       icon: 'brief',
       duration: '2–3 days',
-      text: 'We work out who your customer is, how they choose and where deals fall apart. We look at competitors and at your current analytics if a site already exists.',
+      text: 'We find out who you sell to, what a person weighs when choosing a contractor and what stops them just short of a request. We look at competitors and at your current analytics if a site already exists.',
       points: ['Interview with you', 'Competitor analysis', 'Goals and metrics'],
     },
     {
@@ -235,7 +232,7 @@ export const en: Bundle = {
       icon: 'build',
       duration: '1–4 weeks',
       text: 'We design, agree and build in parallel. You get a working link from the first days instead of a finished result at the very end.',
-      points: ['Figma mockups', 'Responsive 360–1920', 'Motion and interaction'],
+      points: ['Figma mockups', 'Phone, tablet, desktop', 'Motion and interaction'],
     },
     {
       index: '04',
@@ -289,7 +286,7 @@ export const en: Bundle = {
       base: 30_000,
       spread: 1.6,
       weeks: [1, 2],
-      includes: ['Original design', 'Responsive 360–1920', 'Lead form', 'Hosting and domain'],
+      includes: ['Original design', 'Phone, tablet, desktop', 'Lead form', 'Hosting and domain'],
     },
     {
       id: 'corporate',
@@ -343,16 +340,6 @@ export const en: Bundle = {
       weeks: 0.5,
     },
     {
-      id: 'analytics',
-      group: 'Analytics and data',
-      title: 'End-to-end analytics',
-      hint: 'From ad click to actual money',
-      explain:
-        'We link the ad account, the site and the CRM into one chain. Every request is tagged with its source and carries it through to the deal. The report shows not "how many clicks" but how much revenue each channel brought.',
-      price: 30_000,
-      weeks: 1,
-    },
-    {
       id: 'admin',
       group: 'Managing the site',
       title: 'Admin panel',
@@ -404,16 +391,6 @@ export const en: Bundle = {
       weeks: 1,
     },
     {
-      id: 'crm',
-      group: 'Functionality',
-      title: 'CRM integration',
-      hint: 'amoCRM, Bitrix24 or a Telegram bot',
-      explain:
-        'A CRM is where your customers and deals live. A request from the site lands there automatically with the name, contact, service and source. Nothing gets lost in an inbox, and you can see who is on it.',
-      price: 18_000,
-      weeks: 0.5,
-    },
-    {
       id: 'chatbot',
       group: 'Functionality',
       title: 'Telegram bot for leads',
@@ -454,33 +431,13 @@ export const en: Bundle = {
       weeks: 1,
     },
     {
-      id: 'speed',
-      group: 'Growth',
-      title: 'Speed and Core Web Vitals',
-      hint: 'A fast site ranks better',
-      explain:
-        'Core Web Vitals are Google metrics: how fast the main content appears, whether the layout jumps, how quickly controls respond. We compress images, cut dead code and set up caching. It affects both rankings and conversion.',
-      price: 18_000,
-      weeks: 0.5,
-    },
-    {
       id: 'support',
       group: 'After launch',
-      title: '3 months of support',
-      hint: 'Changes on request and monitoring',
+      title: 'Three months of development hours',
+      hint: 'Growing the site after launch, not fixing it',
       explain:
-        'A bundle of hours for changes: edit a text, add a block, update prices. Plus uptime monitoring and security updates. Unused hours roll over to the next month.',
+        'This is not the warranty: bugs in our code are fixed free for 12 months and you never pay for that. These are paid hours for development — add a block or a page, build a landing for a new service, change the structure, connect a service, finish what you thought of after launch. The hours are bought upfront at a reduced rate: the same work ordered later as separate tasks costs more. Anything unused rolls over to the next month.',
       price: 45_000,
-      weeks: 0,
-    },
-    {
-      id: 'abtest',
-      group: 'After launch',
-      title: 'A/B testing',
-      hint: 'Checking what actually works better',
-      explain:
-        'An A/B test shows two versions of a page to two halves of your visitors and compares conversion. We test headlines, offers, the form. Decisions come from numbers, not from "I think this looks nicer".',
-      price: 25_000,
       weeks: 0,
     },
   ],
@@ -627,7 +584,7 @@ export const en: Bundle = {
       eyebrow: 'Work',
       title: ['Projects', 'and what changed'],
       lead: 'Hover a card: the column stops, pulls the shot into frame and shows what the project is, which field it is from and what changed after launch.',
-      note: 'Showing 8 of 40+ projects. Ask for any others in the messages.',
+      note: 'Showing 8 of 40+ projects.',
     },
     process: {
       eyebrow: 'Process',
