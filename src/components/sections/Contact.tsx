@@ -154,6 +154,8 @@ export default function Contact() {
   const estimate = useEstimate()
   const { attached, type, totals } = estimate
   const { site, ui } = useContent()
+  // Почта переносится по домену: «...@» остаётся на первой строке, домен уходит на вторую.
+  const [emailName, emailDomain] = site.email.split('@')
   const { currency } = useCurrency()
   const money = useMoney()
 
@@ -227,19 +229,23 @@ export default function Contact() {
             по любому месту: дисплейным шрифтом её строка шире колонки, и без
             переноса она вылезала на текст формы. Межстрочный интервал у неё
             свой и задан значением, а не классом: leading-* лежит в одном слое
-            с .text-display, где стоит 0.9, и перенесённые строки слипались бы. */}
-        <div className="lg:col-span-4 lg:-mt-8">
+            с .text-display, где стоит 0.9, и перенесённые строки слипались бы.
+            Перенос помечен <wbr> после «@»: браузер выбирает его, пока начало
+            влезает, и адрес копируется одной строкой — жёсткий <br> вставил бы
+            в буфер обмена лишний перевод строки. */}
+        <div className="lg:col-span-5 lg:-mt-8">
           <div className="flex flex-col gap-6">
             <a
               href={`mailto:${site.email}`}
               style={{ lineHeight: 1.2 }}
-              className="text-display text-2xl text-accent transition-colors [overflow-wrap:anywhere] hover:text-text"
+              className="text-display text-xl text-accent transition-colors [overflow-wrap:anywhere] hover:text-text"
             >
-              {site.email}
+              {emailName}@<wbr />
+              {emailDomain}
             </a>
             <a
               href={`tel:${site.phone.replace(/[^+\d]/g, '')}`}
-              className="text-display text-2xl text-accent transition-colors hover:text-text"
+              className="text-display text-xl text-accent transition-colors hover:text-text"
             >
               {site.phone}
             </a>
@@ -247,7 +253,7 @@ export default function Contact() {
               href={site.telegram}
               target="_blank"
               rel="noreferrer noopener"
-              className="text-display text-2xl text-accent transition-colors hover:text-text"
+              className="text-display text-xl text-accent transition-colors hover:text-text"
             >
               Telegram
             </a>
@@ -255,7 +261,7 @@ export default function Contact() {
           </div>
         </div>
 
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-7">
           <AnimatePresence>{attached && status !== 'sent' && <EstimateCard />}</AnimatePresence>
 
           {status === 'sent' ? (
