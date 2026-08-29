@@ -224,13 +224,13 @@ export default function Contact() {
           <div className="flex flex-col gap-6">
             <a
               href={`mailto:${site.email}`}
-              className="text-display text-2xl transition-colors hover:text-accent"
+              className="text-display text-2xl text-accent transition-colors hover:text-text"
             >
               {site.email}
             </a>
             <a
               href={`tel:${site.phone.replace(/[^+\d]/g, '')}`}
-              className="text-display text-2xl transition-colors hover:text-accent"
+              className="text-display text-2xl text-accent transition-colors hover:text-text"
             >
               {site.phone}
             </a>
@@ -238,7 +238,7 @@ export default function Contact() {
               href={site.telegram}
               target="_blank"
               rel="noreferrer noopener"
-              className="text-display text-2xl transition-colors hover:text-accent"
+              className="text-display text-2xl text-accent transition-colors hover:text-text"
             >
               Telegram
             </a>

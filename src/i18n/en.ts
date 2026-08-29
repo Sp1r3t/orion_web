@@ -65,7 +65,7 @@ export const en: Bundle = {
       summary: 'When one page can no longer hold all your services',
       details:
         'We design the structure so anyone finds what they need in two clicks, and wire up an admin panel so you can edit the content without us.',
-      deliverables: ['Up to 15 pages', 'Admin panel', 'SEO structure', 'CRM integrations'],
+      deliverables: ['Up to 7 pages', 'Admin panel', 'SEO structure', 'CRM integrations'],
       price: 'from ₽50,000',
       term: '2–3 weeks',
     },
@@ -101,17 +101,6 @@ export const en: Bundle = {
       deliverables: ['Audit and metrics', 'New interface', 'Content migration', 'SEO preserved'],
       price: 'from ₽40,000',
       term: '2–4 weeks',
-    },
-    {
-      id: 'support',
-      index: '06',
-      title: 'Support and growth',
-      summary: 'A site does not end at launch',
-      details:
-        'Monthly changes, performance, security and A/B tests of new ideas. Once a month you get a report: what we did and what it gave you.',
-      deliverables: ['Changes on request', 'Monitoring', 'A/B tests', 'Monthly report'],
-      price: 'from ₽15,000/mo',
-      term: 'ongoing',
     },
   ],
 
@@ -291,12 +280,12 @@ export const en: Bundle = {
     {
       id: 'corporate',
       title: 'Corporate site',
-      hint: 'Up to 15 pages structured for search',
+      hint: 'Up to 7 pages structured for search',
       icon: 'corporate',
       base: 50_000,
       spread: 1.8,
       weeks: [2, 3],
-      includes: ['Up to 15 pages', 'Original design', 'Basic SEO', 'Hosting and domain'],
+      includes: ['Up to 7 pages', 'Original design', 'Basic SEO', 'Hosting and domain'],
     },
     {
       id: 'ecommerce',
@@ -320,13 +309,7 @@ export const en: Bundle = {
     },
   ],
 
-  optionGroups: [
-    'Analytics and data',
-    'Managing the site',
-    'Functionality',
-    'Growth',
-    'After launch',
-  ],
+  optionGroups: ['Analytics and data', 'Managing the site', 'Functionality', 'Growth'],
 
   pricingOptions: [
     {
@@ -634,7 +617,6 @@ export const en: Bundle = {
     promises: {
       eyebrow: 'Guarantees',
       title: 'Terms, not promises',
-      lead: 'Every point below is written into the contract — you can hold us to it.',
     },
     reviews: {
       eyebrow: 'Reviews',

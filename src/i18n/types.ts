@@ -57,7 +57,7 @@ export type Ui = {
     rateAt: string
     currencies: Record<CurrencyId, string>
   }
-  promises: { eyebrow: string; title: string; lead: string }
+  promises: { eyebrow: string; title: string }
   reviews: { eyebrow: string; title: string; lead: string; list: string; item: string }
   faq: {
     eyebrow: string
