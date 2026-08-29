@@ -101,11 +101,22 @@ export default function ThemeToggle({ className = '' }: { className?: string }) 
       .catch(() => {
         // Переход мог быть прерван — тема уже применена.
       })
+
+    /**
+     * Уборка висит на finished, а не на ready: ready срабатывает в начале
+     * перехода, и класс, гасящий переходы цвета, снялся бы ещё до того, как
+     * круги начали расти. finished наступает по концу анимации — держать
+     * класс дольше незачем, иначе сразу после смены темы наведение теряет
+     * плавность. Значения к этому моменту уже конечные, поэтому возврат
+     * переходов ничего не запускает.
+     */
+    transition.finished
+      .catch(() => {
+        // Переход прерван — состояние всё равно нужно вернуть.
+      })
       .finally(() => {
-        window.setTimeout(() => {
-          document.documentElement.classList.remove('theme-switch')
-          running.current = false
-        }, DURATION)
+        document.documentElement.classList.remove('theme-switch')
+        running.current = false
       })
   }
 
