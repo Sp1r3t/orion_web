@@ -62,8 +62,7 @@ export const projectTypes: ProjectType[] = [
     base: 50_000,
     spread: 1.8,
     weeks: [2, 4],
-    includes: ['До 7 страниц', 'Уникальный дизайн', 'Хостинг и домен'],
-    includedOptions: ['account', 'payments', 'seo'],
+    includes: ['До 7 страниц', 'Уникальный дизайн', 'Базовое SEO', 'Хостинг и домен'],
   },
   {
     id: 'ecommerce',
@@ -73,6 +72,7 @@ export const projectTypes: ProjectType[] = [
     base: 120_000,
     weeks: [3, 8],
     includes: ['Каталог и фильтры', 'Корзина', 'Доставка', 'Выгрузка остатков'],
+    includedOptions: ['account', 'payments', 'seo'],
   },
   {
     id: 'product',

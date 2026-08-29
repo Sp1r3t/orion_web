@@ -287,8 +287,7 @@ export const en: Bundle = {
       base: 50_000,
       spread: 1.8,
       weeks: [2, 4],
-      includes: ['Up to 7 pages', 'Original design', 'Hosting and domain'],
-      includedOptions: ['account', 'payments', 'seo'],
+      includes: ['Up to 7 pages', 'Original design', 'Basic SEO', 'Hosting and domain'],
     },
     {
       id: 'ecommerce',
@@ -298,6 +297,7 @@ export const en: Bundle = {
       base: 120_000,
       weeks: [3, 8],
       includes: ['Catalogue and filters', 'Cart', 'Delivery', 'Stock sync'],
+      includedOptions: ['account', 'payments', 'seo'],
     },
     {
       id: 'product',
