@@ -9,7 +9,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative flex min-h-dvh flex-col overflow-hidden bg-bg pt-20 text-text"
+      className="relative flex min-h-svh flex-col overflow-hidden bg-bg pt-20 text-text"
     >
       {/* Космос занимает весь первый экран и живёт под контентом — границы не видно. */}
       <SpaceField />

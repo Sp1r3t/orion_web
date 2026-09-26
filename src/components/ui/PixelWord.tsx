@@ -305,7 +305,13 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
       frame = requestAnimationFrame(draw)
     }
 
+    /** Для каких размеров собрано слово: шрифт, ширина окна и плотность пикселей. */
+    let builtFor = ''
+    const sizeKey = () =>
+      `${getComputedStyle(wrapper).fontSize}|${window.innerWidth}|${window.devicePixelRatio}`
+
     function run() {
+      builtFor = sizeKey()
       build()
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(draw)
@@ -317,8 +323,14 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
       if (!cancelled) run()
     })
 
+    /**
+     * На телефоне касание и прокрутка прячут адресную строку, и окно меняет высоту.
+     * Раньше каждое такое событие пересобирало слово с нуля — оно собиралось
+     * заново и подтормаживало. Теперь пересборка только при смене размера шрифта
+     * или ширины: от высоты окна слово не зависит.
+     */
     function onResize() {
-      if (!cancelled) run()
+      if (!cancelled && sizeKey() !== builtFor) run()
     }
 
     window.addEventListener('resize', onResize)

@@ -254,6 +254,10 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       const rect = section.getBoundingClientRect()
       const ratio = Math.min(window.devicePixelRatio || 1, rect.width < 768 ? 1.5 : 2)
 
+      // На телефоне высота секции меняется, когда прячется адресная строка. Звёзды
+      // тогда не пересыпаем заново — их координаты в долях, они просто растянутся.
+      const widthChanged = Math.round(rect.width) !== Math.round(width)
+
       width = rect.width
       height = rect.height
       canvas.width = width * ratio
@@ -262,23 +266,26 @@ export default function SpaceField({ className = '' }: { className?: string }) {
 
       // На телефоне звёзд втрое меньше: глазу хватает, а вычислений за кадр заметно меньше.
       const count = Math.round((width * height) / (width < 768 ? 5200 : 2400))
-      stars = Array.from({ length: count }, () => ({
-        bx: Math.random(),
-        by: Math.random(),
-        z: 0.12 + Math.random() * 0.88,
-        r: Math.random() * 1.15 + 0.25,
-        alpha: Math.random() * 0.5 + 0.12,
-        phase: Math.random() * Math.PI * 2,
-        ox: 0,
-        oy: 0,
-      }))
+      if (widthChanged || stars.length === 0)
+        stars = Array.from({ length: count }, () => ({
+          bx: Math.random(),
+          by: Math.random(),
+          z: 0.12 + Math.random() * 0.88,
+          r: Math.random() * 1.15 + 0.25,
+          alpha: Math.random() * 0.5 + 0.12,
+          phase: Math.random() * Math.PI * 2,
+          ox: 0,
+          oy: 0,
+        }))
 
       backdrop = paintBackdrop()
       repaint.current = () => {
         backdrop = paintBackdrop()
       }
-      smooth.x = width * 0.2
-      smooth.y = height * 0.5
+      if (widthChanged) {
+        smooth.x = width * 0.2
+        smooth.y = height * 0.5
+      }
     }
 
     /** Возврат в исходное: линии погашены, звёзды остыли. */

@@ -40,11 +40,11 @@ function Card({ item }: { item: CaseItem }) {
         // Без ленивой загрузки: копии списка лежат за краем обрезки, и лениво
         // они подгрузились бы только в момент, когда уже въехали в кадр.
         decoding="async"
-        className="size-full object-cover brightness-[0.55] grayscale-[45%] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-90 group-hover:grayscale-0 group-focus-visible:scale-[1.06] group-focus-visible:brightness-90 group-focus-visible:grayscale-0"
+        className="size-full object-cover brightness-[0.85] grayscale-[15%] transition-all duration-700 group-hover:scale-[1.06] group-hover:brightness-100 group-hover:grayscale-0 group-focus-visible:scale-[1.06] group-focus-visible:brightness-100 group-focus-visible:grayscale-0"
       />
 
       {/* Затемнение снизу, чтобы текст читался поверх любого снимка. */}
-      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg via-bg/55 to-transparent transition-opacity duration-500 lg:opacity-70 lg:group-hover:opacity-100" />
+      <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-bg/90 via-bg/25 to-transparent transition-opacity duration-500 lg:opacity-60 lg:group-hover:opacity-100" />
 
       <span className="label-mono pointer-events-none absolute top-4 left-5 text-text/70">
         {item.index}
@@ -236,6 +236,12 @@ export default function Cases() {
    */
   useEffect(() => {
     function onMove(event: PointerEvent) {
+      // Пальцем поток не останавливаем: касание при прокрутке замораживало ленту.
+      // Карточка под пальцем открывает сайт обычным нажатием.
+      if (event.pointerType !== 'mouse') {
+        setHovered(null)
+        return
+      }
       const target = event.target as Element | null
       setHovered((target?.closest?.('[data-case]') as HTMLElement | null) ?? null)
     }
