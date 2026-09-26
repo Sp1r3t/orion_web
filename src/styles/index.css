@@ -351,17 +351,34 @@
  * Свет, бегущий по рамке панели сметы. Крутится конический градиент целиком,
  * трансформацией: сам градиент растрируется один раз, и кадр стоит дёшево —
  * анимировать угол в самом градиенте значило бы перерисовывать его каждый кадр.
- * Квадрат заведомо больше рамки, иначе при повороте оголялись бы углы.
+ * Квадрат со стороной в диагональ рамки (√2 · большая сторона ≈ 142cqmax):
+ * при повороте углы не оголяются, а слой не раздувается — прежний
+ * inset: -100% на высокой мобильной панели давал текстуру в 9 площадей
+ * рамки, и Safari на телефонах мерцал и терял тайлы.
  */
 @keyframes beam-spin {
-  to {
-    transform: rotate(1turn);
+  from {
+    transform: translate(-50%, -50%) rotate(0turn);
   }
+  to {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
+}
+
+/* Слой-рамка вокруг луча. clip-path режет скругление и на iOS, где
+   overflow: hidden пропускает вращающийся слой квадратными углами. */
+.beam-frame {
+  container-type: size;
+  clip-path: inset(0 round var(--radius-card));
 }
 
 .beam {
   position: absolute;
-  inset: -100%;
+  top: 50%;
+  left: 50%;
+  width: 142cqmax;
+  height: 142cqmax;
+  transform: translate(-50%, -50%);
   background: conic-gradient(
     from 0deg,
     transparent 0 58%,
@@ -376,6 +393,31 @@
   .beam {
     animation: none;
   }
+}
+
+/* Кружок этапа на мобильной тропе: --glow (0…1) ставит JS, когда точка рядом. */
+.trail-node {
+  border-color: color-mix(
+    in srgb,
+    var(--color-accent) calc(18% + var(--glow, 0) * 82%),
+    transparent
+  );
+  background-color: color-mix(
+    in srgb,
+    var(--color-accent) calc(var(--glow, 0) * 14%),
+    var(--color-bg)
+  );
+  color: color-mix(
+    in srgb,
+    var(--color-accent) calc(30% + var(--glow, 0) * 70%),
+    var(--color-muted)
+  );
+  box-shadow: 0 0 calc(var(--glow, 0) * 20px) rgb(255 106 0 / calc(var(--glow, 0) * 0.45));
+  transition:
+    border-color 0.3s,
+    background-color 0.3s,
+    color 0.3s,
+    box-shadow 0.3s;
 }
 
 /* Побуквенное появление заголовка в hero. */

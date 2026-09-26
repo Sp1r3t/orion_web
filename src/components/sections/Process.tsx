@@ -37,6 +37,10 @@ const smoothstep = (t: number) => t * t * (3 - 2 * t)
  */
 const DOT_GLOW = 34
 
+/** Мобильная тропа: ось через центры кружков (size-11 → 22px) и размах изгиба. */
+const TRAIL_X = 22
+const TRAIL_BEND = 26
+
 type NodePosition = { left: number; top: number }
 
 export default function Process() {
@@ -68,6 +72,75 @@ export default function Process() {
 
   const hintOpacity = useTransform(scrollYProgress, [0, 0.06], [1, 0])
   const barScale = useTransform(scrollYProgress, [0, 1], [0, 1])
+
+  // На телефоне закрепления нет: вдоль списка идёт волнистая тропа через
+  // кружки этапов, прорисовывается по мере прокрутки, а точка идёт на её острие.
+  const trailRef = useRef<HTMLDivElement>(null)
+  const trailPathRef = useRef<SVGPathElement>(null)
+  const trailDotRef = useRef<SVGCircleElement>(null)
+  const [trail, setTrail] = useState<{ d: string; height: number } | null>(null)
+  const { scrollYProgress: trailProgress } = useScroll({
+    target: trailRef,
+    offset: ['start 85%', 'end 60%'],
+  })
+
+  /** Тропу строим по реальным центрам кружков: высота текста у этапов разная. */
+  useEffect(() => {
+    const list = trailRef.current
+    if (!list) return
+
+    function measureTrail() {
+      if (!list) return
+      const nodeEls = [...list.querySelectorAll<HTMLElement>('[data-node]')]
+      if (nodeEls.length < 2) return
+
+      const top = list.getBoundingClientRect().top
+      const centers = nodeEls.map((el) => {
+        const rect = el.getBoundingClientRect()
+        return rect.top - top + rect.height / 2
+      })
+
+      // Кривая виляет то вправо, то влево от оси кружков.
+      let d = `M ${TRAIL_X} ${centers[0]}`
+      centers.slice(1).forEach((y, index) => {
+        const prev = centers[index]
+        const bend = TRAIL_X + (index % 2 === 0 ? TRAIL_BEND : -TRAIL_BEND)
+        d += ` C ${bend} ${prev + (y - prev) * 0.3}, ${bend} ${prev + (y - prev) * 0.7}, ${TRAIL_X} ${y}`
+      })
+
+      setTrail({ d, height: list.getBoundingClientRect().height })
+    }
+
+    measureTrail()
+    document.fonts?.ready.then(measureTrail).catch(() => {})
+    window.addEventListener('resize', measureTrail)
+    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measureTrail) : null
+    observer?.observe(list)
+
+    return () => {
+      window.removeEventListener('resize', measureTrail)
+      observer?.disconnect()
+    }
+  }, [processSteps])
+
+  useMotionValueEvent(trailProgress, 'change', (progress) => {
+    const path = trailPathRef.current
+    const dot = trailDotRef.current
+    const list = trailRef.current
+    if (!path || !dot || !list || typeof path.getTotalLength !== 'function') return
+
+    const point = path.getPointAtLength(path.getTotalLength() * clamp01(progress))
+    dot.setAttribute('cx', String(point.x))
+    dot.setAttribute('cy', String(point.y))
+
+    // Кружок разгорается, когда точка подходит к нему, и остывает после.
+    const top = list.getBoundingClientRect().top
+    for (const el of list.querySelectorAll<HTMLElement>('[data-node]')) {
+      const rect = el.getBoundingClientRect()
+      const center = rect.top - top + rect.height / 2
+      el.style.setProperty('--glow', String(clamp01(1 - Math.abs(point.y - center) / 190)))
+    }
+  })
 
   /** Узлы считаем по самому пути — так метки всегда лежат ровно на кривой. */
   const measure = useCallback(() => {
@@ -193,7 +266,9 @@ export default function Process() {
                 </h2>
               </div>
 
-              <div className="w-full max-w-xs">
+              {/* Счётчик этапа нужен только закреплённому экрану на десктопе: на телефоне
+                  этапы идут списком, и одинокая «01» под заголовком ничего не значила. */}
+              <div className="hidden w-full max-w-xs lg:block">
                 <div className="flex items-baseline justify-between">
                   <span className="text-display text-4xl text-ember">{step.index}</span>
                   <span className="label-mono text-muted">/ 04</span>
@@ -347,24 +422,70 @@ export default function Process() {
               </AnimatePresence>
             </div>
 
-            {/* Мобильная версия: обычный список без закрепления экрана. */}
-            <div className="mt-14 flex flex-col gap-10 lg:hidden">
+            {/* Мобильная версия: список без закрепления экрана, слева — тропа по этапам. */}
+            <div ref={trailRef} className="relative mt-14 flex flex-col gap-10 pl-16 lg:hidden">
+              {trail && (
+                <svg
+                  aria-hidden="true"
+                  viewBox={`0 0 44 ${trail.height}`}
+                  width="44"
+                  height={trail.height}
+                  className="pointer-events-none absolute top-0 left-0 overflow-visible"
+                >
+                  <defs>
+                    <linearGradient id="trail-line" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="var(--color-accent)" />
+                      <stop offset="100%" stopColor="var(--color-ember)" />
+                    </linearGradient>
+                  </defs>
+
+                  {/* Непройденная часть. */}
+                  <path
+                    ref={trailPathRef}
+                    d={trail.d}
+                    fill="none"
+                    stroke="var(--color-line-strong)"
+                    strokeWidth="2"
+                    strokeDasharray="6 8"
+                    strokeLinecap="round"
+                  />
+
+                  {/* Пройденная часть прорисовывается по мере прокрутки. */}
+                  <m.path
+                    d={trail.d}
+                    fill="none"
+                    stroke="url(#trail-line)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    style={{ pathLength: trailProgress }}
+                  />
+
+                  <circle ref={trailDotRef} r="4" fill="var(--color-ember)" cx={TRAIL_X} cy="0">
+                    <animate
+                      attributeName="opacity"
+                      values="0.55;1;0.55"
+                      dur="2.4s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                </svg>
+              )}
+
               {processSteps.map((item) => {
                 const ItemIcon = icons[item.icon]
                 return (
-                  <div key={item.index} className="border-t border-line pt-6">
-                    <div className="flex items-center gap-4">
-                      <span className="flex size-11 items-center justify-center rounded-full border border-accent/40 bg-accent/10 text-accent">
-                        <ItemIcon className="size-5" />
-                      </span>
-                      <div>
-                        <p className="label-mono text-muted">
-                          {item.index} · {item.duration}
-                        </p>
-                        <h3 className="text-display mt-1 text-xl">{item.title}</h3>
-                      </div>
-                    </div>
-                    <p className="mt-4 text-sm text-muted">{item.text}</p>
+                  <div key={item.index} className="relative">
+                    <span
+                      data-node=""
+                      className="trail-node absolute top-0 -left-16 flex size-11 items-center justify-center rounded-full border bg-bg"
+                    >
+                      <ItemIcon className="size-5" />
+                    </span>
+                    <p className="label-mono text-muted">
+                      {item.index} · {item.duration}
+                    </p>
+                    <h3 className="text-display mt-1 text-xl">{item.title}</h3>
+                    <p className="mt-3 text-sm text-muted">{item.text}</p>
                     <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
                       {item.points.map((point) => (
                         <li key={point} className="flex items-center gap-2 text-sm">

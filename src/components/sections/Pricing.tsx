@@ -374,7 +374,7 @@ export default function Pricing() {
                 иначе список валют, который раскрывается вниз, срезался бы краем. */}
             <span
               aria-hidden="true"
-              className="rounded-card pointer-events-none absolute inset-0 overflow-hidden bg-gradient-to-b from-accent/50 via-line to-line"
+              className="beam-frame rounded-card pointer-events-none absolute inset-0 overflow-hidden bg-gradient-to-b from-accent/50 via-line to-line"
             >
               <span className="beam" />
             </span>
