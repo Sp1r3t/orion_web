@@ -9,38 +9,40 @@ Gmail (Apps Script) ──► /api/mail     ├─► бот: служба orion
                                       ┘         └──► Telegram (сам забирает сообщения)
 ```
 
-- Сайт и бот живут на одном домене. Боту не нужны ни отдельный адрес, ни свой сертификат.
-- Бот запускается обычным Node.js: ни сборки, ни установки пакетов.
-- Токен бота хранится в `/etc/orion-bot.env`, прочитать этот файл может только root.
-- Заявки и настройки бот хранит в `/var/lib/orion-bot/kv.json`.
+Гайд рассчитан на сервер с **Ubuntu или Debian**, где у вас есть `sudo`.
 
-Гайд рассчитан на сервер с **Ubuntu или Debian**, где у вас есть `sudo`. Во всех командах
-замените `example.ru` на свой домен.
+**Как пользоваться.** Копируйте блоки команд по очереди и вставляйте в терминал сервера.
+Строки, начинающиеся с `#`, — пояснения, их тоже можно вставлять, терминал их пропустит.
+Если команда что-то спрашивает, ответ описан рядом с ней.
 
 ---
 
-## Шаг 1. Создать бота в Telegram
+## Шаг 1. Создать бота в Telegram (на телефоне)
 
 1. Откройте [@BotFather](https://t.me/BotFather) → `/newbot`.
 2. Имя, например «ORION Studio», и username, заканчивающийся на `bot`.
-3. BotFather пришлёт токен вида `123456789:AA...`. **Не пересылайте его никому.** Он понадобится
-   на шаге 6.
-4. По желанию: `/setuserpic` → загрузите `public/icon-512.png` из проекта.
+3. BotFather пришлёт токен вида `123456789:AA...`. Держите его под рукой (шаг 6) и **не
+   пересылайте никому**.
 
-## Шаг 2. Подключиться к серверу и поставить нужное
+## Шаг 2. Подключиться к серверу
 
-```bash
-ssh user@IP-сервера
-```
-
-Проверьте систему и Node.js:
+На своём компьютере:
 
 ```bash
-cat /etc/os-release | head -2
-node -v
+ssh ПОЛЬЗОВАТЕЛЬ@IP-СЕРВЕРА
 ```
 
-Нужен **Node.js 22.18 или новее**. Если `node` не найден или версия старее, поставьте его:
+Дальше все команды — **на сервере**. Первым делом задайте свой домен, без `https://` и без `www`.
+Остальные команды подставят его сами:
+
+```bash
+DOMAIN=example.ru
+```
+
+> Если отключились от сервера и зашли снова, выполните эту строку ещё раз. С шага 6 вместе с ней
+> нужна и строка `setenv() { ... }` из начала шага 6.
+
+## Шаг 3. Поставить Node.js, git и nginx
 
 ```bash
 curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
@@ -48,200 +50,194 @@ sudo apt install -y nodejs git nginx
 node -v
 ```
 
-## Шаг 3. Посмотреть, как работает старый сайт, и сохранить его
+`node -v` должен показать `v22.18` или новее.
+
+## Шаг 4. Сохранить старый сайт
+
+Найти конфиг nginx, который сейчас отвечает за ваш домен:
 
 ```bash
-sudo nginx -T 2>/dev/null | grep -E "server_name|root |proxy_pass|listen"
+OLD_CONF=$(sudo grep -lsE "server_name[^;]*[[:space:]]$DOMAIN" /etc/nginx/sites-enabled/* /etc/nginx/conf.d/*.conf)
+echo "Конфиг старого сайта: ${OLD_CONF:-не найден}"
 ```
 
-Команда покажет, из какой папки nginx отдаёт старый сайт (строка `root`) и в каком файле
-лежит его конфиг. Список конфигов:
+Сохранить копию конфига и файлов старого сайта в `~/old-site`:
 
 ```bash
-ls /etc/nginx/sites-enabled/ /etc/nginx/conf.d/
+mkdir -p ~/old-site/enabled
+printf '%s\n' $OLD_CONF > ~/old-site/paths.txt
+for f in $OLD_CONF; do sudo cp -L "$f" ~/old-site/; done
+OLD_ROOT=$(sudo grep -hE "^[[:space:]]*root " $OLD_CONF 2>/dev/null | head -1 | awk '{print $2}' | tr -d ';')
+echo "Папка старого сайта: ${OLD_ROOT:-не найдена}"
+[ -n "$OLD_ROOT" ] && sudo cp -r "$OLD_ROOT" ~/old-site/files
+ls ~/old-site
 ```
 
-Сохраните копию старого сайта и его конфига — к ним можно будет вернуться:
+Проверьте, что в этом конфиге нет других сайтов:
 
 ```bash
-sudo cp -r ПАПКА_ИЗ_СТРОКИ_root ~/old-site-backup
-sudo cp /etc/nginx/sites-enabled/ИМЯ_КОНФИГА ~/old-nginx-backup.conf
+sudo grep -h server_name $OLD_CONF
 ```
 
-> Если `nginx -T` ничего не показал, сайт отдаёт что-то другое. Проверьте `pm2 ls`,
-> `docker ps` и `sudo ss -tlnp | grep -E ':80|:443'` и пришлите мне вывод: подскажу, что делать.
+Если там только ваш домен, продолжайте. Если есть чужие домены, или конфиг «не найден»,
+пришлите мне вывод этих команд: подскажу, как поступить.
 
-## Шаг 4. Скачать проект
+## Шаг 5. Скачать и собрать сайт
 
 ```bash
 sudo mkdir -p /opt/orion
 sudo chown $USER /opt/orion
 git clone https://github.com/Sp1r3t/orion_web.git /opt/orion
-```
-
-## Шаг 5. Собрать сайт
-
-Адрес для заявок и домен сайта:
-
-```bash
 cd /opt/orion
-cat > .env.production <<'EOF'
+
+cat > .env.production <<EOF
 VITE_LEAD_ENDPOINT=/api/lead
-VITE_SITE_URL=https://example.ru
+VITE_SITE_URL=https://$DOMAIN
 EOF
-```
 
-Сборка (займёт минуту):
-
-```bash
 npm ci
 npm run build
 ls dist
 ```
 
-В `dist` должны появиться `index.html`, `assets`, `portfolio`, иконки.
+В конце должен появиться список файлов: `index.html`, `assets`, `portfolio`, иконки.
 
 ## Шаг 6. Запустить бота
 
-**6.1. Настройки и токен.** Скопируйте шаблон в системную папку и закройте его от чужих глаз:
+Файл настроек, закрытый от всех, кроме root, и вспомогательная команда для записи в него:
 
 ```bash
 sudo cp /opt/orion/bot/.env.example /etc/orion-bot.env
 sudo chmod 600 /etc/orion-bot.env
+setenv() { sudo sed -i "s|^$1=.*|$1=$2|" /etc/orion-bot.env; }
 ```
 
-Сгенерируйте секрет для почты и скопируйте его, он понадобится ещё на шаге 10:
+**Токен бота.** Команда попросит вставить токен. Вставьте (правой кнопкой мыши или
+`Ctrl+Shift+V`) и нажмите `Enter`. На экране он не отобразится — так и должно быть:
 
 ```bash
-openssl rand -hex 32
+read -rsp "Вставьте токен бота и нажмите Enter: " TOKEN; echo
+setenv BOT_TOKEN "$TOKEN"; unset TOKEN
 ```
 
-Откройте файл настроек:
+Секрет для почты, адрес сайта:
 
 ```bash
-sudo nano /etc/orion-bot.env
+setenv MAIL_SECRET "$(openssl rand -hex 32)"
+setenv ALLOWED_ORIGINS "https://$DOMAIN,https://www.$DOMAIN"
+setenv SITE_URL "https://$DOMAIN"
 ```
 
-Заполните:
-
-- `BOT_TOKEN=` — токен от BotFather;
-- `MAIL_SECRET=` — строка из `openssl`;
-- `ALLOWED_ORIGINS=https://example.ru,https://www.example.ru` и `SITE_URL=https://example.ru` — ваш домен;
-- `ADMIN_CHAT_ID=` — пока оставьте пустым.
-
-Сохраните файл: `Ctrl+O`, `Enter`, затем `Ctrl+X`.
-
-**6.2. Служба.** Бот будет запускаться сам, в том числе после перезагрузки сервера:
+Установить и запустить службу. Бот будет запускаться сам, в том числе после перезагрузки:
 
 ```bash
 sudo cp /opt/orion/deploy/orion-bot.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now orion-bot
-sudo systemctl status orion-bot --no-pager
+sleep 3
+sudo journalctl -u orion-bot -n 5 --no-pager
 ```
 
-В статусе должно быть `active (running)` и строка `Бот @имя_бота слушает Telegram`.
+В выводе должна быть строка `Бот @имя_бота слушает Telegram`.
 
-**6.3. Кто владелец.** Напишите своему боту `/start`, он пришлёт ваш chat_id. Впишите его в
-`ADMIN_CHAT_ID=` (`sudo nano /etc/orion-bot.env`) и перезапустите бота:
+**Владелец.** Напишите своему боту в Telegram `/start`, он ответит вашим chat_id. Вставьте его:
 
 ```bash
+read -rp "chat_id из ответа бота: " CHAT_ID
+setenv ADMIN_CHAT_ID "$CHAT_ID"
 sudo systemctl restart orion-bot
 ```
 
-Снова `/start` — откроется панель студии 🪐.
+Снова напишите боту `/start` — откроется панель студии 🪐.
 
-## Шаг 7. Подключить новый сайт в nginx
-
-**Вариант А — у старого сайта был свой конфиг (обычно так).** Откройте его:
+## Шаг 7. Переключить домен на новый сайт
 
 ```bash
-sudo nano /etc/nginx/sites-enabled/ИМЯ_КОНФИГА
-```
-
-Внутри блока `server { ... }` вашего домена сделайте три правки. Если блоков два (для
-`listen 80` и для `listen 443`), правьте тот, где `443`:
-
-1. `root` замените на `root /opt/orion/dist;`
-2. Добавьте блок для бота:
-
-   ```nginx
-   location /api/ {
-       proxy_pass http://127.0.0.1:8787/;
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
-       client_max_body_size 100k;
-   }
-   ```
-
-3. Блок `location / { ... }` приведите к виду:
-
-   ```nginx
-   location / {
-       try_files $uri $uri/ /index.html;
-   }
-   ```
-
-**Вариант Б — настроить с нуля.** Готовый конфиг лежит в проекте:
-
-```bash
+# Новый конфиг с вашим доменом.
 sudo cp /opt/orion/deploy/nginx-orion.conf /etc/nginx/sites-available/orion
-sudo sed -i 's/example.ru/ВАШ-ДОМЕН/g' /etc/nginx/sites-available/orion
-sudo ln -s /etc/nginx/sites-available/orion /etc/nginx/sites-enabled/orion
-```
+sudo sed -i "s/example.ru/$DOMAIN/g" /etc/nginx/sites-available/orion
 
-Старый конфиг для того же домена при этом нужно убрать из `sites-enabled`, копия у вас уже есть
-с шага 3.
+# Старый конфиг убираем (копия в ~/old-site), новый включаем.
+while read -r f; do [ -n "$f" ] && sudo mv "$f" ~/old-site/enabled/; done < ~/old-site/paths.txt
+sudo ln -sf /etc/nginx/sites-available/orion /etc/nginx/sites-enabled/orion
 
-Проверьте конфиг и примените:
-
-```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-## Шаг 8. HTTPS
+`nginx -t` должен написать `syntax is ok` и `test is successful`. Если старый сайт был на `https`,
+до шага 8 он откроется только по `http` — это на пару минут.
 
-Если старый сайт уже открывался по `https://`, этот шаг пропустите. Иначе:
+## Шаг 8. HTTPS
 
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d example.ru -d www.example.ru
+sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN --redirect
+```
+
+Что отвечать на вопросы certbot:
+
+- **почта** — любая ваша;
+- **условия** — `Y`;
+- **рассылка** — `N`;
+- **если спросит про уже выпущенный сертификат** — выберите `1` (reinstall).
+
+Если certbot ругается на `www`, значит, у домена нет адреса с www. Повторите без него:
+
+```bash
+sudo certbot --nginx -d $DOMAIN --redirect
 ```
 
 ## Шаг 9. Проверить
 
 ```bash
-curl https://example.ru/api/
+curl -s https://$DOMAIN/api/
 ```
 
 Должно ответить `ORION bot is running 🪐`.
 
-Дальше:
+Затем в браузере:
 
-1. Откройте сайт — должна быть новая версия. Если видите старую, обновите страницу с
+1. Откройте сайт — должна быть новая версия. Если видите старую, обновите страницу через
    `Ctrl+F5`.
-2. Отправьте тестовую заявку с формы, в Telegram придёт карточка 🟢 Заявка #1. Потом её можно
+2. Отправьте тестовую заявку с формы — в Telegram придёт карточка 🟢 Заявка #1. Потом её можно
    удалить кнопкой 🗑.
 
 ## Шаг 10. Письма с почты в Telegram
 
-1. Войдите в браузере в `orion.company.web@gmail.com` и откройте
-   [script.google.com](https://script.google.com) → «Новый проект».
-2. Вставьте весь код из файла `bot/gmail/Code.gs`, в строке `WORKER_URL` впишите
-   `'https://example.ru/api'`. Сохраните (💾).
-3. ⚙️ «Настройки проекта» → внизу «Свойства скрипта» → «Добавить»: имя `MAIL_SECRET`, значение —
-   та же строка из `openssl`, что и в `/etc/orion-bot.env`.
-4. Вверху выберите функцию `setup` → «Выполнить». Google попросит доступ к Gmail: «Разрешить».
-   Если появится «Приложение не проверено», нажмите «Дополнительно» → «Перейти».
+Секрет для почты понадобится в Apps Script. Покажите его и скопируйте:
+
+```bash
+sudo grep MAIL_SECRET /etc/orion-bot.env
+```
+
+Дальше в браузере:
+
+1. Войдите в `orion.company.web@gmail.com` и откройте [script.google.com](https://script.google.com) →
+   «Новый проект».
+2. Сотрите пример и вставьте весь код из
+   [bot/gmail/Code.gs](https://github.com/Sp1r3t/orion_web/blob/main/bot/gmail/Code.gs).
+3. В строке `const WORKER_URL = ...` впишите `'https://ваш-домен/api'`. Сохраните (💾).
+4. ⚙️ «Настройки проекта» → внизу «Свойства скрипта» → «Добавить свойство»: имя
+   `MAIL_SECRET`, значение — строка после `MAIL_SECRET=` из команды выше.
+5. Вернитесь в редактор, в списке функций выберите `setup` → «Выполнить». Google попросит доступ
+   к Gmail: «Разрешить». Если появится «Приложение не проверено» — «Дополнительно» → «Перейти».
    Скрипт ваш, так что это нормально.
-5. Проверка: выберите `sendTest` → «Выполнить». Последнее письмо из «Входящих» придёт в бота.
+6. Проверка: выберите `sendTest` → «Выполнить». Последнее письмо из «Входящих» придёт в бота.
 
 Дальше новые письма приходят сами, в течение минуты.
 
-**Необязательно: кнопки «Прочитано» и «В архив» в самом Gmail.** В Apps Script:
-«Начать развёртывание» → «Новое развёртывание» → тип «Веб-приложение», «Запуск от имени: я»,
-«Доступ: все» → «Развернуть». Скопируйте URL в `GMAIL_ACTION_URL=` в `/etc/orion-bot.env` и
-перезапустите бота: `sudo systemctl restart orion-bot`.
+**Необязательно: кнопки «Прочитано» и «В архив» в самом Gmail.**
+
+1. В Apps Script нажмите «Начать развёртывание» → «Новое развёртывание».
+2. Тип — «Веб-приложение», «Запуск от имени: я», «Доступ: все» → «Развернуть».
+3. Скопируйте выданный URL и выполните на сервере:
+
+```bash
+setenv() { sudo sed -i "s|^$1=.*|$1=$2|" /etc/orion-bot.env; }
+read -rp "URL веб-приложения: " GMAIL_URL
+setenv GMAIL_ACTION_URL "$GMAIL_URL"
+sudo systemctl restart orion-bot
+```
 
 ---
 
@@ -257,12 +253,32 @@ bash /opt/orion/deploy/update.sh
 
 ## Если что-то не работает
 
-| Что                         | Где смотреть                                                                                 |
-| --------------------------- | -------------------------------------------------------------------------------------------- |
-| Бот не отвечает             | `sudo journalctl -u orion-bot -n 50 --no-pager`                                              |
-| Заявка не уходит с сайта    | тот же журнал; проверьте `ALLOWED_ORIGINS` — там должен быть точный адрес сайта с `https://` |
-| Сайт не открывается или 502 | `sudo nginx -t`, `sudo tail -n 30 /var/log/nginx/error.log`                                  |
-| Письма не приходят          | Apps Script → «Выполнения», ошибки там; `MAIL_SECRET` должен совпадать в обоих местах        |
-| Вернуть старый сайт         | верните старый конфиг из `~/old-nginx-backup.conf` и `sudo systemctl reload nginx`           |
+Журнал бота — сюда попадают ошибки заявок и писем:
 
-Логи бота в реальном времени: `sudo journalctl -u orion-bot -f`.
+```bash
+sudo journalctl -u orion-bot -n 50 --no-pager
+```
+
+Проверка nginx, если сайт не открывается или пишет 502:
+
+```bash
+sudo nginx -t
+sudo tail -n 30 /var/log/nginx/error.log
+sudo systemctl status orion-bot --no-pager
+```
+
+Посмотреть настройки бота (там же видно, правильный ли домен в `ALLOWED_ORIGINS`):
+
+```bash
+sudo cat /etc/orion-bot.env
+```
+
+Если письма не приходят, откройте в Apps Script раздел «Выполнения» — ошибки будут там.
+
+**Вернуть старый сайт:**
+
+```bash
+sudo rm /etc/nginx/sites-enabled/orion
+while read -r f; do sudo mv ~/old-site/enabled/"$(basename "$f")" "$f"; done < ~/old-site/paths.txt
+sudo nginx -t && sudo systemctl reload nginx
+```
