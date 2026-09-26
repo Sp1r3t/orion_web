@@ -1,0 +1,23 @@
+name = "orion-bot"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+
+[vars]
+# Сайты, с которых принимаются заявки, через запятую. Добавьте сюда боевой домен.
+ALLOWED_ORIGINS = "http://localhost:5173,http://localhost:4173"
+# Адрес сайта: кнопка «Открыть сайт» в меню и «Оставить заявку» для гостей.
+SITE_URL = ""
+CONTACT_URL = "https://t.me/sp1retdev"
+TIMEZONE = "Europe/Moscow"
+
+# Хранилище заявок и настроек. id выдаст команда `npx wrangler kv namespace create KV`.
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Секреты задаются командами, в этот файл их не пишем:
+#   npx wrangler secret put BOT_TOKEN
+#   npx wrangler secret put WEBHOOK_SECRET
+#   npx wrangler secret put MAIL_SECRET
+#   npx wrangler secret put ADMIN_CHAT_ID
+#   npx wrangler secret put GMAIL_ACTION_URL   (необязательно)
