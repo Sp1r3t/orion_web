@@ -52,7 +52,7 @@ export default function Header() {
               }`}
             >
               <img
-                src="/favicon.svg"
+                src="/favicon.svg?v=2"
                 width={40}
                 height={40}
                 alt=""
