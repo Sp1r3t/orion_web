@@ -91,6 +91,16 @@ const FADE_OUT = 1300
 const clamp01 = (t: number) => (t < 0 ? 0 : t > 1 ? 1 : t)
 
 /**
+ * Тёплые оттенки растолканных звёзд, заранее: девять ступеней от белого к
+ * оранжевому. Строку цвета на каждую звезду в каждом кадре собирать нельзя —
+ * сотни строк за кадр будили сборщик мусора, и его паузы давали микрорывки.
+ */
+const WARM = Array.from({ length: 9 }, (_, step) => {
+  const pushed = step / 8
+  return `rgb(255, ${Math.round(176 - pushed * 60)}, ${Math.round(120 - pushed * 110)})`
+})
+
+/**
  * Фон первого экрана: звёздное поле во всю секцию, без видимых границ.
  * Курсор расталкивает звёзды и зажигает Орион — линии остаются, пока
  * созвездие не соберётся целиком. Тогда оно вспыхивает, держится семь
@@ -242,7 +252,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     function resize() {
       if (!canvas || !context || !section) return
       const rect = section.getBoundingClientRect()
-      const ratio = Math.min(window.devicePixelRatio || 1, 2)
+      const ratio = Math.min(window.devicePixelRatio || 1, rect.width < 768 ? 1.5 : 2)
 
       width = rect.width
       height = rect.height
@@ -250,7 +260,8 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       canvas.height = height * ratio
       context.setTransform(ratio, 0, 0, ratio, 0, 0)
 
-      const count = Math.round((width * height) / 2400)
+      // На телефоне звёзд втрое меньше: глазу хватает, а вычислений за кадр заметно меньше.
+      const count = Math.round((width * height) / (width < 768 ? 5200 : 2400))
       stars = Array.from({ length: count }, () => ({
         bx: Math.random(),
         by: Math.random(),
@@ -362,6 +373,9 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       const beltY = box.y + SHAPE[11].v * box.side + parallax.y * 0.8
 
       // Звёзды: параллакс, отталкивание от курсора и волна после сборки.
+      // Цвет меняем только при смене оттенка, прозрачность — через globalAlpha.
+      const inkStyle = `rgb(${palette.current.ink})`
+      let currentStyle = ''
       for (const star of stars) {
         const baseX = star.bx * width + parallax.x * star.z
         const baseY = star.by * height + parallax.y * star.z
@@ -404,14 +418,17 @@ export default function SpaceField({ className = '' }: { className?: string }) {
           (star.alpha * twinkle + pushed * 0.5 + flash * 0.35) * palette.current.boost,
         )
 
-        context.fillStyle =
-          pushed > 0.04
-            ? `rgba(255, ${Math.round(176 - pushed * 60)}, ${Math.round(120 - pushed * 110)}, ${alpha})`
-            : `rgba(${palette.current.ink}, ${alpha})`
+        const style = pushed > 0.04 ? WARM[Math.round(pushed * 8)] : inkStyle
+        if (style !== currentStyle) {
+          context.fillStyle = style
+          currentStyle = style
+        }
+        context.globalAlpha = alpha
 
         const size = star.r * (1 + pushed * 0.7 + flash * 0.5)
         context.fillRect(x - size / 2, y - size / 2, size, size)
       }
+      context.globalAlpha = 1
 
       // Падающая звезда.
       if (!reduced) {
@@ -499,11 +516,17 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         context.stroke()
       })
 
+      const wiredNodes = new Set<number>()
+      EDGES.forEach(([a, b], edge) => {
+        if (edges[edge] > 0.5) {
+          wiredNodes.add(a)
+          wiredNodes.add(b)
+        }
+      })
+
       nodes.forEach((node, index) => {
         // Соединённая звезда держит свет сама, даже когда курсор ушёл.
-        const wired = EDGES.some(
-          ([a, b], edge) => edges[edge] > 0.5 && (a === index || b === index),
-        )
+        const wired = wiredNodes.has(index)
         const glow = wired ? Math.max(node.ignition, 0.85) : node.ignition
         const radius = node.size * (1 + glow * 0.5 + flash * 0.6)
 

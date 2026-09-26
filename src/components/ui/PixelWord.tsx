@@ -224,6 +224,12 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
     function draw(now: number) {
       if (cancelled || !context || !wrapper) return
 
+      // Первый экран уехал из вида — слово не рисуем, цикл только ждёт возврата.
+      if (window.scrollY > window.innerHeight * 1.2) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+
       const elapsed = now - phaseStart
       const flight = MORPH - SPREAD
 

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Check, Copy, Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import type { FormEvent } from 'react'
@@ -77,7 +77,7 @@ function EstimateCard() {
   const money = useMoney()
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35 }}
@@ -146,7 +146,7 @@ function EstimateCard() {
           ))}
         </ul>
       )}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -266,7 +266,7 @@ export default function Contact() {
           <AnimatePresence>{attached && status !== 'sent' && <EstimateCard />}</AnimatePresence>
 
           {status === 'sent' ? (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-card border border-accent/40 bg-accent/8 p-10"
@@ -284,9 +284,9 @@ export default function Contact() {
               >
                 {ui.contact.again}
               </button>
-            </motion.div>
+            </m.div>
           ) : status === 'error' ? (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               className="rounded-card border border-line bg-surface p-8"
@@ -327,7 +327,7 @@ export default function Contact() {
                   {ui.contact.back}
                 </button>
               </div>
-            </motion.div>
+            </m.div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
               <div className="grid gap-8 sm:grid-cols-2">

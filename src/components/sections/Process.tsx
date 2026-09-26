@@ -1,6 +1,6 @@
 import {
   AnimatePresence,
-  motion,
+  m,
   useMotionValue,
   useMotionValueEvent,
   useScroll,
@@ -57,6 +57,8 @@ export default function Process() {
   /** Узлы в координатах viewBox и радиус притяжения — считаются при замере. */
   const nodePoints = useRef<Array<{ x: number; y: number }>>([])
   const snapRadius = useRef(26)
+  /** Длина пути: считаем при замере, а не на каждом кадре прокрутки. */
+  const pathLength = useRef(0)
 
   // Пока идёт прокрутка внутри закреплённого экрана, progress меняется от 0 до 1.
   const { scrollYProgress } = useScroll({
@@ -75,6 +77,7 @@ export default function Process() {
     if (!path || !svg || typeof path.getTotalLength !== 'function') return
 
     const total = path.getTotalLength()
+    pathLength.current = total
     const scale = svg.getBoundingClientRect().width / VIEW_W
 
     setNodes(
@@ -108,7 +111,8 @@ export default function Process() {
       // Путь точки ограничен крайними узлами — иначе в начале и в конце
       // она вылезает за первый и последний круг.
       const span = NODE_T[NODE_T.length - 1] - NODE_T[0]
-      const point = path.getPointAtLength(path.getTotalLength() * (NODE_T[0] + progress * span))
+      const total = pathLength.current || path.getTotalLength()
+      const point = path.getPointAtLength(total * (NODE_T[0] + progress * span))
 
       let x = point.x
       let y = point.y
@@ -195,18 +199,18 @@ export default function Process() {
                   <span className="label-mono text-muted">/ 04</span>
                 </div>
                 <div className="mt-4 h-px w-full bg-line">
-                  <motion.div
+                  <m.div
                     style={{ scaleX: barScale }}
                     className="h-px w-full origin-left bg-gradient-to-r from-accent to-ember"
                   />
                 </div>
-                <motion.p
+                <m.p
                   style={{ opacity: hintOpacity }}
                   className="label-mono mt-4 hidden items-center gap-2 text-muted lg:flex"
                 >
                   <MouseIcon className="size-3.5" />
                   {ui.process.hint}
-                </motion.p>
+                </m.p>
               </div>
             </div>
 
@@ -244,7 +248,7 @@ export default function Process() {
                 />
 
                 {/* Пройденный путь прорисовывается по мере прокрутки. */}
-                <motion.path
+                <m.path
                   d={CURVE}
                   fill="none"
                   stroke="url(#process-line)"
@@ -253,11 +257,11 @@ export default function Process() {
                   style={{ pathLength: scrollYProgress }}
                 />
 
-                <motion.g style={{ x: dotX, y: dotY, opacity: dotFade }}>
+                <m.g style={{ x: dotX, y: dotY, opacity: dotFade }}>
                   <circle r="22" fill="rgba(255,106,0,0.12)" />
                   <circle r="12" fill="rgba(255,106,0,0.22)" />
                   <circle r="6" fill="#ff6a00" filter="url(#process-glow)" />
-                </motion.g>
+                </m.g>
               </svg>
 
               {/* Узлы этапов лежат поверх svg в пиксельных координатах. */}
@@ -310,7 +314,7 @@ export default function Process() {
             {/* Описание активного этапа. */}
             <div className="mt-14 hidden min-h-28 lg:block">
               <AnimatePresence mode="wait">
-                <motion.div
+                <m.div
                   key={step.index}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -339,7 +343,7 @@ export default function Process() {
                       </li>
                     ))}
                   </ul>
-                </motion.div>
+                </m.div>
               </AnimatePresence>
             </div>
 

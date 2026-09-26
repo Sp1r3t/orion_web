@@ -52,18 +52,29 @@ export default function CurrencyProvider({ children }: { children: ReactNode }) 
   useEffect(() => {
     let cancelled = false
 
-    fetchRates()
-      .then((snapshot) => {
-        if (cancelled) return
-        setRates(snapshot.rates)
-        setDate(snapshot.date)
-      })
-      .catch(() => {
-        // Оба источника молчат — остаёмся на запасных курсах.
-      })
+    // Два внешних запроса не должны конкурировать с загрузкой первого экрана:
+    // цены до ответа считаются по запасным курсам, потом обновляются.
+    const start = () =>
+      fetchRates()
+        .then((snapshot) => {
+          if (cancelled) return
+          setRates(snapshot.rates)
+          setDate(snapshot.date)
+        })
+        .catch(() => {
+          // Оба источника молчат — остаёмся на запасных курсах.
+        })
+
+    // Safari до сих пор без requestIdleCallback — там обычный таймер.
+    const hasIdle = 'requestIdleCallback' in window
+    const handle = hasIdle
+      ? window.requestIdleCallback(start, { timeout: 4000 })
+      : window.setTimeout(start, 2000)
 
     return () => {
       cancelled = true
+      if (hasIdle) window.cancelIdleCallback(handle)
+      else window.clearTimeout(handle)
     }
   }, [])
 

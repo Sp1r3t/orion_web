@@ -109,9 +109,9 @@ export function formatLead(
 }
 
 /**
- * Отправка заявки. Адрес приёмника берётся из VITE_LEAD_ENDPOINT — это может быть
- * форм-сервис (Formspree, Getform) или свой обработчик, который перекладывает
- * заявку в Telegram. Токен бота на фронтенде держать нельзя: он виден всем.
+ * Отправка заявки. Адрес приёмника берётся из VITE_LEAD_ENDPOINT — это воркер
+ * бота из папки bot/ (путь /lead): он присылает заявку в Telegram. Токен бота на
+ * фронтенде держать нельзя: он виден всем.
  */
 export async function sendLead(payload: LeadPayload): Promise<void> {
   const endpoint = import.meta.env.VITE_LEAD_ENDPOINT

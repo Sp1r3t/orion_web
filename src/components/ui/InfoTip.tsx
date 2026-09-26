@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Info } from 'lucide-react'
 import { useId, useState } from 'react'
 
@@ -44,7 +44,7 @@ export default function InfoTip({ label, text }: InfoTipProps) {
 
       <AnimatePresence>
         {open && (
-          <motion.span
+          <m.span
             id={id}
             role="tooltip"
             initial={{ opacity: 0, y: 6, scale: 0.97 }}
@@ -57,7 +57,7 @@ export default function InfoTip({ label, text }: InfoTipProps) {
             {text}
             {/* Уголок подсказки. */}
             <span className="absolute -bottom-1 left-1/2 size-2 -translate-x-1/2 rotate-45 border-r border-b border-accent/30 bg-surface-2" />
-          </motion.span>
+          </m.span>
         )}
       </AnimatePresence>
     </span>

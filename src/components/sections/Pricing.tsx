@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import {
   Boxes,
   Building2,
@@ -264,7 +264,7 @@ export default function Pricing() {
 
           <AnimatePresence initial={false}>
             {expanded && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
@@ -290,7 +290,7 @@ export default function Pricing() {
                           }`}
                         >
                           {active && (
-                            <motion.span
+                            <m.span
                               layoutId="urgency-active"
                               className="pointer-events-none absolute inset-0 rounded-card border border-accent"
                               transition={{ type: 'spring', stiffness: 320, damping: 30 }}
@@ -346,7 +346,7 @@ export default function Pricing() {
                     })}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
@@ -418,7 +418,7 @@ export default function Pricing() {
                 <AnimatePresence initial={false}>
                   {chosen.map(({ option, count }) => {
                     return (
-                      <motion.li
+                      <m.li
                         key={option.id}
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
@@ -435,7 +435,7 @@ export default function Pricing() {
                         <span className="label-mono shrink-0">
                           {money.format(option.price * count)}
                         </span>
-                      </motion.li>
+                      </m.li>
                     )
                   })}
                 </AnimatePresence>

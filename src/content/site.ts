@@ -8,7 +8,7 @@ export const site = {
   ],
   telegram: 'https://t.me/sp1retdev',
   email: 'orion.company.web@gmail.com',
-  phone: '+7-995-410-73-35',
+  phone: '+7-903-317-57-93',
   city: 'Работаем удалённо по всему миру',
 } as const
 

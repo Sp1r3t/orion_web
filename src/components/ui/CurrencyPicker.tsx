@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Check, ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -64,7 +64,7 @@ export default function CurrencyPicker() {
 
       <AnimatePresence>
         {open && (
-          <motion.div
+          <m.div
             role="menu"
             aria-label={ui.pricing.currency}
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
@@ -109,7 +109,7 @@ export default function CurrencyPicker() {
             <p className="label-mono border-t border-line px-2.5 pt-2.5 pb-1 text-muted">
               {ui.pricing.rateAt} {shownDate}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useState } from 'react'
 
 import HatchBackdrop from '@/components/ui/HatchBackdrop'
@@ -44,7 +44,7 @@ export default function Faq() {
 
                   <AnimatePresence initial={false}>
                     {open && (
-                      <motion.div
+                      <m.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -52,7 +52,7 @@ export default function Faq() {
                         className="overflow-hidden"
                       >
                         <p className="max-w-2xl pb-6 text-muted">{item.answer}</p>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>

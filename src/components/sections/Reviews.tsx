@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 
 import Section from '@/components/ui/Section'
@@ -67,7 +67,7 @@ export default function Reviews() {
             {/* Высота зафиксирована: иначе на смене отзыва прыгает вся секция. */}
             <div className="relative min-h-64 sm:min-h-52">
               <AnimatePresence mode="wait">
-                <motion.figure
+                <m.figure
                   key={review.id}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -94,7 +94,7 @@ export default function Reviews() {
                       {review.result}
                     </span>
                   </figcaption>
-                </motion.figure>
+                </m.figure>
               </AnimatePresence>
             </div>
           </div>

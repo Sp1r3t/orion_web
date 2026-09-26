@@ -120,6 +120,7 @@ export default function FooterStars({ className = '' }: { className?: string }) 
       context.clearRect(0, 0, width, height)
 
       const { ink, accent, boost } = palette.current
+      const inkStyle = `rgb(${ink})`
       const near: Array<{ x: number; y: number; weight: number }> = []
 
       for (const star of stars) {
@@ -162,11 +163,15 @@ export default function FooterStars({ className = '' }: { className?: string }) 
           }
         }
 
+        // Цвет один на все звёзды, прозрачность — через globalAlpha: строка
+        // цвета на каждую звезду в каждом кадре только кормила сборщик мусора.
         context.beginPath()
         context.arc(x, y, star.r, 0, Math.PI * 2)
-        context.fillStyle = `rgba(${ink}, ${alpha})`
+        context.fillStyle = inkStyle
+        context.globalAlpha = alpha
         context.fill()
       }
+      context.globalAlpha = 1
 
       /**
        * Звёзды рядом с курсором связываются в паутину. Пары ищем только среди

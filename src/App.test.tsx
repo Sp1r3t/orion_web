@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import App from '@/App'
@@ -18,9 +18,12 @@ describe('App', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(/Держим\s*курс на/)
   })
 
-  it('каждый пункт хедера ведёт на существующую секцию', () => {
+  it('каждый пункт хедера ведёт на существующую секцию', async () => {
     const { container } = render(<App />)
     const nav = screen.getByRole('navigation', { name: ru.ui.header.nav })
+
+    // Разделы ниже первого экрана подгружаются отдельным чанком.
+    await waitFor(() => expect(container.querySelector('section#contact')).not.toBeNull())
 
     for (const item of ru.navItems) {
       const link = within(nav).getByRole('link', { name: item.label })

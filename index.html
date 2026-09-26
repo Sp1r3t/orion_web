@@ -2,23 +2,60 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>ORION — создание сайтов и веб-приложений под ключ</title>
     <meta
       name="description"
-      content="ORION — веб-студия полного цикла: сайты, магазины и сервисы под ключ."
+      content="Веб-студия ORION: сайты, интернет-магазины и веб-сервисы под ключ. Дизайн, разработка, запуск за 2–6 недель и гарантия на код 12 месяцев."
     />
-    <title>ORION — разработка сайтов и веб-приложений</title>
+    <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#050505" />
-    <meta property="og:title" content="ORION — разработка сайтов и веб-приложений" />
+    <meta name="application-name" content="ORION" />
+    <meta name="apple-mobile-web-app-title" content="ORION" />
+
+    <!-- Иконки: вкладка браузера, закладки, экран «Домой» на iOS и Android. -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Превью ссылки в соцсетях и мессенджерах. Абсолютные og:url, og:image и
+         canonical добавляет сборка, когда задан VITE_SITE_URL (см. vite.config.ts). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ORION" />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:title" content="ORION — создание сайтов и веб-приложений под ключ" />
     <meta
       property="og:description"
-      content="Веб-студия полного цикла: дизайн, разработка, запуск и поддержка."
+      content="Веб-студия ORION: сайты, интернет-магазины и веб-сервисы под ключ. Дизайн, разработка, запуск за 2–6 недель и гарантия на код 12 месяцев."
     />
-    <meta property="og:type" content="website" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ORION — веб-студия полного цикла" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ORION — создание сайтов и веб-приложений под ключ" />
+    <meta
+      name="twitter:description"
+      content="Веб-студия ORION: сайты, интернет-магазины и веб-сервисы под ключ. Дизайн, разработка, запуск за 2–6 недель и гарантия на код 12 месяцев."
+    />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <h1>ORION — веб-студия полного цикла</h1>
+      <p>
+        Создаём сайты, интернет-магазины и веб-сервисы под ключ: стратегия, дизайн, разработка,
+        запуск и поддержка. Запуск за 2–6 недель, гарантия на код 12 месяцев.
+      </p>
+      <p>
+        Телефон: <a href="tel:+79033175793">+7-903-317-57-93</a><br />
+        Почта: <a href="mailto:orion.company.web@gmail.com">orion.company.web@gmail.com</a><br />
+        Telegram: <a href="https://t.me/sp1retdev">t.me/sp1retdev</a>
+      </p>
+      <p>Для работы сайта нужен включённый JavaScript.</p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

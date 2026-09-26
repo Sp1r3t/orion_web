@@ -1,4 +1,4 @@
-import { motion, useSpring, useTransform, useVelocity } from 'framer-motion'
+import { m, useSpring, useTransform, useVelocity } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { flushSync } from 'react-dom'
 
@@ -130,7 +130,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
       style={{ width: WIDTH, height: HEIGHT }}
       className={`group/lang relative flex shrink-0 items-center overflow-hidden rounded-[10px] border border-line bg-surface/40 backdrop-blur-sm transition-colors duration-500 hover:border-line-strong ${className}`.trim()}
     >
-      <motion.span
+      <m.span
         aria-hidden="true"
         style={{
           x,
@@ -145,7 +145,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
         className="pointer-events-none absolute border border-accent/45 bg-accent/12 shadow-[0_0_14px_-3px_rgb(255_106_0/0.5)]"
       >
         {/* На каждом переключении из бегунка расходится короткая волна. */}
-        <motion.span
+        <m.span
           key={lang}
           initial={{ opacity: 0.5, scale: 0.5 }}
           animate={{ opacity: 0, scale: 1.5 }}
@@ -153,7 +153,7 @@ export default function LanguageToggle({ className = '' }: { className?: string 
           style={{ borderRadius: THUMB_R }}
           className="absolute inset-0 bg-accent/45 blur-[6px]"
         />
-      </motion.span>
+      </m.span>
 
       <span
         aria-hidden="true"
@@ -163,14 +163,14 @@ export default function LanguageToggle({ className = '' }: { className?: string 
         <span className="pl-[0.12em]">EN</span>
       </span>
 
-      <motion.span
+      <m.span
         aria-hidden="true"
         style={{ clipPath: clip, WebkitClipPath: clip }}
         className="pointer-events-none absolute inset-0 grid grid-cols-2 items-center text-center font-mono text-[10px] font-medium tracking-[0.12em] text-accent uppercase"
       >
         <span className="pl-[0.12em]">RU</span>
         <span className="pl-[0.12em]">EN</span>
-      </motion.span>
+      </m.span>
 
       {/* Настоящие кнопки лежат сверху и прозрачны: подписи рисуют слои выше. */}
       {ORDER.map((code) => (

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
 
@@ -29,33 +29,42 @@ export default function Header() {
       {/* При прокрутке хедер собирается в плавающую капсулу. */}
       <header className="fixed inset-x-0 top-0 z-50">
         <div className={`container-page ${scrolled ? 'pt-3' : 'pt-0'}`}>
-          <motion.div
+          <m.div
             layout
             transition={glide}
-            animate={{
-              // Наверху блюра быть не должно: он размыл бы звёздное поле под хедером.
-              backdropFilter: scrolled ? 'blur(24px)' : 'blur(0px)',
-            }}
             style={{ borderRadius: 999 }}
             // Фон и рамку ведём классами, а не значениями framer: так они следуют за темой.
+            // Блюр включается сразу, без анимации радиуса: плавно растущее размытие
+            // перерисовывалось каждый кадр и давало рывок в начале прокрутки. Наверху
+            // его нет вовсе — он размыл бы звёздное поле под хедером.
             className={`flex items-center border transition-colors duration-500 ${
               scrolled
-                ? 'h-14 gap-6 border-line bg-bg/85 px-6 shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
+                ? 'h-14 gap-6 border-line bg-bg/85 px-6 backdrop-blur-xl shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
                 : 'h-20 w-full justify-between gap-6 border-transparent bg-transparent px-0'
             }`}
           >
-            <motion.a
+            <m.a
               layout
               transition={glide}
               href="#top"
-              className={`font-display font-bold tracking-[-0.02em] uppercase transition-[font-size,color] duration-500 hover:text-accent ${
+              className={`flex items-center gap-2.5 font-display font-bold tracking-[-0.02em] uppercase transition-[font-size,color] duration-500 hover:text-accent ${
                 scrolled ? 'text-xl' : 'text-2xl lg:text-3xl'
               }`}
             >
+              <img
+                src="/favicon.svg"
+                width={40}
+                height={40}
+                alt=""
+                fetchPriority="high"
+                className={`transition-[width,height] duration-500 ${
+                  scrolled ? 'size-7' : 'size-8 lg:size-10'
+                }`}
+              />
               {site.name}
-            </motion.a>
+            </m.a>
 
-            <motion.nav
+            <m.nav
               layout
               transition={glide}
               className={`hidden items-center lg:flex ${scrolled ? 'gap-6' : 'gap-9'}`}
@@ -64,7 +73,7 @@ export default function Header() {
               {navItems.map((item) => {
                 const active = activeId === item.id
                 return (
-                  <motion.a
+                  <m.a
                     layout
                     transition={glide}
                     key={item.id}
@@ -80,12 +89,12 @@ export default function Header() {
                         active ? 'w-full' : 'w-0 group-hover:w-full'
                       }`}
                     />
-                  </motion.a>
+                  </m.a>
                 )
               })}
-            </motion.nav>
+            </m.nav>
 
-            <motion.div
+            <m.div
               layout
               transition={glide}
               className={`flex items-center ${scrolled ? 'gap-3' : 'gap-4'}`}
@@ -109,8 +118,8 @@ export default function Header() {
               >
                 <Menu className="size-6" />
               </button>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </div>
       </header>
 

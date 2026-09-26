@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useEffect } from 'react'
 
@@ -30,7 +30,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
   return (
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-60 bg-bg lg:hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -56,7 +56,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
 
           <nav className="container-page mt-8 flex flex-col gap-2" aria-label={ui.header.nav}>
             {navItems.map((item, index) => (
-              <motion.a
+              <m.a
                 key={item.id}
                 href={`#${item.id}`}
                 onClick={onClose}
@@ -68,7 +68,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
                 }`}
               >
                 {item.label}
-              </motion.a>
+              </m.a>
             ))}
           </nav>
 
@@ -80,7 +80,7 @@ export default function MobileMenu({ open, activeId, onClose }: MobileMenuProps)
               Telegram
             </Button>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   )

@@ -1,7 +1,10 @@
+import { useRef } from 'react'
+
 import Reveal from '@/components/ui/Reveal'
 import Section from '@/components/ui/Section'
 import StarDust from '@/components/ui/StarDust'
 import StarGlyph from '@/components/ui/StarGlyph'
+import { usePauseOffscreen } from '@/hooks/usePauseOffscreen'
 import { useContent } from '@/i18n/context'
 
 /** Ряды складываются зеркально: длинный + короткий, короткий + длинный, во всю ширину. */
@@ -13,11 +16,13 @@ const SPAN = {
 
 export default function Promises() {
   const { promises, ui } = useContent()
+  const gridRef = useRef<HTMLDivElement>(null)
+  usePauseOffscreen(gridRef)
 
   return (
     <Section id="promises" index="05" eyebrow={ui.promises.eyebrow} title={ui.promises.title}>
       {/* Подзаголовка у раздела нет, поэтому плитки идут сразу под названием. */}
-      <div className="mt-8 grid gap-4 lg:grid-cols-3">
+      <div ref={gridRef} className="mt-8 grid gap-4 lg:grid-cols-3">
         {promises.map((item, index) => (
           <Reveal key={item.title} delay={index * 0.05} className={SPAN[item.span]}>
             <article className="group relative flex h-full min-h-48 items-start gap-5 overflow-hidden rounded-card border border-line bg-surface p-7 transition-colors duration-500 hover:border-accent/40">
