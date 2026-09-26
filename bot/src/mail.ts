@@ -1,8 +1,8 @@
-import { json, readJson, str } from './http'
-import { Store } from './store'
-import { Telegram } from './telegram'
-import type { Env, Mail } from './types'
-import { mailScreen } from './ui'
+import { json, readJson, str } from './http.ts'
+import { Store } from './store.ts'
+import { Telegram } from './telegram.ts'
+import type { Env, Mail } from './types.ts'
+import { mailScreen } from './ui.ts'
 
 /** Письмо от Google Apps Script: проверяем секрет и присылаем карточку. */
 export async function handleMail(request: Request, env: Env): Promise<Response> {

@@ -1,0 +1,24 @@
+# Служба Telegram-бота ORION. Установка — DEPLOY.md, шаг 6.
+[Unit]
+Description=ORION Telegram bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/orion/bot
+ExecStart=/usr/bin/node src/server.ts
+# Секреты читает сам systemd до запуска бота, поэтому файл может принадлежать root с правами 600.
+EnvironmentFile=/etc/orion-bot.env
+Restart=always
+RestartSec=5
+
+# Бот работает от временного пользователя без прав, пишет только в /var/lib/orion-bot.
+DynamicUser=yes
+StateDirectory=orion-bot
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=multi-user.target

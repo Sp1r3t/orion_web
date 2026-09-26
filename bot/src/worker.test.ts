@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import worker from './index'
-import type { Env } from './types'
+import worker from './index.ts'
+import type { Env } from './types.ts'
 
 /** KV в памяти: воркеру нужны только get/put/delete. */
 function memoryKv() {

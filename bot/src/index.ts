@@ -1,10 +1,10 @@
-import { handleUpdate } from './bot'
-import type { Update } from './bot'
-import { json } from './http'
-import { handleLead } from './lead'
-import { handleMail } from './mail'
-import { Telegram } from './telegram'
-import type { Env } from './types'
+import { handleUpdate } from './bot.ts'
+import type { Update } from './bot.ts'
+import { json } from './http.ts'
+import { handleLead } from './lead.ts'
+import { handleMail } from './mail.ts'
+import { Telegram } from './telegram.ts'
+import type { Env } from './types.ts'
 
 /**
  * Один воркер на всё:
@@ -64,6 +64,15 @@ async function setup(url: URL, env: Env) {
     drop_pending_updates: true,
   })
 
+  Object.assign(results, await configureBot(tg))
+
+  return json({ ok: true, results })
+}
+
+/** Меню команд и описание бота — общие для воркера и для запуска на своём сервере. */
+export async function configureBot(tg: Telegram) {
+  const results: Record<string, unknown> = {}
+
   results.commands = await tg.call('setMyCommands', {
     commands: [
       { command: 'menu', description: '🪐 Панель студии' },
@@ -83,5 +92,5 @@ async function setup(url: URL, env: Env) {
     short_description: 'ORION — веб-студия полного цикла: сайты, магазины и сервисы под ключ.',
   })
 
-  return json({ ok: true, results })
+  return results
 }

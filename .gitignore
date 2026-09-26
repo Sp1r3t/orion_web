@@ -34,3 +34,6 @@ coverage
 # Cloudflare Workers
 .wrangler
 .dev.vars
+
+# Данные бота на сервере
+bot/data

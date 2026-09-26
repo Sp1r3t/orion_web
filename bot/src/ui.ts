@@ -7,7 +7,7 @@ import type {
   Mail,
   Screen,
   Settings,
-} from './types'
+} from './types.ts'
 
 export const STATUS: Record<LeadStatus, { icon: string; label: string; plural: string }> = {
   new: { icon: '🟢', label: 'Новая', plural: 'Новые' },
@@ -491,8 +491,10 @@ export function setupScreen(chatId: number): Screen {
       '',
       `Ваш chat_id: <code>${chatId}</code>`,
       '',
-      'Сохраните его как секрет — и бот будет присылать заявки и письма только вам:',
-      '<code>npx wrangler secret put ADMIN_CHAT_ID</code>',
+      'Впишите его в ADMIN_CHAT_ID и перезапустите бота — после этого заявки и письма будут приходить только вам.',
+      '',
+      '• свой сервер: <code>/etc/orion-bot.env</code>, затем <code>sudo systemctl restart orion-bot</code>',
+      '• Cloudflare: <code>npx wrangler secret put ADMIN_CHAT_ID</code>',
     ].join('\n'),
     keyboard: [],
   }

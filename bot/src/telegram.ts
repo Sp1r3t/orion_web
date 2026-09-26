@@ -1,11 +1,13 @@
-import type { Keyboard } from './types'
+import type { Keyboard } from './types.ts'
 
 export class TelegramError extends Error {
-  constructor(
-    readonly method: string,
-    readonly description: string,
-  ) {
+  readonly method: string
+  readonly description: string
+
+  constructor(method: string, description: string) {
     super(`Telegram ${method}: ${description}`)
+    this.method = method
+    this.description = description
     this.name = 'TelegramError'
   }
 }
@@ -14,10 +16,17 @@ type SendOptions = { silent?: boolean; forceReply?: string; replyTo?: number }
 
 /** Тонкая обёртка над Bot API: только те методы, что нужны боту. */
 export class Telegram {
-  constructor(private readonly token: string) {}
+  /** Адрес Bot API; на своём сервере его можно сменить (свой Bot API сервер, тесты). */
+  static apiBase = 'https://api.telegram.org'
+
+  private readonly token: string
+
+  constructor(token: string) {
+    this.token = token
+  }
 
   async call<T>(method: string, body: Record<string, unknown>): Promise<T> {
-    const response = await fetch(`https://api.telegram.org/bot${this.token}/${method}`, {
+    const response = await fetch(`${Telegram.apiBase}/bot${this.token}/${method}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

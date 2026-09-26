@@ -1,6 +1,11 @@
 # ORION bot
 
-Telegram-бот студии на Cloudflare Workers (бесплатный тариф). Делает три вещи:
+Telegram-бот студии. Запускается двумя способами:
+
+- **на своём сервере** рядом с сайтом — пошаговый гайд в [DEPLOY.md](../DEPLOY.md);
+- **на Cloudflare Workers** (бесплатно, без сервера) — раздел «Запуск» ниже.
+
+Бот делает три вещи:
 
 - принимает заявки с формы сайта и присылает их вам карточками с кнопками;
 - присылает письма с `orion.company.web@gmail.com` (через Google Apps Script);
@@ -33,7 +38,7 @@ Gmail ─POST /mail──┘        ▲
 Остальным пользователям бот показывает приветствие и ссылку на сайт — заявки и
 письма видит только владелец.
 
-## Запуск
+## Запуск на Cloudflare
 
 Понадобятся аккаунт Cloudflare (бесплатный) и Node.js 20+.
 
@@ -116,6 +121,7 @@ npx wrangler secret put GMAIL_ACTION_URL
 npm test          # тесты: воркер целиком с поддельным Telegram
 npm run typecheck
 npm run dev       # локальный воркер на http://localhost:8787
+npm run server    # серверный режим (Node 22.18+), настройки из bot/.env
 ```
 
 Локальные секреты для `npm run dev` кладите в `bot/.dev.vars` (в git не попадает).

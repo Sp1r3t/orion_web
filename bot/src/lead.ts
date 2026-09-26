@@ -1,8 +1,8 @@
-import { json, num, readJson, str } from './http'
-import { Store } from './store'
-import { Telegram } from './telegram'
-import type { Env, Lead, LeadEstimate } from './types'
-import { leadScreen } from './ui'
+import { json, num, readJson, str } from './http.ts'
+import { Store } from './store.ts'
+import { Telegram } from './telegram.ts'
+import type { Env, Lead, LeadEstimate } from './types.ts'
+import { leadScreen } from './ui.ts'
 
 /** Сколько заявок с одного адреса пропускаем за десять минут. */
 const RATE_LIMIT = 5

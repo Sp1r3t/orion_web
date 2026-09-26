@@ -1,4 +1,4 @@
-import type { Lead, LeadIndexItem, Mail, Settings } from './types'
+import type { Lead, LeadIndexItem, Mail, Settings } from './types.ts'
 
 const INDEX = 'leads:index'
 const SEQ = 'leads:seq'
@@ -23,7 +23,11 @@ export function toIndexItem(lead: Lead): LeadIndexItem {
 }
 
 export class Store {
-  constructor(private readonly kv: KVNamespace) {}
+  private readonly kv: KVNamespace
+
+  constructor(kv: KVNamespace) {
+    this.kv = kv
+  }
 
   async index(): Promise<LeadIndexItem[]> {
     return (await this.kv.get<LeadIndexItem[]>(INDEX, 'json')) ?? []

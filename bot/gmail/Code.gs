@@ -8,8 +8,12 @@
  * Настройка — в bot/README.md, раздел «Почта».
  */
 
-/** Адрес воркера без слэша в конце, например https://orion-bot.имя.workers.dev */
-const WORKER_URL = 'https://orion-bot.REPLACE_ME.workers.dev'
+/**
+ * Адрес бота без слэша в конце:
+ *   свой сервер — https://ваш-домен/api
+ *   Cloudflare — https://orion-bot.имя.workers.dev
+ */
+const WORKER_URL = 'https://REPLACE_ME/api'
 
 /** Письма крупнее обрезаем: в Telegram они всё равно раскрываются по кнопке. */
 const BODY_LIMIT = 6000

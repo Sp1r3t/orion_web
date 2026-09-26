@@ -4,12 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev",
+    "server": "node --env-file=.env src/server.ts",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^5.20260925.2",
+    "@types/node": "^22.20.4",
     "typescript": "^6.0.2",
     "vitest": "^4.1.11",
     "wrangler": "^4.141.0"

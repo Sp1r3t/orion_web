@@ -1,7 +1,7 @@
-import { gmailAction } from './mail'
-import { Store } from './store'
-import { Telegram } from './telegram'
-import type { Env, Lead, LeadStatus, Screen } from './types'
+import { gmailAction } from './mail.ts'
+import { Store } from './store.ts'
+import { Telegram } from './telegram.ts'
+import type { Env, Lead, LeadStatus, Screen } from './types.ts'
 import {
   deletedLeadScreen,
   guestScreen,
@@ -15,12 +15,12 @@ import {
   settingsScreen,
   statsScreen,
   STATUS,
-} from './ui'
+} from './ui.ts'
 
 type Chat = { id: number }
 type Message = { message_id: number; chat: Chat; text?: string }
 type CallbackQuery = { id: string; data?: string; message?: Message; from: { id: number } }
-export type Update = { message?: Message; callback_query?: CallbackQuery }
+export type Update = { update_id?: number; message?: Message; callback_query?: CallbackQuery }
 
 type Ctx = { env: Env; tg: Telegram; store: Store; tz: string; admin: string }
 
