@@ -265,7 +265,7 @@ export const en: Bundle = {
       base: 30_000,
       spread: 1.6,
       weeks: [1, 2],
-      includes: ['Original design', 'Phone, tablet, desktop', 'Lead form', 'Hosting and domain'],
+      includes: ['Original design', 'Phone, tablet, desktop', 'Lead form'],
     },
     {
       id: 'corporate',
@@ -275,7 +275,7 @@ export const en: Bundle = {
       base: 50_000,
       spread: 1.8,
       weeks: [2, 4],
-      includes: ['Up to 7 pages', 'Original design', 'Basic SEO', 'Hosting and domain'],
+      includes: ['Up to 7 pages', 'Original design', 'Basic SEO'],
     },
     {
       id: 'ecommerce',

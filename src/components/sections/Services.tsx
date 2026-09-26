@@ -56,7 +56,7 @@ export default function Services() {
                   {service.summary}
                 </span>
 
-                <span className="label-mono hidden text-text sm:block">
+                <span className="label-mono hidden text-[0.8125rem]! text-text sm:block lg:text-sm!">
                   {ui.pricing.from} {money.format(service.priceFrom)}
                 </span>
 
@@ -93,7 +93,7 @@ export default function Services() {
                         <p className="label-mono mt-5 text-muted">
                           {ui.services.term} <span className="text-text">{service.term}</span>
                           <span className="mx-3 text-line-strong">/</span>
-                          <span className="text-text sm:hidden">
+                          <span className="text-[0.8125rem] text-text sm:hidden">
                             {ui.pricing.from} {money.format(service.priceFrom)}
                           </span>
                         </p>

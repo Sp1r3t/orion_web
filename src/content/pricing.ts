@@ -47,12 +47,7 @@ export const projectTypes: ProjectType[] = [
     base: 30_000,
     spread: 1.6,
     weeks: [1, 2],
-    includes: [
-      'Уникальный дизайн',
-      'Телефон, планшет, компьютер',
-      'Форма заявки',
-      'Хостинг и домен',
-    ],
+    includes: ['Уникальный дизайн', 'Телефон, планшет, компьютер', 'Форма заявки'],
   },
   {
     id: 'corporate',
@@ -62,7 +57,7 @@ export const projectTypes: ProjectType[] = [
     base: 50_000,
     spread: 1.8,
     weeks: [2, 4],
-    includes: ['До 7 страниц', 'Уникальный дизайн', 'Базовое SEO', 'Хостинг и домен'],
+    includes: ['До 7 страниц', 'Уникальный дизайн', 'Базовое SEO'],
   },
   {
     id: 'ecommerce',
