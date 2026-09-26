@@ -181,6 +181,10 @@ sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN --redirect
 - **рассылка** — `N`;
 - **если спросит про уже выпущенный сертификат** — выберите `1` (reinstall).
 
+> **Домен за Cloudflare** (в ответах сервера есть `server: cloudflare`)? После certbot сайт уйдёт в
+> бесконечное перенаправление, пока в Cloudflare стоит SSL-режим «Flexible». Откройте
+> dash.cloudflare.com → домен → **SSL/TLS** → **Overview** → **Configure** → **Full (strict)** → **Save**.
+
 Если certbot ругается на `www`, значит, у домена нет адреса с www. Повторите без него:
 
 ```bash
