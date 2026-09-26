@@ -5,108 +5,104 @@ export type CaseItem = {
   /** Сфера бизнеса — показывается на карточке при наведении. */
   field: string
   type: string
-  year: string
-  /** Что именно изменилось после запуска. */
+  /** Что сделано на сайте — одна фраза под названием. */
   improved: string
-  /** Короткая метрика для чипа. */
-  result: string
+  /** Живой сайт: карточка открывает его в новой вкладке. */
+  url: string
   image: string
 }
 
-/**
- * ДЕМО-ДАННЫЕ. Кейсы придуманы, а снимки — случайные стоковые фотографии
- * с Unsplash, поставленные заглушками под размер карточки.
- * Перед публикацией замените и то, и другое на свои проекты.
- */
-const photo = (id: string) => `https://images.unsplash.com/${id}?w=900&q=80&auto=format&fit=crop`
+/** Снимки лежат в public/portfolio — квадрат 800×800, как карточка. */
+const shot = (id: string) => `/portfolio/${id}.webp`
 
 export const cases: CaseItem[] = [
   {
-    id: 'nordwood',
+    id: 'loveconcert',
     index: '01',
-    name: 'Nordwood',
-    field: 'Мебель на заказ',
-    type: 'Сайт + конфигуратор',
-    year: '2026',
-    improved: 'Конфигуратор считает смету сам, заявка уходит в CRM вместе с расчётом',
-    result: 'Заявок ×2,4',
-    image: photo('photo-1524758631624-e2822e304c36'),
+    name: 'LOVECONCERT',
+    field: 'Концертное агентство',
+    type: 'Сайт-афиша',
+    improved: 'Афиша концертов с датами и площадками, артисты и групповые заказы',
+    url: 'https://loveconcert.ru/',
+    image: shot('loveconcert'),
   },
   {
-    id: 'atlas',
+    id: 'boggart',
     index: '02',
-    name: 'Atlas Logistics',
-    field: 'Логистика',
-    type: 'Корпоративный сайт',
-    year: '2026',
-    improved: 'Расчёт доставки и отслеживание груза перешли на сайт с телефонных звонков',
-    result: 'Звонков −35%',
-    image: photo('photo-1454165804606-c3d57bc86b40'),
+    name: 'БОГГАРТ',
+    field: 'Разработка игр',
+    type: 'Сайт студии',
+    improved: 'Сайт студии аутсорсинга и разработки игр: услуги, карьера и блог',
+    url: 'https://bogg.art/',
+    image: shot('boggart'),
   },
   {
-    id: 'lumen',
+    id: 'uct',
     index: '03',
-    name: 'Lumen Clinic',
-    field: 'Медицина',
-    type: 'Лендинг + онлайн-запись',
-    year: '2025',
-    improved: 'Запись без администратора: выбор врача, времени и напоминание в Telegram',
-    result: 'Записей ×1,8',
-    image: photo('photo-1519494026892-80bbd2d6fd0d'),
-  },
-  {
-    id: 'grano',
-    index: '04',
-    name: 'Grano Coffee',
-    field: 'Обжарка кофе',
-    type: 'Интернет-магазин',
-    year: '2025',
-    improved: 'Подписка на зерно с регулярной доставкой даёт треть выручки',
-    result: 'Средний чек +28%',
-    image: photo('photo-1521737604893-d14cc237f11d'),
-  },
-  {
-    id: 'vector',
-    index: '05',
-    name: 'Vector Estate',
-    field: 'Недвижимость',
-    type: 'Веб-сервис',
-    year: '2025',
-    improved: 'Подбор по параметрам и выгрузка презентации объекта в PDF за один клик',
-    result: 'Показов +64%',
-    image: photo('photo-1560518883-ce09059eeffa'),
-  },
-  {
-    id: 'forge',
-    index: '06',
-    name: 'Forge Supply',
-    field: 'Оптовые поставки',
-    type: 'Каталог с выгрузкой из Excel',
-    year: '2025',
-    improved: 'Четыре тысячи позиций с остатками обновляются автоматически',
-    result: '4 000 SKU',
-    image: photo('photo-1553413077-190dd305871c'),
-  },
-  {
-    id: 'pulse',
-    index: '07',
-    name: 'Pulse Auto',
+    name: 'UCT',
     field: 'Автосервис',
-    type: 'Лендинг',
-    year: '2024',
-    improved: 'Цены и запись видны с телефона, владелец правит их сам через админку',
-    result: 'Заявки с мобильных ×3',
-    image: photo('photo-1486262715619-67b85e0b08d3'),
+    type: 'Корпоративный сайт',
+    improved: 'Услуги, тюнинг и спецпредложения премиального автосервиса с записью на консультацию',
+    url: 'https://uct.ru/',
+    image: shot('uct'),
   },
   {
-    id: 'linea',
+    id: 'ruff',
+    index: '04',
+    name: 'RUFF',
+    field: 'Бренд одежды',
+    type: 'Интернет-магазин',
+    improved: 'Магазин коллекций с корзиной, избранным и скидкой за подписку',
+    url: 'https://ruff.global/',
+    image: shot('ruff'),
+  },
+  {
+    id: 'civil',
+    index: '05',
+    name: 'CIVIL',
+    field: 'Уличная одежда',
+    type: 'Интернет-магазин',
+    improved: 'Магазин капсульных коллекций независимого российского бренда',
+    url: 'https://civilstreet.ru/',
+    image: shot('civil'),
+  },
+  {
+    id: 'tutorplace',
+    index: '06',
+    name: 'TutorPlace',
+    field: 'Онлайн-образование',
+    type: 'Образовательная платформа',
+    improved: 'Каталог курсов, авторы и тарифы с пробным доступом за 1 ₽',
+    url: 'https://tutorplace.ru/',
+    image: shot('tutorplace'),
+  },
+  {
+    id: 'rokucyber',
+    index: '07',
+    name: 'RokuCyber',
+    field: 'Компьютерный клуб',
+    type: 'Сайт клуба',
+    improved: 'Игровые зоны, цены и акции кибер-лаунжа с онлайн-бронью места',
+    url: 'https://rokucyber.club/',
+    image: shot('rokucyber'),
+  },
+  {
+    id: 'bonsai',
     index: '08',
-    name: 'Linea Studio',
-    field: 'Косметология',
-    type: 'Лендинг',
-    year: '2024',
-    improved: 'Полная стоимость курса видна до записи, поэтому меньше пустых звонков',
-    result: 'Запуск за 6 дней',
-    image: photo('photo-1560750588-73207b1ef5b8'),
+    name: 'BONSAI',
+    field: 'Инженерная разработка',
+    type: 'Корпоративный сайт',
+    improved: 'Embedded-системы и промышленный IoT: решения, экспертиза и кейсы',
+    url: 'https://bonsai-agency.com/',
+    image: shot('bonsai'),
   },
 ]
+
+/** Домен без www и слэша — подпись на чипе карточки. */
+export function caseHost(url: string) {
+  try {
+    return new URL(url).host.replace(/^www\./, '')
+  } catch {
+    return url
+  }
+}

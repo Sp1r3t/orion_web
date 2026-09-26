@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { RefObject } from 'react'
 
 import Section from '@/components/ui/Section'
+import { caseHost } from '@/content/cases'
 import type { CaseItem } from '@/content/cases'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useContent } from '@/i18n/context'
@@ -24,14 +25,18 @@ const EDGE_PAD = VEIL + 12
 function Card({ item }: { item: CaseItem }) {
   return (
     <a
-      href="#contact"
+      href={item.url}
+      target="_blank"
+      rel="noreferrer noopener"
       data-case=""
-      aria-label={`${item.name} — ${item.field}`}
+      aria-label={`${item.name} — ${item.field}, ${caseHost(item.url)}`}
       className="group relative block aspect-square overflow-hidden rounded-card border border-line ring-0 ring-accent/45 transition-all duration-500 hover:border-accent/80 hover:ring-2 focus-visible:border-accent/80 focus-visible:ring-2"
     >
       <img
         src={item.image}
         alt=""
+        width={800}
+        height={800}
         // Без ленивой загрузки: копии списка лежат за краем обрезки, и лениво
         // они подгрузились бы только в момент, когда уже въехали в кадр.
         decoding="async"
@@ -52,7 +57,7 @@ function Card({ item }: { item: CaseItem }) {
         <span className="text-display text-xl leading-tight lg:text-2xl">{item.name}</span>
 
         <span className="label-mono text-muted">
-          {item.field} · {item.year}
+          {item.field} · {item.type}
         </span>
 
         <span className="mt-1 hidden text-sm leading-snug text-text/85 lg:block">
@@ -60,7 +65,7 @@ function Card({ item }: { item: CaseItem }) {
         </span>
 
         <span className="mt-2 flex items-center gap-2 self-start rounded-full border border-accent/40 bg-accent/10 px-3 py-1 text-xs text-accent">
-          {item.result}
+          {caseHost(item.url)}
         </span>
       </span>
     </a>
@@ -110,6 +115,8 @@ function Column({
     let offset = 0
     let target: number | null = null
     let measured: HTMLElement | null = null
+    let period = 0
+    let periodAt = -Infinity
 
     function tick(now: number) {
       if (!track) return
@@ -118,9 +125,13 @@ function Column({
 
       // Период — это высота одной копии вместе с отступом до следующей.
       // Просто половина высоты ленты дала бы промах на половину зазора,
-      // и на стыке копий поток дёргался бы.
-      const gap = parseFloat(getComputedStyle(track).rowGap) || 0
-      const period = (track.scrollHeight + gap) / 2
+      // и на стыке копий поток дёргался бы. Замер заставляет браузер считать
+      // раскладку, поэтому берём его дважды в секунду, а не каждый кадр.
+      if (now - periodAt > 500) {
+        const gap = parseFloat(getComputedStyle(track).rowGap) || 0
+        period = (track.scrollHeight + gap) / 2
+        periodAt = now
+      }
 
       if (period > 0) {
         const card = hoveredRef.current
@@ -168,8 +179,26 @@ function Column({
       frame = requestAnimationFrame(tick)
     }
 
-    frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
+    // Лента крутится, только пока её видно: за экраном цикл стоит.
+    const host = windowRef.current ?? track
+    const inView =
+      typeof IntersectionObserver === 'function'
+        ? new IntersectionObserver(([entry]) => {
+            cancelAnimationFrame(frame)
+            if (entry.isIntersecting) {
+              last = performance.now()
+              frame = requestAnimationFrame(tick)
+            }
+          })
+        : null
+
+    if (inView) inView.observe(host)
+    else frame = requestAnimationFrame(tick)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      inView?.disconnect()
+    }
   }, [direction, seconds, reduced, windowRef])
 
   return (
