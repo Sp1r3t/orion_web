@@ -113,7 +113,7 @@ export const en: Bundle = {
       type: 'Event listings site',
       improved: 'Concert listings with dates and venues, artist pages and group bookings',
       url: 'https://loveconcert.ru/',
-      image: '/portfolio/loveconcert.webp',
+      image: '/portfolio/loveconcert.webp?v=20261008-2',
     },
     {
       id: 'boggart',
@@ -123,7 +123,7 @@ export const en: Bundle = {
       type: 'Studio website',
       improved: 'Site for a game outsourcing and development studio: services, careers and blog',
       url: 'https://bogg.art/',
-      image: '/portfolio/boggart.webp',
+      image: '/portfolio/boggart.webp?v=20261008-2',
     },
     {
       id: 'uct',
@@ -134,7 +134,7 @@ export const en: Bundle = {
       improved:
         'Services, tuning and special offers of a premium car service with consultation booking',
       url: 'https://uct.ru/',
-      image: '/portfolio/uct.webp',
+      image: '/portfolio/uct.webp?v=20261008-2',
     },
     {
       id: 'ruff',
@@ -144,7 +144,7 @@ export const en: Bundle = {
       type: 'Online store',
       improved: 'Collections store with cart, wishlist and a subscription discount',
       url: 'https://ruff.global/',
-      image: '/portfolio/ruff.webp',
+      image: '/portfolio/ruff.webp?v=20261008-2',
     },
     {
       id: 'civil',
@@ -154,7 +154,7 @@ export const en: Bundle = {
       type: 'Online store',
       improved: 'Store for the capsule collections of an independent Russian brand',
       url: 'https://frht.ru/',
-      image: '/portfolio/civil.webp',
+      image: '/portfolio/civil.webp?v=20261008-2',
     },
     {
       id: 'tutorplace',
@@ -164,7 +164,7 @@ export const en: Bundle = {
       type: 'Learning platform',
       improved: 'Course catalogue, authors and plans with a 1 ₽ trial',
       url: 'https://tutorplace.ru/',
-      image: '/portfolio/tutorplace.webp',
+      image: '/portfolio/tutorplace.webp?v=20261008-2',
     },
     {
       id: 'rokucyber',
@@ -174,7 +174,7 @@ export const en: Bundle = {
       type: 'Club website',
       improved: 'Gaming zones, prices and promos of a cyber lounge with online seat booking',
       url: 'https://rokucyber.club/',
-      image: '/portfolio/rokucyber.webp',
+      image: '/portfolio/rokucyber.webp?v=20261008-2',
     },
     {
       id: 'bonsai',
@@ -184,7 +184,7 @@ export const en: Bundle = {
       type: 'Corporate site',
       improved: 'Embedded systems and industrial IoT: solutions, expertise and case studies',
       url: 'https://bonsai-agency.com/',
-      image: '/portfolio/bonsai.webp',
+      image: '/portfolio/bonsai.webp?v=20261008-2',
     },
   ],
 

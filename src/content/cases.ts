@@ -13,7 +13,7 @@ export type CaseItem = {
 }
 
 /** Снимки лежат в public/portfolio — квадрат 800×800, как карточка. */
-const shot = (id: string) => `/portfolio/${id}.webp`
+const shot = (id: string) => `/portfolio/${id}.webp?v=20261008-2`
 
 export const cases: CaseItem[] = [
   {
