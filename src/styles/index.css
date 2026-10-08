@@ -1,8 +1,6 @@
 @import 'tailwindcss';
 
-@import '@fontsource-variable/unbounded';
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/jetbrains-mono';
+@import './fonts.css';
 
 @theme {
   --color-bg: #050505;
