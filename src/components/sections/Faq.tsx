@@ -1,5 +1,4 @@
-import { AnimatePresence, m } from 'framer-motion'
-import { useState } from 'react'
+import { useId, useState } from 'react'
 
 import HatchBackdrop from '@/components/ui/HatchBackdrop'
 import Section from '@/components/ui/Section'
@@ -7,6 +6,7 @@ import { useContent } from '@/i18n/context'
 
 export default function Faq() {
   const { site, faq, ui } = useContent()
+  const answerId = useId()
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
@@ -16,7 +16,7 @@ export default function Faq() {
 
       <div className="relative mt-16 grid gap-10 lg:grid-cols-12">
         <div className="lg:col-span-8">
-          <div className="border-t border-line">
+          <div className="border-t border-line [overflow-anchor:none]">
             {faq.map((item, index) => {
               const open = openIndex === index
 
@@ -26,13 +26,14 @@ export default function Faq() {
                     type="button"
                     onClick={() => setOpenIndex(open ? null : index)}
                     aria-expanded={open}
+                    aria-controls={`${answerId}-${index}`}
                     className="group flex w-full items-center gap-6 py-6 text-left"
                   >
                     <span className="flex-1 text-lg transition-colors duration-300 group-hover:text-accent">
                       {item.question}
                     </span>
                     <span
-                      className={`relative size-4 shrink-0 transition-transform duration-500 ${
+                      className={`relative size-4 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${
                         open ? 'rotate-45' : ''
                       }`}
                       aria-hidden="true"
@@ -42,19 +43,18 @@ export default function Faq() {
                     </span>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {open && (
-                      <m.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <p className="max-w-2xl pb-6 text-muted">{item.answer}</p>
-                      </m.div>
-                    )}
-                  </AnimatePresence>
+                  <div
+                    id={`${answerId}-${index}`}
+                    aria-hidden={!open}
+                    inert={!open}
+                    className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out motion-reduce:transition-none ${
+                      open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+                    }`}
+                  >
+                    <div className="min-h-0 overflow-hidden">
+                      <p className="max-w-2xl pb-6 text-muted">{item.answer}</p>
+                    </div>
+                  </div>
                 </div>
               )
             })}
