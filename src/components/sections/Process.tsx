@@ -231,15 +231,6 @@ export default function Process() {
     setActive(next)
   })
 
-  /** Клик по узлу — прокрутка к его месту на пути. */
-  function goToStep(index: number) {
-    const wrapper = wrapperRef.current
-    if (!wrapper) return
-
-    const distance = wrapper.offsetHeight - window.innerHeight
-    window.scrollTo({ top: wrapper.offsetTop + distance * NODE_T[index], behavior: 'smooth' })
-  }
-
   const step = processSteps[active]
   const StepIcon = icons[step.icon]
 
@@ -347,12 +338,10 @@ export default function Process() {
                 const above = node.top < VIEW_H / 2
 
                 return (
-                  <button
+                  <div
                     key={processSteps[index].index}
-                    type="button"
-                    onClick={() => goToStep(index)}
                     style={{ left: node.left, top: node.top }}
-                    className="group absolute -translate-x-1/2 -translate-y-1/2"
+                    className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
                     aria-label={`${ui.process.stage} ${processSteps[index].index}: ${processSteps[index].title}`}
                   >
                     <span
@@ -361,7 +350,7 @@ export default function Process() {
                           ? 'scale-110 border-accent bg-accent text-bg shadow-glow'
                           : done
                             ? 'border-accent/50 bg-bg text-accent'
-                            : 'border-line bg-surface text-muted group-hover:border-accent/60 group-hover:text-accent'
+                            : 'border-line bg-surface text-muted'
                       }`}
                     >
                       {done ? <Check className="size-5" /> : <NodeIcon className="size-5" />}
@@ -381,7 +370,7 @@ export default function Process() {
                     >
                       {processSteps[index].index} · {processSteps[index].duration}
                     </span>
-                  </button>
+                  </div>
                 )
               })}
             </div>
