@@ -179,6 +179,8 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     let nextShot = 3000 + Math.random() * 5000
     let frame = 0
     let cancelled = false
+    let visible = true
+    let lastPaint = 0
     let last = performance.now()
 
     /**
@@ -252,7 +254,11 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     function resize() {
       if (!canvas || !context || !section) return
       const rect = section.getBoundingClientRect()
-      const ratio = Math.min(window.devicePixelRatio || 1, rect.width < 768 ? 1.5 : 2)
+      const ratio = Math.min(
+        window.devicePixelRatio || 1,
+        rect.width < 1024 ? 1.5 : 2,
+        Math.sqrt(4_000_000 / Math.max(1, rect.width * rect.height)),
+      )
 
       // На телефоне высота секции меняется, когда прячется адресная строка. Звёзды
       // тогда не пересыпаем заново — их координаты в долях, они просто растянутся.
@@ -265,7 +271,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       context.setTransform(ratio, 0, 0, ratio, 0, 0)
 
       // На телефоне звёзд втрое меньше: глазу хватает, а вычислений за кадр заметно меньше.
-      const count = Math.round((width * height) / (width < 768 ? 5200 : 2400))
+      const count = Math.min(900, Math.round((width * height) / (width < 1024 ? 5200 : 2400)))
       if (widthChanged || stars.length === 0)
         stars = Array.from({ length: count }, () => ({
           bx: Math.random(),
@@ -302,6 +308,12 @@ export default function SpaceField({ className = '' }: { className?: string }) {
 
     function draw(now: number) {
       if (cancelled || !context || !canvas) return
+      if (!visible) return
+      if (width < 1024 && now - lastPaint < 1000 / 30) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+      lastPaint = now
       const delta = Math.min(now - last, 48)
       last = now
 
@@ -318,7 +330,13 @@ export default function SpaceField({ className = '' }: { className?: string }) {
 
       // Курсор слушается только в самом верху страницы, а вот сама себя
       // фигура рисует всегда: раньше любая прокрутка останавливала и её.
-      const alive = !reduced
+      const showConstellation = width >= 1024
+      if (!showConstellation) {
+        resetConstellation()
+        flash = 0
+        shock = -1
+      }
+      const alive = !reduced && showConstellation
       const followsPointer = atTop && !reduced && pointer.active && idle < 3500
 
       idle += delta
@@ -476,6 +494,12 @@ export default function SpaceField({ className = '' }: { className?: string }) {
         }
       }
 
+      // На узких экранах остаётся только фон: созвездие перекрывает текст.
+      if (!showConstellation) {
+        frame = requestAnimationFrame(draw)
+        return
+      }
+
       // Звёзды созвездия: положение и разогрев от курсора.
       const ignite = Math.min(150, Math.max(80, box.side * 0.22))
 
@@ -618,6 +642,19 @@ export default function SpaceField({ className = '' }: { className?: string }) {
     onScroll()
     frame = requestAnimationFrame(draw)
 
+    const visibilityObserver =
+      typeof IntersectionObserver === 'function'
+        ? new IntersectionObserver(([entry]) => {
+            visible = entry.isIntersecting
+            cancelAnimationFrame(frame)
+            if (visible) {
+              last = performance.now()
+              frame = requestAnimationFrame(draw)
+            }
+          })
+        : null
+    if (section) visibilityObserver?.observe(section)
+
     const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(resize) : null
     if (section) observer?.observe(section)
     window.addEventListener('resize', resize)
@@ -629,6 +666,7 @@ export default function SpaceField({ className = '' }: { className?: string }) {
       cancelled = true
       cancelAnimationFrame(frame)
       observer?.disconnect()
+      visibilityObserver?.disconnect()
       window.removeEventListener('resize', resize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('scroll', onScroll)

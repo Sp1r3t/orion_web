@@ -39,8 +39,8 @@ export default function Header() {
             // его нет вовсе — он размыл бы звёздное поле под хедером.
             className={`flex items-center border transition-colors duration-500 ${
               scrolled
-                ? 'h-14 gap-6 border-line bg-bg/85 px-6 backdrop-blur-xl shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] lg:mx-auto lg:w-fit lg:justify-start lg:gap-8'
-                : 'h-20 w-full justify-between gap-6 border-transparent bg-transparent px-0'
+                ? 'h-14 justify-between gap-6 border-line bg-bg/85 px-6 backdrop-blur-xl shadow-[0_18px_50px_-24px_rgba(0,0,0,0.55)] sm:mx-auto sm:w-fit sm:justify-center lg:justify-start lg:gap-8'
+                : 'h-20 w-full justify-between gap-6 border-transparent bg-transparent px-0 sm:max-lg:mx-auto sm:max-lg:w-fit sm:max-lg:justify-center'
             }`}
           >
             <m.a

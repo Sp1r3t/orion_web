@@ -63,7 +63,7 @@ export const cases: CaseItem[] = [
     field: 'Уличная одежда',
     type: 'Интернет-магазин',
     improved: 'Магазин капсульных коллекций независимого российского бренда',
-    url: 'https://civilstreet.ru/',
+    url: 'https://frht.ru/',
     image: shot('civil'),
   },
   {

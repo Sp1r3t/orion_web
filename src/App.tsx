@@ -1,16 +1,13 @@
-import { LazyMotion } from 'framer-motion'
+import { domMax, LazyMotion } from 'framer-motion'
 import { lazy, Suspense } from 'react'
 
+import LoadBoundary from '@/components/ui/LoadBoundary'
 import Header from '@/components/layout/Header'
 import Hero from '@/components/sections/Hero'
 import CurrencyProvider from '@/context/CurrencyProvider'
 import EstimateProvider from '@/context/EstimateProvider'
 import { useSmoothScroll } from '@/hooks/useSmoothScroll'
 import LanguageProvider from '@/i18n/LanguageProvider'
-
-// Возможности анимации (layout, жесты) подгружаются после первого кадра:
-// до этого `m`-элементы рисуются в стартовом состоянии, без движка.
-const loadMotion = () => import('@/lib/motionFeatures').then((mod) => mod.default)
 
 // Разделы ниже первого экрана и подвал грузятся отдельными чанками.
 const Sections = lazy(() => import('@/components/sections/Sections'))
@@ -20,7 +17,7 @@ export default function App() {
   useSmoothScroll()
 
   return (
-    <LazyMotion features={loadMotion}>
+    <LazyMotion features={domMax}>
       <LanguageProvider>
         <CurrencyProvider>
           <EstimateProvider>
@@ -29,13 +26,23 @@ export default function App() {
               <main>
                 <Hero />
                 {/* Пока чанк едет, держим место — страница не прыгает под пальцем. */}
-                <Suspense fallback={<div className="min-h-[200vh]" aria-hidden="true" />}>
-                  <Sections />
-                </Suspense>
+                <LoadBoundary>
+                  <Suspense
+                    fallback={
+                      <div className="container-page min-h-[50vh] py-16" role="status">
+                        {document.documentElement.lang === 'en' ? 'Loading…' : 'Загружаем разделы…'}
+                      </div>
+                    }
+                  >
+                    <Sections />
+                  </Suspense>
+                </LoadBoundary>
               </main>
-              <Suspense fallback={null}>
-                <Footer />
-              </Suspense>
+              <LoadBoundary>
+                <Suspense fallback={null}>
+                  <Footer />
+                </Suspense>
+              </LoadBoundary>
             </div>
           </EstimateProvider>
         </CurrencyProvider>

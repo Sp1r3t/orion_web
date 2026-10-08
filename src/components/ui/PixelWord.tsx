@@ -58,6 +58,7 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
   const wrapperRef = useRef<HTMLSpanElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [index, setIndex] = useState(0)
+  const [canvasReady, setCanvasReady] = useState(false)
   const [reduced] = useState(
     () =>
       typeof window !== 'undefined' &&
@@ -315,6 +316,7 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
       build()
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(draw)
+      setCanvasReady(true)
     }
 
     // Шрифт должен быть загружен: иначе снимем карту пикселей запасного шрифта.
@@ -348,7 +350,7 @@ export default function PixelWord({ words, interval = 3000, className = '' }: Pi
 
   return (
     <span ref={wrapperRef} className={`relative inline-block align-baseline ${className}`}>
-      <span className="sr-only">{words[index]}</span>
+      <span className={canvasReady ? 'sr-only' : undefined}>{words[index]}</span>
       <canvas
         ref={canvasRef}
         aria-hidden="true"

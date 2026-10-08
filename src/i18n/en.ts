@@ -153,7 +153,7 @@ export const en: Bundle = {
       field: 'Streetwear',
       type: 'Online store',
       improved: 'Store for the capsule collections of an independent Russian brand',
-      url: 'https://civilstreet.ru/',
+      url: 'https://frht.ru/',
       image: '/portfolio/civil.webp',
     },
     {

@@ -12,7 +12,7 @@ export function useScrollSpy(ids: readonly string[]) {
       .map((id) => document.getElementById(id))
       .filter((el): el is HTMLElement => el !== null)
 
-    if (sections.length === 0) return
+    if (sections.length === 0 || typeof IntersectionObserver !== 'function') return
 
     const visible = new Map<string, number>()
 

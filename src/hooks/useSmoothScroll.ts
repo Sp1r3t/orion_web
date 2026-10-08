@@ -24,23 +24,31 @@ export function getLenis() {
  */
 export function useSmoothScroll() {
   useEffect(() => {
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+    if (
+      typeof ResizeObserver !== 'function' ||
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    )
+      return
 
     let cancelled = false
     let lenis: Lenis | null = null
 
-    import('lenis').then(({ default: LenisCtor }) => {
-      if (cancelled) return
+    import('lenis')
+      .then(({ default: LenisCtor }) => {
+        if (cancelled) return
 
-      lenis = new LenisCtor({
-        duration: 1.15,
-        easing: (t) => 1 - Math.pow(1 - t, 4),
-        autoRaf: true,
-        smoothWheel: false,
-        anchors: { offset: 0 },
+        lenis = new LenisCtor({
+          duration: 1.15,
+          easing: (t) => 1 - Math.pow(1 - t, 4),
+          autoRaf: true,
+          smoothWheel: false,
+          anchors: { offset: 0 },
+        })
+        instance = lenis
       })
-      instance = lenis
-    })
+      .catch(() => {
+        // Нативные якоря и прокрутка работают и без необязательной библиотеки.
+      })
 
     return () => {
       cancelled = true
